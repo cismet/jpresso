@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
+<filesystem>
+    <folder name="Actions">
+        <folder name="Build">
+            <file name="de-cismet-jpresso-project-actions-ImportProjectAction.instance"/>
+            <file name="de-cismet-jpresso-project-actions-CreateDefaultPropertiesAction.instance"/>
+            <file name="de-cismet-jpresso-project-nodes-actions-ExportProjectAction.instance"/>
+            <file name="de-cismet-jpresso-project-nodes-actions-NewCodeAction.instance"/>
+            <file name="de-cismet-jpresso-project-nodes-actions-StartProjectAction.instance"/>
+            <file name="de-cismet-jpresso-project-filetypes-action-JPNodeRenameAction.instance" />
+            <file name="de-cismet-jpresso-project-filetypes-run-action-RunAction.instance" />
+            <file name="de-cismet-jpresso-project-filetypes-sql-action-RunSQLAction.instance" />
+        </folder>
+        <folder name="Edit">
+            <file name="de-cismet-jpresso-project-nodes-actions-CreateDefaultPropertiesAction.instance"/>
+        </folder>
+        <folder name="Help">
+            <file name="de-cismet-jpresso-project-actions-AboutJPressoAction.instance"/>
+        </folder>
+        <folder name="Project">
+            <file name="de-cismet-jpresso-project-nodes-actions-NewSQLAction.instance"/>
+            <file name="de-cismet-jpresso-project-nodes-actions-NewConnectionAction.instance"/>
+            <file name="de-cismet-jpresso-project-nodes-actions-NewQueryAction.instance"/>
+            <file name="de-cismet-jpresso-project-nodes-actions-NewRunAction.instance"/>
+        </folder>
+    </folder>
+    <folder name="Loaders">
+        <folder name="text">
+            <folder name="x-jpresso-connection">
+                <folder name="Actions">
+                    <file name="org-openide-actions-CopyAction.instance">
+                        <attr name="position" intvalue="500"/>
+                    </file>
+                    <file name="org-openide-actions-CutAction.instance">
+                        <attr name="position" intvalue="400"/>
+                    </file>
+                    <file name="org-openide-actions-DeleteAction.instance">
+                        <attr name="position" intvalue="700"/>
+                    </file>
+                    <file name="org-openide-actions-FileSystemAction.instance">
+                        <attr name="position" intvalue="200"/>
+                    </file>
+                    <file name="org-openide-actions-OpenAction.instance">
+                        <attr name="position" intvalue="100"/>
+                    </file>
+                    <file name="org-openide-actions-PropertiesAction.instance">
+                        <attr name="position" intvalue="1300"/>
+                    </file>
+                    <file name="org-openide-actions-RenameAction.instance">
+                        <attr name="position" intvalue="800"/>
+                    </file>
+                    <file name="org-openide-actions-SaveAsTemplateAction.instance">
+                        <attr name="position" intvalue="1000"/>
+                    </file>
+                    <file name="org-openide-actions-ToolsAction.instance">
+                        <attr name="position" intvalue="1200"/>
+                    </file>
+                    <file name="sep-1.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="300"/>
+                    </file>
+                    <file name="sep-2.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="600"/>
+                    </file>
+                    <file name="sep-3.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="900"/>
+                    </file>
+                    <file name="sep-4.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="1100"/>
+                    </file>
+                </folder>
+            </folder>
+            <folder name="x-jpresso-options">
+                <folder name="Actions">
+                    <file name="org-openide-actions-CopyAction.instance">
+                        <attr name="position" intvalue="500"/>
+                    </file>
+                    <file name="org-openide-actions-CutAction.instance">
+                        <attr name="position" intvalue="400"/>
+                    </file>
+                    <file name="org-openide-actions-DeleteAction.instance">
+                        <attr name="position" intvalue="700"/>
+                    </file>
+                    <file name="org-openide-actions-FileSystemAction.instance">
+                        <attr name="position" intvalue="200"/>
+                    </file>
+                    <file name="org-openide-actions-OpenAction.instance">
+                        <attr name="position" intvalue="100"/>
+                    </file>
+                    <file name="org-openide-actions-PropertiesAction.instance">
+                        <attr name="position" intvalue="1300"/>
+                    </file>
+                    <file name="org-openide-actions-RenameAction.instance">
+                        <attr name="position" intvalue="800"/>
+                    </file>
+                    <file name="org-openide-actions-SaveAsTemplateAction.instance">
+                        <attr name="position" intvalue="1000"/>
+                    </file>
+                    <file name="org-openide-actions-ToolsAction.instance">
+                        <attr name="position" intvalue="1200"/>
+                    </file>
+                    <file name="sep-1.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="300"/>
+                    </file>
+                    <file name="sep-2.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="600"/>
+                    </file>
+                    <file name="sep-3.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="900"/>
+                    </file>
+                    <file name="sep-4.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="1100"/>
+                    </file>
+                </folder>
+            </folder>
+            <folder name="x-jpresso-query">
+                <folder name="Actions">
+                    <file name="org-openide-actions-CopyAction.instance">
+                        <attr name="position" intvalue="500"/>
+                    </file>
+                    <file name="org-openide-actions-CutAction.instance">
+                        <attr name="position" intvalue="400"/>
+                    </file>
+                    <file name="org-openide-actions-DeleteAction.instance">
+                        <attr name="position" intvalue="700"/>
+                    </file>
+                    <file name="org-openide-actions-FileSystemAction.instance">
+                        <attr name="position" intvalue="200"/>
+                    </file>
+                    <file name="org-openide-actions-OpenAction.instance">
+                        <attr name="position" intvalue="100"/>
+                    </file>
+                    <file name="org-openide-actions-PropertiesAction.instance">
+                        <attr name="position" intvalue="1300"/>
+                    </file>
+                    <file name="org-openide-actions-RenameAction.instance">
+                        <attr name="position" intvalue="800"/>
+                    </file>
+                    <file name="org-openide-actions-SaveAsTemplateAction.instance">
+                        <attr name="position" intvalue="1000"/>
+                    </file>
+                    <file name="org-openide-actions-ToolsAction.instance">
+                        <attr name="position" intvalue="1200"/>
+                    </file>
+                    <file name="sep-1.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="300"/>
+                    </file>
+                    <file name="sep-2.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="600"/>
+                    </file>
+                    <file name="sep-3.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="900"/>
+                    </file>
+                    <file name="sep-4.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="1100"/>
+                    </file>
+                </folder>
+            </folder>
+            <folder name="x-jpresso-run">
+                <folder name="Actions">
+                    <file name="org-openide-actions-CopyAction.instance">
+                        <attr name="position" intvalue="500"/>
+                    </file>
+                    <file name="org-openide-actions-CutAction.instance">
+                        <attr name="position" intvalue="400"/>
+                    </file>
+                    <file name="org-openide-actions-DeleteAction.instance">
+                        <attr name="position" intvalue="700"/>
+                    </file>
+                    <file name="org-openide-actions-FileSystemAction.instance">
+                        <attr name="position" intvalue="200"/>
+                    </file>
+                    <file name="org-openide-actions-OpenAction.instance">
+                        <attr name="position" intvalue="100"/>
+                    </file>
+                    <file name="org-openide-actions-PropertiesAction.instance">
+                        <attr name="position" intvalue="1300"/>
+                    </file>
+                    <file name="org-openide-actions-RenameAction.instance">
+                        <attr name="position" intvalue="800"/>
+                    </file>
+                    <file name="org-openide-actions-SaveAsTemplateAction.instance">
+                        <attr name="position" intvalue="1000"/>
+                    </file>
+                    <file name="org-openide-actions-ToolsAction.instance">
+                        <attr name="position" intvalue="1200"/>
+                    </file>
+                    <file name="sep-1.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="300"/>
+                    </file>
+                    <file name="sep-2.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="600"/>
+                    </file>
+                    <file name="sep-3.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="900"/>
+                    </file>
+                    <file name="sep-4.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="1100"/>
+                    </file>
+                </folder>
+            </folder>
+            <folder name="x-jpresso-rqs">
+                <folder name="Actions">
+                    <file name="org-openide-actions-CopyAction.instance">
+                        <attr name="position" intvalue="500"/>
+                    </file>
+                    <file name="org-openide-actions-CutAction.instance">
+                        <attr name="position" intvalue="400"/>
+                    </file>
+                    <file name="org-openide-actions-DeleteAction.instance">
+                        <attr name="position" intvalue="700"/>
+                    </file>
+                    <file name="org-openide-actions-FileSystemAction.instance">
+                        <attr name="position" intvalue="200"/>
+                    </file>
+                    <file name="org-openide-actions-OpenAction.instance">
+                        <attr name="position" intvalue="100"/>
+                    </file>
+                    <file name="org-openide-actions-PropertiesAction.instance">
+                        <attr name="position" intvalue="1300"/>
+                    </file>
+                    <file name="org-openide-actions-RenameAction.instance">
+                        <attr name="position" intvalue="800"/>
+                    </file>
+                    <file name="org-openide-actions-SaveAsTemplateAction.instance">
+                        <attr name="position" intvalue="1000"/>
+                    </file>
+                    <file name="org-openide-actions-ToolsAction.instance">
+                        <attr name="position" intvalue="1200"/>
+                    </file>
+                    <file name="sep-1.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="300"/>
+                    </file>
+                    <file name="sep-2.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="600"/>
+                    </file>
+                    <file name="sep-3.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="900"/>
+                    </file>
+                    <file name="sep-4.instance">
+                        <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
+                        <attr name="position" intvalue="1100"/>
+                    </file>
+                </folder>
+            </folder>
+        </folder>
+    </folder>
+    <folder name="Menu">
+        <folder name="File">
+            <file name="de-cismet-jpresso-project-actions-ImportProjectAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Build/de-cismet-jpresso-project-actions-ImportProjectAction.instance"/>
+                <attr name="position" intvalue="950"/>
+            </file>
+            <file name="de-cismet-jpresso-project-actions-CreateDefaultPropertiesAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Build/de-cismet-jpresso-project-actions-CreateDefaultPropertiesAction.instance"/>
+                <attr name="position" intvalue="951"/>
+            </file>
+            <file name="de-cismet-jpresso-project-filetypes-run-action-RunAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Build/de-cismet-jpresso-project-filetypes-run-action-RunAction.instance"/>
+                <attr name="position" intvalue="300"/>
+            </file>
+        </folder>
+        <folder name="Help">
+            <file name="de-cismet-jpresso-project-actions-AboutJPressoAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Help/de-cismet-jpresso-project-actions-AboutJPressoAction.instance"/>
+                <attr name="position" intvalue="1400"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="OptionsDialog">
+        <file name="de-cismet-jpresso-project-gui-options-jpresso-project-filetypesOptionsCategory.instance"/>
+    </folder>
+    <folder name="Services">
+        <folder name="MIMEResolver">
+            <file name="ConnectionResolver.xml" url="ConnectionResolver.xml">
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="de.cismet.jpresso.project.filetypes.Bundle"/>
+            </file>
+            <file name="OptionsResolver.xml" url="OptionsResolver.xml">
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="de.cismet.jpresso.project.filetypes.Bundle"/>
+            </file>
+            <file name="QueryResolver.xml" url="QueryResolver.xml">
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="de.cismet.jpresso.project.filetypes.Bundle"/>
+            </file>
+            <file name="RunResolver.xml" url="RunResolver.xml">
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="de.cismet.jpresso.project.filetypes.Bundle"/>
+            </file>
+            <file name="SQLResolver.xml" url="SQLResolver.xml">
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="de.cismet.jpresso.project.filetypes.Bundle"/>
+            </file>
+        </folder>
+    </folder>
+    <folder name="Windows2">
+        <folder name="Components">
+            <file name="ConnectionTopComponent.settings" url="ConnectionTopComponentSettings.xml"/>
+            <file name="QueryTopComponent.settings" url="QueryTopComponentSettings.xml"/>
+            <file name="RunTopComponent.settings" url="RunTopComponentSettings.xml"/>
+            <file name="SQLTopComponent.settings" url="SQLTopComponentSettings.xml"/>
+        </folder>
+        <folder name="Modes">
+            <folder name="editor">
+                <file name="ConnectionTopComponent.wstcref" url="ConnectionTopComponentWstcref.xml"/>
+                <file name="QueryTopComponent.wstcref" url="QueryTopComponentWstcref.xml"/>
+                <file name="RunTopComponent.wstcref" url="RunTopComponentWstcref.xml"/>
+                <file name="SQLTopComponent.wstcref" url="SQLTopComponentWstcref.xml"/>
+            </folder>
+        </folder>
+    </folder>
+    <folder name="Templates">
+        <folder name="Project">
+            <folder name="JPresso">
+                <file name="EmptyJPressoProjectProject.zip" url="EmptyJPressoProjectProject.zip">
+                    <attr name="SystemFileSystem.localizingBundle" stringvalue="de.cismet.jpresso.project.Bundle"/>
+                    <attr name="instantiatingIterator" methodvalue="de.cismet.jpresso.project.templates.EmptyJPressoProjectWizardIterator.createIterator"/>
+                    <attr name="instantiatingWizardURL" urlvalue="nbresloc:/de/cismet/jpresso/project/templates/EmptyJPressoProjectDescription.html"/>
+                    <attr name="template" boolvalue="true"/>
+                </file>
+            </folder>
+        </folder>
+    </folder>
+</filesystem>

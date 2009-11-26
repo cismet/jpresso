@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+OpenIDE-Module-Localizing-Bundle: de/cismet/jpresso/branding/Bundle.properties
+OpenIDE-Module-Layer: de/cismet/jpresso/branding/layer.xml
+

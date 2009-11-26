@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+OpenIDE-Module: de.cismet.jpresso.project
+OpenIDE-Module-Install: de/cismet/jpresso/project/Installer.class
+OpenIDE-Module-Layer: de/cismet/jpresso/project/layer.xml
+OpenIDE-Module-Localizing-Bundle: de/cismet/jpresso/project/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+
+Name: de/cismet/jpresso/project/filetypes/connection/ConnectionDataLoader.class
+OpenIDE-Module-Class: Loader
+
+Name: de/cismet/jpresso/project/filetypes/options/OptionsDataLoader.class
+OpenIDE-Module-Class: Loader
+
+Name: de/cismet/jpresso/project/filetypes/query/QueryDataLoader.class
+OpenIDE-Module-Class: Loader
+
+Name: de/cismet/jpresso/project/filetypes/run/RunDataLoader.class
+OpenIDE-Module-Class: Loader
+
+Name: de/cismet/jpresso/project/filetypes/sql/SQLDataLoader.class
+OpenIDE-Module-Class: Loader

@@ -1,0 +1,10 @@
+<nbm>
+   <!-- is normal by default -->
+   <!--moduleType>autoload</moduleType-->
+
+   <!-- is automatically constructed from groupId and artifactId -->
+   <!--codeNameBase>de.cismet.jpresso/1</codeNameBase-->
+
+   <!--licenseName>Apache License, Version 2.0</licenseName>
+   <licenseFile>license.txt</licenseFile-->
+</nbm>

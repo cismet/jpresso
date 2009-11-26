@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+OpenIDE-Module: de.cismet.jpresso.core
+OpenIDE-Module-Layer: de/cismet/jpresso/core/layer.xml
+OpenIDE-Module-Localizing-Bundle: de/cismet/jpresso/core/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+Main-Class: de.cismet.jpresso.core.installer.Installer

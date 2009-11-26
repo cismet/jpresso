@@ -1,0 +1,247 @@
+/*
+ * JDBCImportExecutor.java
+ *
+ * Created on 28. Oktober 2003, 11:40
+ */
+package de.cismet.jpresso.core.finalizer;
+
+import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
+import de.cismet.jpresso.core.exceptions.WrongNameException;
+import de.cismet.jpresso.core.kernel.Finalizer;
+import de.cismet.jpresso.core.kernel.IntermedTable;
+import de.cismet.jpresso.core.serviceprovider.exceptions.FinalizerException;
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author  srichter
+ */
+public final class UpdateFinalizer extends Finalizer {
+
+    /** Logger */
+    private static final String KOMMA_SPACE = ", ";
+    private static final String SPACE_AND_SPACE = " AND ";
+    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+    private boolean debug = log.isDebugEnabled();
+    public static final int MAX_LOG_ERROR = 20;
+    /** Holds value of property rollback. */
+    private final StringBuilder buff = new StringBuilder();
+    private final Map<String, int[]> whereMap;
+    private String[] tableCompareString;
+    private boolean rb = true;
+    private boolean force = false;
+
+    /** Creates a new instance of ABFImporter */
+    public UpdateFinalizer() {
+        this.whereMap = TypeSafeCollections.newHashMap();
+    }
+
+    public void setTableCompareFields(String in) {
+        if (in != null) {
+            tableCompareString = in.split("&&");
+        }
+    }
+
+    private boolean evalString(final String param) {
+        if (param.equalsIgnoreCase("true")) {
+            return true;
+        } else if (param.equalsIgnoreCase("false")) {
+            return false;
+        } else {
+            throw new IllegalArgumentException("Illegal Rollback argument. Found " + param + "! Please provide 'true' or 'false'!");
+        }
+    }
+
+    public void setForceWrite(final String in) throws JPressoException {
+        force = evalString(in);
+    }
+
+    /** Setter for property param.
+     * @param param New value of property param.
+     *
+     */
+    public void setRollback(final String rollback) {
+        log.debug("Rollback got: " + rollback);
+        if (evalString(rollback)) {
+            log.info("Rollback was set true. The transcation will be rolled back!");
+            rb = true;
+        } else {
+            rb = false;
+        }
+    }
+
+    /** 
+     * The method that actually performs all the writing to DB.
+     */
+    @Override
+    public long finalise() throws Exception {
+        if (tableCompareString == null) {
+            throw new FinalizerException("Missing TableCompareFields arguments.\nSyntax: TableCompareFields=TABLENAME1:FIELD1[, FIELD2, ...] [&& TABLENAME2:FIELD1[, FIELD2, ...]]");
+        }
+        log.debug("finalise");
+        for (final String in : tableCompareString) {
+            final String[] sA = in.trim().split(":");
+            if (sA.length != 2) {
+                throw new IllegalArgumentException("Illegal TableCompareFields arguments: " + in + ".\nSyntax: TableCompareFields=TABLENAME1:FIELD1[, FIELD2, ...] [&& TABLENAME2:FIELD1[, FIELD2, ...]]");
+            }
+            final IntermedTable itab = getIntermedTables().getIntermedTable(sA[0].trim());
+            if (itab == null) {
+                throw new WrongNameException("Wrong table name: " + sA[0].trim());
+            }
+            final String[] tA = sA[1].split(",");
+            final int[] iA = new int[tA.length];
+            if (tA.length < 1) {
+                throw new IllegalArgumentException("Illegal TableCompareFields arguments: " + in + ".\nSyntax: TableCompareFields=TABLENAME1:FIELD1[, FIELD2, ...] [&& TABLENAME2:FIELD1[, FIELD2, ...]]");
+            }
+            int i = 0;
+            for (final String s : tA) {
+                iA[i++] = itab.getColumnNumber(s.trim());
+            }
+            //irgendwas in den hash
+            whereMap.put(itab.getTableName(), iA);
+        }
+        long errorCounter = 0;
+        String stmnt;
+        final Connection conn = getIntermedTables().getTargetConn();
+        conn.setAutoCommit(force);
+        for (final String tableName : getIntermedTables().getMetaInfo().getTopologicalTableSequence()) {
+            final IntermedTable itab = getIntermedTables().getIntermedTable(tableName);
+            final int tableRowCount = itab.getRowCount();
+            System.out.println("finalizing ---> " + tableName);
+            if (debug) {
+                String debugString = "Update for table: " + tableName + " (" + tableRowCount + " rows)\n";
+                log.debug(debugString);
+            }
+            buff.append("\n" + "Update for table: " + tableName + " (" + tableRowCount + " rows)\n");
+
+            int logErrorCounter = 0;
+
+            //Statement s = conn.createStatement();
+            final int[] where = whereMap.get(itab.getTableName());
+            Arrays.sort(where);
+            if (where == null || where.length < 1) {
+                continue;
+            }
+            for (int j = 0; j < tableRowCount; ++j) {
+                //TODO processCancelCommand handling in superclass
+                if (isCanceled()) {
+                    conn.rollback();
+                    log.info("cancel -> rollback");
+                    logs += buff.toString();
+                    setProgressCanceled(tableName);
+                    return errorCounter;
+                }
+
+                stmnt = createUpdateStatement(itab, j, where);
+
+                if (debug) {
+                    log.debug("Statement: " + stmnt);
+                }
+                final Statement s = conn.createStatement();
+                try {
+                    s.execute(stmnt);
+                    s.close();
+                    setProgressValue(tableName, j + 1, logErrorCounter);
+                } catch (SQLException ex) {
+                    ++errorCounter;
+                    ++logErrorCounter;
+                    final String msg = "Error at:" + stmnt + ": " + ex;
+                    log.error(msg);
+                    log.debug(msg + stmnt, ex);
+                    setProgressValue(tableName, j + 1, logErrorCounter);
+                    //switch to rollback as error occured
+                    rb = true;
+                    if (logErrorCounter < MAX_LOG_ERROR) {
+                        logs += "    Updates error @ statement:" + stmnt + "\n" + ex.toString() + "\n";
+                    } else if (logErrorCounter == MAX_LOG_ERROR) {
+                        logs += "    ************** more errors (output stopped)\n";
+                    }
+                }
+            }
+        }
+        try {
+            if (rb && !force) {
+                conn.rollback();
+            } else {
+                conn.commit();
+            }
+        //.execute("ROLLBACK");
+        } catch (SQLException ex) {
+
+            final String msg = "Error on: ROLLBACK: " + ex;
+            log.error(msg);
+            log.debug(msg);
+            logs += "    Updates error .. rollback statement\n" + ex.toString() + "\n";
+//            System.out.println("done.");
+        }
+//HINT: Do not close, so that multiple finalizations with one connection are possible!!
+//        if (!conn.isClosed()) {
+//            conn.close();
+//        } // todo: check
+        log.info("Updates finished");
+        buff.append("\n\n-----------------Updates finished");
+        logs += buff.toString();
+        return errorCounter;
+    }
+//    public static String UPDATE =;
+//    public static String SET =;
+//    public static String EQUALS =;
+//    public static String KOMMA =;
+//    public static String WHERE =;
+
+    protected String createUpdateStatement(final IntermedTable itab, final int i, final int[] where) throws JPressoException {
+        return "UPDATE " + itab.getTableName() + generateSetPart(itab, i, where);
+    }
+
+    protected String generateSetPart(final IntermedTable itab, int pos, int[] where) throws JPressoException {
+        final int columnCount = itab.getColumnCount();
+        final StringBuilder sb = new StringBuilder(" SET ");
+        final List<String> values = itab.getValueListWithGivenEnclosingChar(pos);
+        int wherePointer = 0;
+        for (int i = 0; i < columnCount; ++i) {
+            if (i != where[wherePointer]) {
+                final String colName = itab.getColumnName(i);
+                final String val = values.get(i);
+                sb.append(colName);
+                sb.append(" = ");
+                sb.append(val);
+                sb.append(KOMMA_SPACE);
+            } else {
+                if (where.length <= ++wherePointer) {
+                    --wherePointer;
+                }
+            }
+        }
+        if (sb.length() > 1) {
+            sb.setLength(sb.length() - KOMMA_SPACE.length());
+        }
+        sb.append(" WHERE ");
+        for (int i : where) {
+            String comparator;
+            final String val = values.get(i);
+            if (!val.equalsIgnoreCase("null")) {
+                comparator = " = ";
+            } else {
+                comparator = " IS ";
+            }
+            sb.append(itab.getColumnName(i));
+            sb.append(comparator);
+            sb.append(val);
+            sb.append(SPACE_AND_SPACE);
+        }
+        if (sb.length() > 4) {
+            sb.setLength(sb.length() - SPACE_AND_SPACE.length());
+        }
+        return sb.toString();
+    }
+
+    @Override
+    protected void processCancelCommand() {
+        setCanceled(true);
+    }
+}
