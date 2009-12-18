@@ -143,11 +143,11 @@ public final class RunTopComponent extends AbstractJPTopComponent<RunDataObject>
         jPanel5 = new javax.swing.JPanel();
         jTabbedPane2 = OutputTabbedPaneFactory.createOutputTabbedPane();
         jToolBar1 = new javax.swing.JToolBar();
-        jButton7 = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        btnTest = new javax.swing.JButton();
+        btnFillIntermed = new javax.swing.JButton();
+        btnFinalize = new javax.swing.JButton();
+        btnFullRun = new javax.swing.JButton();
+        btnClear = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JToolBar.Separator();
         jLabel1 = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
@@ -233,62 +233,67 @@ public final class RunTopComponent extends AbstractJPTopComponent<RunDataObject>
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
-        jButton7.setToolTipText("Check Syntax And Settings");
-        jButton7.setFocusable(false);
-        jButton7.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton7.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton7.addActionListener(new java.awt.event.ActionListener() {
+        btnTest.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/jpresso/project/res/kontact-todo.png"))); // NOI18N
+        btnTest.setToolTipText("Check Syntax And Settings");
+        btnTest.setFocusable(false);
+        btnTest.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnTest.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnTest.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton7ActionPerformed(evt);
+                btnTestActionPerformed(evt);
             }
         });
-        jToolBar1.add(jButton7);
+        jToolBar1.add(btnTest);
 
-        jButton1.setToolTipText("Fill Intermed Table");
-        jButton1.setFocusable(false);
-        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnFillIntermed.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/jpresso/project/res/table.png"))); // NOI18N
+        btnFillIntermed.setToolTipText("Fill Intermed Table");
+        btnFillIntermed.setFocusable(false);
+        btnFillIntermed.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnFillIntermed.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnFillIntermed.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnFillIntermedActionPerformed(evt);
             }
         });
-        jToolBar1.add(jButton1);
+        jToolBar1.add(btnFillIntermed);
 
-        jButton2.setToolTipText("Write Intermed Table to Target");
-        jButton2.setEnabled(false);
-        jButton2.setFocusable(false);
-        jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnFinalize.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/jpresso/project/res/db_comit.png"))); // NOI18N
+        btnFinalize.setToolTipText("Write Intermed Table to Target");
+        btnFinalize.setEnabled(false);
+        btnFinalize.setFocusable(false);
+        btnFinalize.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnFinalize.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnFinalize.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnFinalizeActionPerformed(evt);
             }
         });
-        jToolBar1.add(jButton2);
+        jToolBar1.add(btnFinalize);
 
-        jButton3.setToolTipText("Fill Intermed Table And Write To Target");
-        jButton3.setFocusable(false);
-        jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        btnFullRun.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/jpresso/project/res/agt_runit.png"))); // NOI18N
+        btnFullRun.setToolTipText("Fill Intermed Table And Write To Target");
+        btnFullRun.setFocusable(false);
+        btnFullRun.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnFullRun.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnFullRun.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                btnFullRunActionPerformed(evt);
             }
         });
-        jToolBar1.add(jButton3);
+        jToolBar1.add(btnFullRun);
 
-        jButton4.setToolTipText("Clear Intermed Table");
-        jButton4.setEnabled(false);
-        jButton4.setFocusable(false);
-        jButton4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton4.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        btnClear.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/jpresso/project/res/user-trash.png"))); // NOI18N
+        btnClear.setToolTipText("Clear Intermed Table");
+        btnClear.setEnabled(false);
+        btnClear.setFocusable(false);
+        btnClear.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnClear.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                btnClearActionPerformed(evt);
             }
         });
-        jToolBar1.add(jButton4);
+        jToolBar1.add(btnClear);
         jToolBar1.add(jSeparator1);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, "  Source Query:"); // NOI18N
@@ -377,6 +382,7 @@ public final class RunTopComponent extends AbstractJPTopComponent<RunDataObject>
         jLabel3.setPreferredSize(new java.awt.Dimension(100, 0));
         jToolBar1.add(jLabel3);
 
+        lblStatus.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/jpresso/project/res/14_layer_novisible.png"))); // NOI18N
         lblStatus.setToolTipText("Autocomplete fields disabled. Execute a source query to enable!");
         lblStatus.setEnabled(false);
         jToolBar1.add(lblStatus);
@@ -384,7 +390,7 @@ public final class RunTopComponent extends AbstractJPTopComponent<RunDataObject>
         add(jToolBar1, java.awt.BorderLayout.NORTH);
     }// </editor-fold>//GEN-END:initComponents
 //TODO Button disablen und enablen verbessern
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnFillIntermedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFillIntermedActionPerformed
 
         references.stopEditing();
         mappings.stopEditing();
@@ -394,7 +400,7 @@ public final class RunTopComponent extends AbstractJPTopComponent<RunDataObject>
         startWait("Processing Query...");
         final FillWorker fill = new FillWorker();
         ExecutorProvider.execute(fill);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btnFillIntermedActionPerformed
 
     private void jPanel4ComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_jPanel4ComponentShown
         setListenerActive(false);
@@ -404,13 +410,13 @@ public final class RunTopComponent extends AbstractJPTopComponent<RunDataObject>
         setListenerActive(true);//GEN-LAST:event_jPanel4ComponentShown
     }
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnFinalizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinalizeActionPerformed
         if (this.finCreator != null) {
             this.runFinalize();
         }
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btnFinalizeActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void btnFullRunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFullRunActionPerformed
         references.stopEditing();
         mappings.stopEditing();
         mappings.clearErrors();
@@ -421,11 +427,11 @@ public final class RunTopComponent extends AbstractJPTopComponent<RunDataObject>
         final FinalizerWorker fw = new FinalizerWorker();
         ExecutorProvider.execute(fw);
 //        fw.execute();
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_btnFullRunActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
         clearIntermedTable();
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }//GEN-LAST:event_btnClearActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         qe.checkSourceConnection();
@@ -435,7 +441,7 @@ public final class RunTopComponent extends AbstractJPTopComponent<RunDataObject>
         dce.checkTargetConnection(false);
     }//GEN-LAST:event_jButton6ActionPerformed
 
-    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+    private void btnTestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTestActionPerformed
         references.stopEditing();
         mappings.stopEditing();
         mappings.clearErrors();
@@ -445,7 +451,7 @@ public final class RunTopComponent extends AbstractJPTopComponent<RunDataObject>
         final CreateWorker cw = new CreateWorker(false);
         ExecutorProvider.execute(cw);
 //        cw.execute();
-    }//GEN-LAST:event_jButton7ActionPerformed
+    }//GEN-LAST:event_btnTestActionPerformed
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
         openQueryEditor();
@@ -537,13 +543,13 @@ private void jPanel13MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:ev
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton btnClear;
+    private javax.swing.JButton btnFillIntermed;
+    private javax.swing.JButton btnFinalize;
+    private javax.swing.JButton btnFullRun;
+    private javax.swing.JButton btnTest;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
     private javax.swing.JComboBox jComboBox1;
@@ -835,27 +841,27 @@ private void jPanel13MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:ev
     }
 
     private void disableAllButtons() {
-        jButton7.setEnabled(false);
-        jButton1.setEnabled(false);
-        jButton2.setEnabled(false);
-        jButton3.setEnabled(false);
-        jButton4.setEnabled(false);
+        btnTest.setEnabled(false);
+        btnFillIntermed.setEnabled(false);
+        btnFinalize.setEnabled(false);
+        btnFullRun.setEnabled(false);
+        btnClear.setEnabled(false);
     }
 
     private void setButtonsEmpty() {
-        jButton7.setEnabled(true);
-        jButton1.setEnabled(true);
-        jButton2.setEnabled(false);
-        jButton3.setEnabled(true);
-        jButton4.setEnabled(false);
+        btnTest.setEnabled(true);
+        btnFillIntermed.setEnabled(true);
+        btnFinalize.setEnabled(false);
+        btnFullRun.setEnabled(true);
+        btnClear.setEnabled(false);
     }
 
     private void setButtonsFilled() {
-        jButton7.setEnabled(true);
-        jButton1.setEnabled(true);
-        jButton2.setEnabled(true);
-        jButton3.setEnabled(true);
-        jButton4.setEnabled(true);
+        btnTest.setEnabled(true);
+        btnFillIntermed.setEnabled(true);
+        btnFinalize.setEnabled(true);
+        btnFullRun.setEnabled(true);
+        btnClear.setEnabled(true);
     }
 // </editor-fold>
     // <editor-fold defaultstate="collapsed" desc="myInit">

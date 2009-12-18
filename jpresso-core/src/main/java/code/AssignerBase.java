@@ -5,6 +5,7 @@
 package code;
 
 import de.cismet.jpresso.core.kernel.*;
+import de.cismet.jpresso.core.serviceprovider.DynamicDriverManager;
 import java.sql.Connection;
 
 /**
@@ -21,10 +22,11 @@ public abstract class AssignerBase {
     public static Connection FLD$TargetConnection;
     public static Connection FLD$SourceConnection;
     public static UniversalContainer FLD$UniversalContainer;
+    public static DynamicDriverManager FLD$DriverManager;
     static boolean FLD$Stopped = false;
 
     /**
-     * 
+     *
      * @return
      */
     public boolean isStopped() {
@@ -32,7 +34,7 @@ public abstract class AssignerBase {
     }
 
     /**
-     * 
+     *
      */
     public static void stop() {
         FLD$Stopped = true;

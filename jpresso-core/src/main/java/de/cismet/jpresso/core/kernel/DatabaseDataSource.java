@@ -66,10 +66,12 @@ public final class DatabaseDataSource implements DataSource {
 
     @Override
     public final Iterator<String[]> iterator() {
+        //this order is important, as getRowCount affects cachedResultSet!
+        final int rowCount = getRowCount();
         if (cachedResultSet == null) {
             refreshResultSet();
         }
-        final Iterator<String[]> res = new ResultSetIterator(cachedResultSet, getRowCount());
+        final Iterator<String[]> res = new ResultSetIterator(cachedResultSet, rowCount);
         cachedResultSet = null;
         return res;
     }
@@ -101,7 +103,9 @@ public final class DatabaseDataSource implements DataSource {
             } catch (SQLException ex) {
                 log.warn("Smart rowcount detection failed. Query was: " + countQuery, ex);
             }
-            cachedRowCount = getRowCountFailSafte();
+            if (cachedRowCount < 0) {
+                cachedRowCount = getRowCountFailSafte();
+            }
         }
         return cachedRowCount;
     }
@@ -130,12 +134,12 @@ public final class DatabaseDataSource implements DataSource {
             while (cachedResultSet.next()) {
                 ++counter;
             }
-            return counter;
-        } catch (SQLException ex) {
-            log.error(ex, ex);
-        } finally {
             cachedResultSet = null;
+            return counter;
+        } catch (Exception ex) {
+            log.error(ex, ex);
         }
+        cachedResultSet = null;
         return 0;
     }
 
@@ -190,6 +194,7 @@ public final class DatabaseDataSource implements DataSource {
                 }
             } catch (Exception ex) {
                 log.error(ex, ex);
+                throw new IllegalStateException("Could not fetch next row (" + currentPosition + " of " + rowCount + ")!", ex);
             }
             throw new IllegalStateException("Could not fetch next row (" + currentPosition + " of " + rowCount + ")!");
         }
@@ -199,15 +204,10 @@ public final class DatabaseDataSource implements DataSource {
             //not supported
         }
 
-        private final String[] retrieveCurrent() {
+        private final String[] retrieveCurrent() throws SQLException {
             final String[] ret = new String[columnCount];
             for (int i = 0; i < columnCount; ++i) {
-                try {
-                    ret[i] = rs.getString(i + 1);
-                } catch (Exception ex) {
-                    log.error(ex, ex);
-                    ret[i] = null;
-                }
+                ret[i] = rs.getString(i + 1);
             }
             return ret;
         }
