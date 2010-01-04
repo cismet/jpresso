@@ -620,8 +620,8 @@ public final class ImportMetaInfo {
             }
         }
 
-        if(log.isDebugEnabled()) {
-            log.debug("Found the follwing source fields: "+sourceFields);
+        if (log.isDebugEnabled()) {
+            log.debug("Found the follwing source fields: " + sourceFields);
         }
     }
 
@@ -755,8 +755,9 @@ public final class ImportMetaInfo {
         buf.append("import " + JPressoFileManager.DIR_CDE + ".*;\n");
         buf.append("import java.util.Map;\n");
         buf.append("import java.util.HashMap;\n");
+        buf.append("import de.cismet.jpresso.core.serviceprovider.DynamicDriverManager;\n");
+        buf.append("import de.cismet.jpresso.core.kernel.UniversalContainer;\n\n");
         //buf.append("import java.util.LinkedHashMap;\n");
-        buf.append("import de.cismet.jpressocore.kernel.UniversalContainer;\n\n");
         buf.append(" public final class " + className + " extends " + AssignerBase.class.getCanonicalName() + " implements " + Assigner.class.getCanonicalName() + " {\n\n");
         buf.append("    private final Map<String, int[]> lookupMap;\n");
         buf.append("    private String[][] currentRows;\n\n");
@@ -840,6 +841,12 @@ public final class ImportMetaInfo {
         buf.append("\n    }\n");
         buf.append("\n    public final void setTargetConnection(final java.sql.Connection targetConnection) {");
         buf.append("\n        " + FIELD_TAG + "TargetConnection = targetConnection;");
+        buf.append("\n    }\n");
+        buf.append("\n    public final DynamicDriverManager getDriverManager() {");
+        buf.append("\n        return " + FIELD_TAG + "DriverManager;");
+        buf.append("\n    }\n");
+        buf.append("\n    public final void setDriverManager(final DynamicDriverManager drvManager) {");
+        buf.append("\n        " + FIELD_TAG + "DriverManager = drvManager;");
         buf.append("\n    }\n");
         buf.append("\n    public final java.sql.Connection getSourceConnection() {");
         buf.append("\n        return " + FIELD_TAG + "SourceConnection;");

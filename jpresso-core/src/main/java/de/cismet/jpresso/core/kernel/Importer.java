@@ -136,6 +136,7 @@ public final class Importer implements FinalizerCreator, ExtractAndTransformCont
                 final Class<? extends Assigner> assignerClass = loader.compileAndLoadClass(CANONICAL_ASSIGNER_CLASSNAME, assignerJavaCode, Assigner.class);
                 assigner = assignerClass.newInstance();
                 assigner.setSourceConnection(sourceConn);
+                assigner.setDriverManager(findDriverManager());
             } catch (DynamicCompilingException ex) {
                 throw ex;
             } catch (Exception ex) {

@@ -4,6 +4,7 @@
  */
 package de.cismet.jpresso.core.kernel;
 
+import de.cismet.jpresso.core.serviceprovider.DynamicDriverManager;
 import java.sql.Connection;
 
 /**
@@ -27,10 +28,14 @@ public interface Assigner {
      * 
      * @return the target db connection
      */
+    public void setDriverManager(DynamicDriverManager manager);
+
+    public DynamicDriverManager getDriverManager();
+
     public Connection getTargetConnection();
 
     public void setTargetConnection(Connection targetConnection);
-    
+
     public Connection getSourceConnection();
 
     public void setSourceConnection(Connection targetConnection);
