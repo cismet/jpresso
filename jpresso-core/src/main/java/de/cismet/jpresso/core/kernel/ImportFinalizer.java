@@ -5,6 +5,7 @@
  */
 package de.cismet.jpresso.core.kernel;
 
+import de.cismet.jpresso.core.finalizer.StandardFinalizer;
 import de.cismet.jpresso.core.serviceacceptor.ProgressListener;
 import de.cismet.jpresso.core.serviceprovider.FinalizerController;
 import de.cismet.jpresso.core.serviceprovider.exceptions.FinalizerException;
@@ -29,7 +30,7 @@ public class ImportFinalizer implements FinalizerController {
     private final ProgressListener progressListener;
     private String fullMethodName;
 //    private static final String FINALIZER_PACKAGE = "de.cismet.jpresso.core.finalizer.";
-    private static final String FINALIZER_PACKAGE = Finalizer.class.getPackage().getName();
+    private static final String FINALIZER_PACKAGE = StandardFinalizer.class.getPackage().getName();
     private static final String SET = "set";
 
     //IntermedTablesContainer intermedTables;
