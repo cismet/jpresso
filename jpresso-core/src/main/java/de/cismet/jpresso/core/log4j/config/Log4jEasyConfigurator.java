@@ -8,6 +8,7 @@ import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 /**
@@ -21,11 +22,21 @@ public class Log4jEasyConfigurator {
         final File logConf = new File(home, JPressoFileManager.LOG_CONFIG);
         final Properties p = new Properties();
         if (logConf.isFile()) {
+            FileInputStream fis = null;
             try {
-                p.load(new BufferedInputStream(new FileInputStream(logConf)));
+                fis = new FileInputStream(logConf);
+                p.load(new BufferedInputStream(fis));
                 System.out.println("Loading log4J configuration from file.");
             } catch (Exception ex) {
                 //ignore
+            } finally {
+                if (fis != null) {
+                    try {
+                        fis.close();
+                    } catch (IOException ex) {
+                        System.out.println(ex);
+                    }
+                }
             }
         }
         if (p.isEmpty()) {
