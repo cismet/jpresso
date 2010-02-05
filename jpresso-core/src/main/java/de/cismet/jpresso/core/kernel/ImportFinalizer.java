@@ -28,7 +28,8 @@ public class ImportFinalizer implements FinalizerController {
     private final Finalizer finalizer;
     private final ProgressListener progressListener;
     private String fullMethodName;
-    private static final String FINALIZER_PACKAGE = "de.cismet.jpressocore.finalizer.";
+//    private static final String FINALIZER_PACKAGE = "de.cismet.jpresso.core.finalizer.";
+    private static final String FINALIZER_PACKAGE = Finalizer.class.getPackage().getName();
     private static final String SET = "set";
 
     //IntermedTablesContainer intermedTables;
@@ -42,7 +43,7 @@ public class ImportFinalizer implements FinalizerController {
         //Abspeichern der intermediate Tables
         //this.intermedTables = intermedTables;
         this.progressListener = progressListener;
-        String canonicalFinalizer = FINALIZER_PACKAGE + finalizerClassName;
+        String canonicalFinalizer = FINALIZER_PACKAGE + "." + finalizerClassName;
 
         try {
             //Suchen der Finisher Klasse

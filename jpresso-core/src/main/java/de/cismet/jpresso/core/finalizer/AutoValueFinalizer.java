@@ -100,7 +100,7 @@ public final class AutoValueFinalizer extends Finalizer {
         AutoValueStrategy strategy = null;
         try {
             final String drivername = connection.getMetaData().getDatabaseProductName();
-            final ResourceBundle res = ResourceBundle.getBundle("de.cismet.jpressocore.finalizer.finalizer");
+            final ResourceBundle res = ResourceBundle.getBundle("de.cismet.jpresso.core.finalizer.finalizer");
             for (final String key : res.keySet()) {
                 if (key.equalsIgnoreCase(AUTOVAL_PROPERTY_PREFIX + drivername)) {
                     final Class<?> avc = Class.forName(res.getString(key));
