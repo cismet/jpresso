@@ -193,7 +193,7 @@ class DynamicCompileClassLoaderImpl extends URLClassLoader implements DynamicCom
             final String className = sourceFile.getAbsolutePath().substring(baseDir.length() + 1, sourceFile.getAbsolutePath().length() - (JPressoFileManager.END_JAVA.length() + 1)).replace(File.separator, DOT);
 //            final String className = sourceFile.getAbsolutePath().substring(baseDir.length() + 1, sourceFile.getAbsolutePath().length() - (JPressoFileManager.END_JAVA.length() + 1)).replaceAll(MASKED_FILE_SEPERATOR, DOT);
             return compileAndLoadClass(className, sourceCode, clazz);
-        } catch (Exception ex) {
+        } catch (Exception ex) {            
             throw new DynamicCompilingException("Internal Compilation Bug: " + ex.toString(), "");
         }
     }

@@ -21,21 +21,22 @@ public final class DatabaseDataSource implements DataSource {
 
     private static final String COUNT_STMNT = "select count(*) as rcount from (%1$2s) as t";
 
-    public DatabaseDataSource(final Connection con, final String query) throws SQLException {
+    public DatabaseDataSource(final Connection con, final String query, final int fetchSize) throws SQLException {
         if (con == null || query == null) {
             throw new NullPointerException();
         }
         this.query = query + "\n"; //append newline against "--" comments
         this.con = con;
-        this.cachedResultSet = con.createStatement().executeQuery(query);
-        metaData = cachedResultSet.getMetaData();
+        this.fetchSize = fetchSize;
+        refreshResultSet();
     }
-    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DatabaseDataSource.class);
     private final Connection con;
     private ResultSet cachedResultSet;
     private ResultSetMetaData metaData;
     private Exception internalEx;
     private int cachedRowCount = -1;
+    private int fetchSize = NO_FETCH_SIZE;
     private final String query;
 
     @Override
@@ -95,8 +96,9 @@ public final class DatabaseDataSource implements DataSource {
             if (log.isDebugEnabled()) {
                 log.debug("Count Query: " + countQuery);
             }
+            ResultSet countRS = null;
             try {
-                final ResultSet countRS = createStatement().executeQuery(countQuery);
+                countRS = createStatement().executeQuery(countQuery);
                 if (countRS.next()) {
                     cachedRowCount = countRS.getInt(1);
                 }
@@ -104,16 +106,26 @@ public final class DatabaseDataSource implements DataSource {
                 log.warn("Smart rowcount detection failed. Query was: " + countQuery, ex);
             }
             if (cachedRowCount < 0) {
+                try {
+                    if (!con.getAutoCommit()) {
+                        //known bug: org.postgresql.util.PSQLException: FEHLER: Portal C_3 existiert nicht
+                        con.rollback();
+                    }
+                } catch (Exception ex) {
+                    log.debug(ex);
+                }
+
                 cachedRowCount = getRowCountFailSafte();
             }
+            closeResultSetAndStatementSilently(countRS);
         }
         return cachedRowCount;
     }
 
-    private final Statement createStatement() {
+    private Statement createStatement() {
         Statement stmnt = null;
         try {
-            stmnt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            stmnt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
         } catch (SQLException sqlE) {
             log.warn("Error creating statement with options", sqlE);
             try {
@@ -125,7 +137,7 @@ public final class DatabaseDataSource implements DataSource {
         return stmnt;
     }
 
-    private final int getRowCountFailSafte() {
+    private int getRowCountFailSafte() {
         if (cachedResultSet == null) {
             refreshResultSet();
         }
@@ -134,18 +146,43 @@ public final class DatabaseDataSource implements DataSource {
             while (cachedResultSet.next()) {
                 ++counter;
             }
+            closeResultSetAndStatementSilently(cachedResultSet);
             cachedResultSet = null;
             return counter;
         } catch (Exception ex) {
             log.error(ex, ex);
         }
+        closeResultSetAndStatementSilently(cachedResultSet);
         cachedResultSet = null;
         return 0;
     }
 
-    private final void refreshResultSet() {
+    private static void closeResultSetAndStatementSilently(ResultSet rs) {
+        if (rs != null) {
+            try {
+                rs.close();
+                rs.getStatement().close();
+            } catch (Exception ex) {
+                log.debug("Error on closing resultset and statement!", ex);
+            }
+        }
+    }
+
+    private void refreshResultSet() {
         try {
-            cachedResultSet = createStatement().executeQuery(query);
+            final Statement stmnt = createStatement();
+            if (fetchSize != NO_FETCH_SIZE) {
+                try {
+                    //postgres fix
+                    con.setAutoCommit(false);
+                    stmnt.setFetchSize(fetchSize);
+                    log.debug("Setting connection fetch size = " + fetchSize);
+                } catch (Exception ex) {
+                    log.debug("Error on setting fetch size!", ex);
+                }
+            }
+            closeResultSetAndStatementSilently(cachedResultSet);
+            cachedResultSet = stmnt.executeQuery(query);
             metaData = cachedResultSet.getMetaData();
         } catch (SQLException ex) {
             cachedResultSet = null;
@@ -191,6 +228,8 @@ public final class DatabaseDataSource implements DataSource {
                 if (rs.next()) {
                     ++currentPosition;
                     return retrieveCurrent();
+                } else {
+                    closeResultSetAndStatementSilently(rs);
                 }
             } catch (Exception ex) {
                 log.error(ex, ex);
@@ -204,7 +243,7 @@ public final class DatabaseDataSource implements DataSource {
             //not supported
         }
 
-        private final String[] retrieveCurrent() throws SQLException {
+        private String[] retrieveCurrent() throws SQLException {
             final String[] ret = new String[columnCount];
             for (int i = 0; i < columnCount; ++i) {
                 ret[i] = rs.getString(i + 1);
@@ -213,4 +252,3 @@ public final class DatabaseDataSource implements DataSource {
         }
     }
 }
-

@@ -38,7 +38,6 @@ public class StartProject {
     }
 
     private static void startProject(final String projDir) throws FileNotFoundException, IOException, DynamicCompilingException, NoSuchMethodException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InstantiationException {
-        String msg;
         final File projDirFile = new File(projDir);
         final ClassResourceProvider crp = ClassResourceProviderFactory.createClassRessourceProvider(projDirFile);
         final DynamicCompileClassLoader dl = crp.getDynClassLoader();

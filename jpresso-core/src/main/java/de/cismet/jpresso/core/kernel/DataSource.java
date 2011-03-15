@@ -12,6 +12,9 @@ package de.cismet.jpresso.core.kernel;
  */
 public interface DataSource extends Iterable<String[]> {
 
+    public static final int NO_FETCH_SIZE = -712345;
+    public static final String FETCH_SIZE_PROPERTY = "fetchSize";
+
     /**
      *
      * @return the column count of the datasource

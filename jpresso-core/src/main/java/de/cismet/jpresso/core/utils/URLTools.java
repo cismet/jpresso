@@ -15,20 +15,21 @@ import java.net.URL;
  */
 public final class URLTools {
 
-    public static final File convertURLToFile(final URL toConvert) {
+    public static File convertURLToFile(final URL toConvert) {
         try {
+            //warning maybe still buggy :(
             final String urlString = toConvert.getFile();
             if (urlString.endsWith(".jar!/")) {
                 return new File(new URI(urlString.substring(0, urlString.length() - 2)));
             } else {
-                return new File(urlString);
+                return new File(toConvert.toURI());
             }
         } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public static final boolean testEquals(URL u1, URL u2) {
+    public static boolean testEquals(URL u1, URL u2) {
         if (u1 == u2) {
             return true;
         } else if (u1 == null || u2 == null) {

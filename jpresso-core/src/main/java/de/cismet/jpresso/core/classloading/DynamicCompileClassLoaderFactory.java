@@ -10,6 +10,7 @@ import de.cismet.jpresso.core.utils.TypeSafeCollections;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -159,7 +160,6 @@ public final class DynamicCompileClassLoaderFactory {
         for (int i = 0; i < fileFilter.size(); i++) {
             urls[i] = fileFilter.get(i);
         }
-
         urls[fileFilter.size()] = JPressoFileManager.locateJarForClass(DynamicCompileClassLoaderFactory.class);
         return urls;
     }

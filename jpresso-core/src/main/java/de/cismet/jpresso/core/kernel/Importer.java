@@ -476,6 +476,16 @@ public final class Importer implements FinalizerCreator, ExtractAndTransformCont
     private DataSource openDataSource() throws InitializingException {
         try {
             final Query source = impRules.getSourceQuery();
+            final String fetchSizeProp = source.getProps().getProperty(DataSource.FETCH_SIZE_PROPERTY);
+            int fetchSize;
+            try {
+                fetchSize = Integer.parseInt(fetchSizeProp);
+            } catch (Exception ex) {
+                fetchSize = DataSource.NO_FETCH_SIZE;
+            }
+            if (fetchSize != DataSource.NO_FETCH_SIZE) {
+                log.info("FetchSize = " + fetchSize);
+            }
             if (getSourceConn() == null || getSourceConn().isClosed()) {
                 final DynamicDriverManager dm = findDriverManager();
                 if (source.getProps().values().size() > 0) {
@@ -486,7 +496,8 @@ public final class Importer implements FinalizerCreator, ExtractAndTransformCont
                     setSourceConn(c);
                 }
             }
-            return new DatabaseDataSource(sourceConn, source.getQueryStatement());
+
+            return new DatabaseDataSource(sourceConn, source.getQueryStatement(), fetchSize);
         } catch (Exception e) {
             throw new InitializingException(e.toString(), initializeLog.toString(), e);
         }

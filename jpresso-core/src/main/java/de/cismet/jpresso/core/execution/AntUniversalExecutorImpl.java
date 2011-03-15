@@ -169,31 +169,21 @@ public final class AntUniversalExecutorImpl implements AntUniversalExecutor {
         throw new IllegalArgumentException("File " + name + " does not represent a database connection!");
     }
 
-    /**
-     *
-     * @param name
-     * @param testOnly
-     * @return
-     * @throws de.cismet.jpressocore.kernel.InitializingException
-     * @throws de.cismet.jpressocore.kernel.FinalizerException
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
-     * @throws de.cismet.jpressocore.kernel.JPressoException
-     */
-    private final long execute(final String name, final boolean testOnly) throws InitializingException, FinalizerException, FileNotFoundException, IOException, JPressoException {
-        if (name == null || name.length() < 5) {
-            throw new IllegalArgumentException("Illegal filename argument on AntUniversalExecutor.");
-        }
-        processClosingPreviouseConnections();
+    @Override
+    public JPLoadable openJPressoFile(String name) throws IOException {
         JPLoadable exec = cache.get(name);
         if (exec == null) {
             exec = loader.load(name);
             cache.put(name, exec);
         }
+        return exec;
+    }
+
+    public final long execute(final JPLoadable exec, final boolean testOnly) throws JPressoException {
         long errorCount;
         if (exec instanceof ImportRules) {
             final ImportRules impRules = (ImportRules) exec;
-            impRules.setFileName(name.substring(0, name.length() - 4));
+//            impRules.setFileName(name.substring(0, name.length() - 4));
 //            final ClassResourceProvider clp = ClassResourceProviderFactory.createClassRessourceProvider(new File(getProjDir()));
             final Importer importer = new Importer(impRules, clp);
             String msg;
@@ -235,9 +225,29 @@ public final class AntUniversalExecutorImpl implements AntUniversalExecutor {
             this.setLatestSourceCon(null);
             this.setLatestTargetCon(sqlexec.getTargetConn());
         } else {
-            throw new InitializingException("Argument " + name + "was not an executable run or did not exist!", "");
+            throw new InitializingException("Argument was not an executable run or did not exist!", "");
         }
         return errorCount;
+    }
+
+    /**
+     *
+     * @param name
+     * @param testOnly
+     * @return
+     * @throws de.cismet.jpressocore.kernel.InitializingException
+     * @throws de.cismet.jpressocore.kernel.FinalizerException
+     * @throws java.io.FileNotFoundException
+     * @throws java.io.IOException
+     * @throws de.cismet.jpressocore.kernel.JPressoException
+     */
+    private final long execute(final String name, final boolean testOnly) throws InitializingException, FinalizerException, FileNotFoundException, IOException, JPressoException {
+        if (name == null || name.length() < 5) {
+            throw new IllegalArgumentException("Illegal filename argument on AntUniversalExecutor.");
+        }
+        processClosingPreviouseConnections();
+        JPLoadable exec = openJPressoFile(name);
+        return execute(exec, testOnly);
     }
 
     /**
