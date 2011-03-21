@@ -62,8 +62,8 @@ public abstract class AntHandler {
     private static final String COMPILE_FILELIST = "compile.filelist";
     private static final String RUN_CLASS = "run.class";
     //Memory settings
-//    private static final String MAX_MEMORY = "memory.max";
-//    private static final String MAX_MEMORY_VALUE = "512M";
+    private static final String MAX_MEMORY = "memory.max";
+    private static final String MAX_MEMORY_VALUE = "512M";
 
     /**
      * 
@@ -313,7 +313,7 @@ public abstract class AntHandler {
 //        final File defProp = new File(FileUtil.toFile(buildXML.getParent()), JPressoFileManager.DEFAULT_PROPS);
         final File defProp = new File(System.getProperty("user.home"), File.separator + JPressoFileManager.ANT_PROPS);
         final Properties p = createProjectAntProperties();
-//        p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
+        p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
         p.store(new BufferedOutputStream(new FileOutputStream(defProp)), "");
     }
 
