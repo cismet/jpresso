@@ -6,7 +6,7 @@
     <parent>
         <groupId>de.cismet</groupId>
         <artifactId>cismet-parent</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.2.6</version>
     </parent>
 
     <groupId>de.cismet.jpresso</groupId>
@@ -40,7 +40,7 @@
     </scm>
 
     <properties>
-        <netbeans.version>RELEASE67</netbeans.version>
+        <netbeans.version>RELEASE691</netbeans.version>
         <branding.token>jpresso</branding.token>
     </properties>
 
@@ -96,6 +96,14 @@
                     <configuration>
                     <!-- to have the jar plugin pickup the nbm generated manifest -->
                         <useDefaultManifestFile>true</useDefaultManifestFile>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>triemax</groupId>
+                    <artifactId>jalopy-maven</artifactId>
+<!--                    <version>1.9.4-101</version>-->
+                    <configuration>
+                        <skip>true</skip>
                     </configuration>
                 </plugin>
             </plugins>
