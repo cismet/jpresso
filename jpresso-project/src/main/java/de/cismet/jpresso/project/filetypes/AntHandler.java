@@ -62,8 +62,8 @@ public abstract class AntHandler {
     private static final String COMPILE_FILELIST = "compile.filelist";
     private static final String RUN_CLASS = "run.class";
     //Memory settings
-    private static final String MAX_MEMORY = "memory.max";
-    private static final String MAX_MEMORY_VALUE = "512M";
+//    private static final String MAX_MEMORY = "memory.max";
+//    private static final String MAX_MEMORY_VALUE = "512M";
 
     /**
      * 
@@ -78,7 +78,7 @@ public abstract class AntHandler {
             //String dest = FileUtil.toFile(source.getPrimaryFile()).getAbsolutePath();
 
             p.put(RUN_SOURCE, file);
-            p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
+//            p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
             log.debug("Ant " + ANT_TARGET_SINGLE_RUN + " properties: " + RUN_SOURCE + " = " + file);
             if (canExecute(jpRun)) {
                 try {
@@ -109,7 +109,7 @@ public abstract class AntHandler {
             if (sourcefiles.length() > 0) {
                 sourcefiles.deleteCharAt(sourcefiles.length() - 1);
             }
-            p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
+//            p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
             p.put(COMPILE_FILELIST, sourcefiles.toString());
             log.debug("Ant " + ANT_TARGET_COMPILE + " properties: " + COMPILE_FILELIST + " = " + sourcefiles.toString());
 
@@ -134,7 +134,7 @@ public abstract class AntHandler {
         if (runClass != null) {
             final Properties p = createProjectAntProperties();
             addAdditionalClassPathToProperties(p, buildXML);
-            p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
+//            p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
             p.put(RUN_CLASS, JPressoFileManager.DIR_CDE + "." + runClass.getPrimaryFile().getName());
             p.put(COMPILE_FILELIST, JPressoFileManager.DIR_CDE + "/" + runClass.getPrimaryFile().getNameExt());
             log.debug("Ant " + ANT_TARGET_RUN_JAVA + " properties: " + RUN_CLASS + " = " + runClass.getPrimaryFile().getPath());
@@ -162,7 +162,7 @@ public abstract class AntHandler {
             p.put(CONVERT_SOURCE, files);
             p.put(CONVERT_DEST, dir);
             p.put(MERGE_PROPS, mergeProperties);
-            p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
+//            p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
             log.debug("Ant " + ANT_TARGET_CONVERT + " properties: " + CONVERT_SOURCE + " = " + files + ", " + CONVERT_DEST + " = " + dir);
             try {
                 ActionUtils.runTarget(buildXML, new String[]{ANT_TARGET_CONVERT}, p);
@@ -186,7 +186,7 @@ public abstract class AntHandler {
             String source = FileUtil.toFile(buildXML.getParent()).getAbsolutePath();
             p.put(EXPORT_SOURCE, source);
             p.put(EXPORT_DEST, dest);
-            p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
+//            p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
             log.debug("Ant " + ANT_TARGET_EXPORT + " properties: " + EXPORT_DEST + " = " + dest + ", " + EXPORT_SOURCE + " = " + source);
             try {
                 ActionUtils.runTarget(buildXML, new String[]{ANT_TARGET_EXPORT}, p);
@@ -211,7 +211,7 @@ public abstract class AntHandler {
             String dest = FileUtil.toFile(buildXML.getParent()).getAbsolutePath();
             p.put(IMPORT_DEST, dest);
             p.put(IMPORT_SOURCE, src);
-            p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
+//            p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
             log.debug("Ant " + ANT_TARGET_IMPORT + " properties: " + IMPORT_DEST + " = " + src + ", " + IMPORT_SOURCE + " = " + dest);
             try {
                 ActionUtils.runTarget(buildXML, new String[]{ANT_TARGET_IMPORT}, p);
@@ -247,7 +247,7 @@ public abstract class AntHandler {
      */
     public static void startProject(final FileObject buildXML) {
         final Properties p = createProjectAntProperties();
-        p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
+//        p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
         try {
             ActionUtils.runTarget(buildXML, new String[]{ANT_TARGET_PROJECT}, p);
         } catch (IOException e) {
@@ -313,7 +313,7 @@ public abstract class AntHandler {
 //        final File defProp = new File(FileUtil.toFile(buildXML.getParent()), JPressoFileManager.DEFAULT_PROPS);
         final File defProp = new File(System.getProperty("user.home"), File.separator + JPressoFileManager.ANT_PROPS);
         final Properties p = createProjectAntProperties();
-        p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
+//        p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
         p.store(new BufferedOutputStream(new FileOutputStream(defProp)), "");
     }
 
