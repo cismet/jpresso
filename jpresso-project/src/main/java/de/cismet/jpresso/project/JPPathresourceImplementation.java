@@ -1,28 +1,44 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.project;
 
-import de.cismet.jpresso.core.utils.URLTools;
-import java.net.URL;
 import org.netbeans.spi.java.classpath.ClassPathImplementation;
 import org.netbeans.spi.java.classpath.support.PathResourceBase;
 
+import java.net.URL;
+
+import de.cismet.jpresso.core.utils.URLTools;
+
 /**
  * Represents a single classpath-entry like e.g. a jar-file.
- * 
- * @author srichter
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public final class JPPathresourceImplementation extends PathResourceBase {
 
-    //Although  it is an array it will contain only one URL.
+    //~ Instance fields --------------------------------------------------------
+
+    // Although  it is an array it will contain only one URL.
     private final URL url;
+
+    //~ Constructors -----------------------------------------------------------
 
     /**
      * Create a ClassPathEntry for the given URL.
-     * 
-     * @param root
+     *
+     * @param   root  DOCUMENT ME!
+     *
+     * @throws  IllegalArgumentException  DOCUMENT ME!
      */
     public JPPathresourceImplementation(final URL root) {
         if (root == null) {
@@ -31,18 +47,23 @@ public final class JPPathresourceImplementation extends PathResourceBase {
         this.url = root;
     }
 
+    //~ Methods ----------------------------------------------------------------
+
     /**
-     * 
-     * @return
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
+    @Override
     public URL[] getRoots() {
-        return new URL[]{url};
+        return new URL[] { url };
     }
 
 //    public void setRoots(URL root) {
 //        this.url = new URL[]{root};
 //        firePropertyChange(PROP_ROOTS, null, null);
 //    }
+    @Override
     @Deprecated
     public ClassPathImplementation getContent() {
         return null;
@@ -50,7 +71,7 @@ public final class JPPathresourceImplementation extends PathResourceBase {
 
     @Override
     public String toString() {
-        return "JPPathresourceImplementation{" + url + "}";   //NOI18N
+        return "JPPathresourceImplementation{" + url + "}"; // NOI18N
     }
 
     @Override
@@ -61,7 +82,7 @@ public final class JPPathresourceImplementation extends PathResourceBase {
     @Override
     public boolean equals(final Object other) {
         if (other instanceof JPPathresourceImplementation) {
-            final JPPathresourceImplementation opr = (JPPathresourceImplementation) other;
+            final JPPathresourceImplementation opr = (JPPathresourceImplementation)other;
             return URLTools.testEquals(this.url, opr.url);
         } else {
             return false;

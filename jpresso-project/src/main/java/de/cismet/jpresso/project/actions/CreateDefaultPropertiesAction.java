@@ -1,36 +1,68 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.project.actions;
 
-import de.cismet.jpresso.project.filetypes.AntHandler;
-import java.awt.Frame;
-import java.io.IOException;
-import javax.swing.JOptionPane;
 import org.netbeans.api.project.Project;
+
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.CallableSystemAction;
 import org.openide.util.actions.CookieAction;
 import org.openide.windows.WindowManager;
 
+import java.awt.Frame;
+
+import java.io.IOException;
+
+import javax.swing.JOptionPane;
+
+import de.cismet.jpresso.project.filetypes.AntHandler;
+
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
 public final class CreateDefaultPropertiesAction extends CallableSystemAction {
+
+    //~ Static fields/initializers ---------------------------------------------
 
     private static final String ERROR = "Error";
     private static final String SUCCESS = "Success";
     private static final String MSG_ERROR = "Could not create Ant-properties!";
     private static final String MSG_SUCCESS = "Successfully created Ant-properties!";
-    private static final Class[] COOKIE_CLASSES = new Class[]{Project.class};
+    private static final Class[] COOKIE_CLASSES = new Class[] { Project.class };
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     protected int mode() {
         return CookieAction.MODE_EXACTLY_ONE;
     }
 
+    @Override
     public String getName() {
         return NbBundle.getMessage(CreateDefaultPropertiesAction.class, "CTL_CreateDefaultPropertiesAction");
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     protected Class[] cookieClasses() {
         return COOKIE_CLASSES;
     }
@@ -42,6 +74,7 @@ public final class CreateDefaultPropertiesAction extends CallableSystemAction {
         putValue("noIconInMenu", Boolean.TRUE);
     }
 
+    @Override
     public HelpCtx getHelpCtx() {
         return HelpCtx.DEFAULT_HELP;
     }
@@ -63,4 +96,3 @@ public final class CreateDefaultPropertiesAction extends CallableSystemAction {
         }
     }
 }
-

@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * JDBCImportExecutor.java
  *
@@ -5,52 +12,74 @@
  */
 package de.cismet.jpresso.core.finalizer;
 
-import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
-import de.cismet.jpresso.core.kernel.Finalizer;
-import de.cismet.jpresso.core.kernel.IntermedTable;
-import de.cismet.jpresso.core.utils.TypeSafeCollections;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.cismet.jpresso.core.kernel.Finalizer;
+import de.cismet.jpresso.core.kernel.IntermedTable;
+import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
 /**
- * @author  srichter
+ * DOCUMENT ME!
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public final class SequenceFinalizer_BU_old extends Finalizer {
 
-    /** Logger */
+    //~ Static fields/initializers ---------------------------------------------
+
+    public static final int MAX_LOG_ERROR = 20;
+
+    //~ Instance fields --------------------------------------------------------
+
+    boolean rb;
+
+    /** Logger. */
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private boolean debug = log.isDebugEnabled();
-    public static final int MAX_LOG_ERROR = 20;
     /** Holds value of property rollback. */
     private String rollback;
     private final StringBuilder buff = new StringBuilder();
-    boolean rb;
     private final Map<String, Map<String, List<String>>> referenceMap;
-    //enthält die funktionsaufruf für den next value eines feldes einer tabelle
+    // enthält die funktionsaufruf für den next value eines feldes einer tabelle
     private final Map<String, Map<String, String>> nextVal;
-    //enthält die funktionsaufruf für den next value eines feldes einer tabelle
+    // enthält die funktionsaufruf für den next value eines feldes einer tabelle
     private final Map<String, Map<String, String>> curVal;
 
-    /** Creates a new instance of ABFImporter */
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new instance of ABFImporter.
+     */
     public SequenceFinalizer_BU_old() {
         referenceMap = TypeSafeCollections.newHashMap();
         nextVal = TypeSafeCollections.newHashMap();
         curVal = TypeSafeCollections.newHashMap();
     }
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  in  DOCUMENT ME!
+     */
     public void setSequences(final String in) {
         final String[] tabStrings = in.split("&&");
         for (String ts : tabStrings) {
             final HashMap<String, String> next = TypeSafeCollections.newHashMap();
             final HashMap<String, String> cur = TypeSafeCollections.newHashMap();
             ts = ts.trim();
-            String[] fldStrings = ts.split(":");
-            String tab = fldStrings[0];
+            final String[] fldStrings = ts.split(":");
+            final String tab = fldStrings[0];
             String fs = fldStrings[1];
             fs = fs.trim();
             final String seqNext = fs.substring(fs.indexOf("(") + 1, fs.indexOf(",")).trim();
@@ -63,12 +92,17 @@ public final class SequenceFinalizer_BU_old extends Finalizer {
         }
     }
 
-    /** Setter for property rollback.
-     * @param rollback New value of property rollback.
+    /**
+     * Setter for property rollback.
      *
+     * @param   rollback  New value of property rollback.
+     *
+     * @throws  IllegalArgumentException  DOCUMENT ME!
      */
     public void setRollback(final String rollback) throws IllegalArgumentException {
-        log.debug("Rollback got: " + rollback);
+        if (log.isDebugEnabled()) {
+            log.debug("Rollback got: " + rollback);
+        }
         // :-(
         // GEFAHR
         this.rollback = rollback;
@@ -78,45 +112,55 @@ public final class SequenceFinalizer_BU_old extends Finalizer {
         } else if (rollback.equalsIgnoreCase("false")) {
             rb = false;
         } else {
-            throw new IllegalArgumentException("Illegal Rollback argument. Found " + rollback + "! Please provide 'true' or 'false'!");
+            throw new IllegalArgumentException("Illegal Rollback argument. Found " + rollback
+                        + "! Please provide 'true' or 'false'!");
         }
     }
 
-    /** 
+    /**
      * The method that actually performs all the writing to DB.
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
      */
+    @Override
     public long finalise() throws Exception {
-        log.debug("finalise");
+        if (log.isDebugEnabled()) {
+            log.debug("finalise");
+        }
         long errorCounter = 0;
         String stmnt;
         final Connection conn = getIntermedTables().getTargetConn();
         conn.setAutoCommit(false);
-        //maps x -> generated values list.
-        HashMap<String, List<String>> refs = TypeSafeCollections.newHashMap();
+        // maps x -> generated values list.
+        final HashMap<String, List<String>> refs = TypeSafeCollections.newHashMap();
         for (final String tableName : getIntermedTables().getMetaInfo().getTopologicalTableSequence()) {
             final IntermedTable itab = getIntermedTables().getIntermedTable(tableName);
             final int tableRowCount = itab.getRowCount();
 //            final int tableCount = itab.getRowCount();
-            
+
             System.out.println("finalizing ---> " + tableName);
             if (debug) {
-                String debugString = "Import for table: " + tableName + " (" + tableRowCount + " rows)\n";
-                log.debug(debugString);
+                final String debugString = "Import for table: " + tableName + " (" + tableRowCount + " rows)\n";
+                if (log.isDebugEnabled()) {
+                    log.debug(debugString);
+                }
             }
             buff.append("\n" + "Import for table: " + tableName + " (" + tableRowCount + " rows)\n");
 
             int logErrorCounter = 0;
-            //maps field -> function
+            // maps field -> function
             final Map<String, String> cur = curVal.get(tableName);
             final Map<String, String> next = nextVal.get(tableName);
-            //testen ob hier sequence action gefragt ist!
+            // testen ob hier sequence action gefragt ist!
             if (next != null) {
                 for (final String key : next.values()) {
                     refs.put(key, new ArrayList<String>());
                 }
             }
             for (int j = 0; j < itab.getRowCount(); ++j) {
-                //TODO processCancelCommand handling in superclass
+                // TODO processCancelCommand handling in superclass
                 if (isCanceled()) {
                     conn.rollback();
                     log.info("cancel -> rollback");
@@ -126,7 +170,9 @@ public final class SequenceFinalizer_BU_old extends Finalizer {
                 }
                 stmnt = createStatement(itab, j, next, refs);
                 if (debug) {
-                    log.debug("Statement: " + stmnt);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Statement: " + stmnt);
+                    }
                 }
                 final Statement s = conn.createStatement();
                 try {
@@ -138,9 +184,11 @@ public final class SequenceFinalizer_BU_old extends Finalizer {
                     ++logErrorCounter;
                     final String msg = "Error at:" + stmnt + ": " + ex;
                     log.error(msg);
-                    log.debug(msg + stmnt, ex);
+                    if (log.isDebugEnabled()) {
+                        log.debug(msg + stmnt, ex);
+                    }
                     setProgressValue(tableName, j + 1, logErrorCounter);
-                    //switch to rollback as error occured
+                    // switch to rollback as error occured
                     rb = true;
                     if (logErrorCounter < MAX_LOG_ERROR) {
                         logs += "    Import error @ statement:" + stmnt + "\n" + ex.toString() + "\n";
@@ -150,7 +198,7 @@ public final class SequenceFinalizer_BU_old extends Finalizer {
                 }
             }
             if (refs != null) {
-                //referenzmapping für diese tabelle der map hinzufügen (=speichern)
+                // referenzmapping für diese tabelle der map hinzufügen (=speichern)
                 referenceMap.put(tableName, refs);
             }
             System.out.println(referenceMap);
@@ -161,11 +209,13 @@ public final class SequenceFinalizer_BU_old extends Finalizer {
             } else {
                 conn.commit();
             }
-        //.execute("ROLLBACK");
+            // .execute("ROLLBACK");
         } catch (SQLException ex) {
             final String msg = "Error on: ROLLBACK: " + ex;
             log.error(msg);
-            log.debug(msg);
+            if (log.isDebugEnabled()) {
+                log.debug(msg);
+            }
             logs += "    Import error .. rollback statement\n" + ex.toString() + "\n";
 //            System.out.println("done.");
         }
@@ -178,11 +228,42 @@ public final class SequenceFinalizer_BU_old extends Finalizer {
         return errorCounter;
     }
 
-    protected String createStatement(final IntermedTable itab, final int i, Map<String, String> next, Map<String, List<String>> refs) throws JPressoException {
-        return "INSERT INTO " + itab.getTableName() + "(" + getFieldList(itab) + ") VALUES " + generateSetPart(itab, i, next, refs);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   itab  DOCUMENT ME!
+     * @param   i     DOCUMENT ME!
+     * @param   next  DOCUMENT ME!
+     * @param   refs  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  JPressoException  DOCUMENT ME!
+     */
+    protected String createStatement(final IntermedTable itab,
+            final int i,
+            final Map<String, String> next,
+            final Map<String, List<String>> refs) throws JPressoException {
+        return "INSERT INTO " + itab.getTableName() + "(" + getFieldList(itab) + ") VALUES "
+                    + generateSetPart(itab, i, next, refs);
     }
 
-    protected String generateSetPart(final IntermedTable itab, int pos, Map<String, String> next, Map<String, List<String>> refs) throws JPressoException {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   itab  DOCUMENT ME!
+     * @param   pos   DOCUMENT ME!
+     * @param   next  DOCUMENT ME!
+     * @param   refs  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  JPressoException  DOCUMENT ME!
+     */
+    protected String generateSetPart(final IntermedTable itab,
+            final int pos,
+            final Map<String, String> next,
+            final Map<String, List<String>> refs) throws JPressoException {
         final int columnCount = itab.getColumnCount();
         final StringBuilder sb = new StringBuilder("(");
         final List<String> values = itab.getValueListWithGivenEnclosingChar(pos);
@@ -192,7 +273,7 @@ public final class SequenceFinalizer_BU_old extends Finalizer {
             if (next != null) {
                 fct = next.get(colName);
             }
-            String stdVal = values.get(i);
+            final String stdVal = values.get(i);
             final String val;
             if (fct == null) {
                 val = stdVal;
@@ -211,9 +292,18 @@ public final class SequenceFinalizer_BU_old extends Finalizer {
         return sb.toString();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   itab  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  JPressoException  DOCUMENT ME!
+     */
     protected String getFieldList(final IntermedTable itab) throws JPressoException {
         final StringBuilder sBuff = new StringBuilder();
-        for (int i = 0; i < itab.getColumnCount() - 1; ++i) {
+        for (int i = 0; i < (itab.getColumnCount() - 1); ++i) {
             sBuff.append(itab.getColumnName(i)).append(", ");
         }
         sBuff.append(itab.getColumnName(itab.getColumnCount() - 1));

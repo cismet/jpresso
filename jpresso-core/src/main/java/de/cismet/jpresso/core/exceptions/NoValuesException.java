@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * NoValuesException.java
  *
@@ -7,20 +14,28 @@ package de.cismet.jpresso.core.exceptions;
 
 import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
 
-
-/** Wir geworfen wenn kein Wert gefunden wurde
- * @author hell
+/**
+ * Wir geworfen wenn kein Wert gefunden wurde.
+ *
+ * @author   hell
+ * @version  $Revision$, $Date$
  */
 public class NoValuesException extends JPressoException {
 
-    /** Creates a new instance of NoValuesException */
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new instance of NoValuesException.
+     */
     public NoValuesException() {
     }
 
-    /** Creates a new instance of NoValuesException
-     * @param s Beschreibung der Exception
+    /**
+     * Creates a new instance of NoValuesException.
+     *
+     * @param  s  Beschreibung der Exception
      */
-    public NoValuesException(String s) {
+    public NoValuesException(final String s) {
         super(s);
     }
 }

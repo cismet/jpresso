@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -5,19 +12,30 @@
 package de.cismet.jpresso.core.data;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import de.cismet.jpresso.core.serviceprovider.AntExecutableInterface;
-import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
 import java.util.List;
 
+import de.cismet.jpresso.core.serviceprovider.AntExecutableInterface;
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
 /**
+ * DOCUMENT ME!
  *
- * @author srichter
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 @XStreamAlias("SQLRun")
 public class SQLRun implements AntExecutableInterface, JPLoadable {
 
-    // <editor-fold defaultstate="collapsed" desc="Constructors">
-    public SQLRun(String connectionFile, List<String> script) {
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * <editor-fold defaultstate="collapsed" desc="Constructors">.
+     *
+     * @param  connectionFile  DOCUMENT ME!
+     * @param  script          DOCUMENT ME!
+     */
+    public SQLRun(final String connectionFile, final List<String> script) {
         if (connectionFile != null) {
             this.connectionFile = connectionFile;
         } else {
@@ -30,22 +48,29 @@ public class SQLRun implements AntExecutableInterface, JPLoadable {
         }
     }
 
+    /**
+     * Creates a new SQLRun object.
+     */
     public SQLRun() {
         script = TypeSafeCollections.newArrayList();
     }
     // </editor-fold>
-    @XStreamAlias("Connection")
-    private String connectionFile = "";
-    @XStreamAlias("Statements")
-    private List<String> script;
-    private transient DatabaseConnection connection;
 
-    // <editor-fold defaultstate="collapsed" desc="Setters & Getters">
+    /**
+     * <editor-fold defaultstate="collapsed" desc="Setters & Getters">.
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getConnectionFile() {
         return connectionFile;
     }
 
-    public void setConnectionFile(String connectionFile) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  connectionFile  DOCUMENT ME!
+     */
+    public void setConnectionFile(final String connectionFile) {
         if (connectionFile != null) {
             this.connectionFile = connectionFile;
         } else {
@@ -53,11 +78,21 @@ public class SQLRun implements AntExecutableInterface, JPLoadable {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public List<String> getScript() {
         return script;
     }
 
-    public void setScript(List<String> script) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  script  DOCUMENT ME!
+     */
+    public void setScript(final List<String> script) {
         if (script != null) {
             this.script = script;
         } else {
@@ -65,11 +100,21 @@ public class SQLRun implements AntExecutableInterface, JPLoadable {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public DatabaseConnection getConnection() {
         return connection;
     }
 
-    public void setConnection(DatabaseConnection connection) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  connection  DOCUMENT ME!
+     */
+    public void setConnection(final DatabaseConnection connection) {
         if (connection != null) {
             this.connection = connection;
         } else {
@@ -77,4 +122,12 @@ public class SQLRun implements AntExecutableInterface, JPLoadable {
         }
     }
 // </editor-fold>
+
+    //~ Instance fields --------------------------------------------------------
+
+    @XStreamAlias("Connection")
+    private String connectionFile = "";
+    @XStreamAlias("Statements")
+    private List<String> script;
+    private transient DatabaseConnection connection;
 }

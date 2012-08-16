@@ -1,36 +1,68 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.project.filetypes.query;
 
-import de.cismet.jpresso.project.filetypes.action.JPNodeRenameAction;
-import de.cismet.jpresso.project.filetypes.refactoring.RefactoringEngine;
-import java.io.IOException;
-import javax.swing.Action;
 import org.openide.loaders.DataNode;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.Children;
 import org.openide.util.Lookup;
 import org.openide.util.actions.SystemAction;
 
+import java.io.IOException;
+
+import javax.swing.Action;
+
+import de.cismet.jpresso.project.filetypes.action.JPNodeRenameAction;
+import de.cismet.jpresso.project.filetypes.refactoring.RefactoringEngine;
+
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
 public final class QueryDataNode extends DataNode {
+
+    //~ Static fields/initializers ---------------------------------------------
 
     private static final String IMAGE_ICON_BASE = "de/cismet/jpresso/project/res/today.png";
 
-    public QueryDataNode(DataObject obj) {
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new QueryDataNode object.
+     *
+     * @param  obj  DOCUMENT ME!
+     */
+    public QueryDataNode(final DataObject obj) {
         super(obj, Children.LEAF);
         setIconBaseWithExtension(IMAGE_ICON_BASE);
     }
 
-    QueryDataNode(DataObject obj, Lookup lookup) {
+    /**
+     * Creates a new QueryDataNode object.
+     *
+     * @param  obj     DOCUMENT ME!
+     * @param  lookup  DOCUMENT ME!
+     */
+    QueryDataNode(final DataObject obj, final Lookup lookup) {
         super(obj, Children.LEAF, lookup);
         setIconBaseWithExtension(IMAGE_ICON_BASE);
     }
 
+    //~ Methods ----------------------------------------------------------------
+
     @Override
-    public Action[] getActions(boolean context) {
-        Action[] superResult = super.getActions(context);
+    public Action[] getActions(final boolean context) {
+        final Action[] superResult = super.getActions(context);
         superResult[7] = SystemAction.get(JPNodeRenameAction.class);
         return superResult;
     }

@@ -1,14 +1,16 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.project.nodes.actions;
 
-import de.cismet.jpresso.core.data.SQLRun;
-import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
-import de.cismet.jpresso.project.ProjectCookie;
-import java.io.File;
-import java.io.IOException;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.NotifyDescriptor.InputLine;
@@ -23,12 +25,25 @@ import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.util.actions.CallableSystemAction;
 
+import java.io.File;
+import java.io.IOException;
+
+import de.cismet.jpresso.core.data.SQLRun;
+import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
+
+import de.cismet.jpresso.project.ProjectCookie;
+
 /**
  * TODO should be Node action!
- * @author srichter
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public final class NewSQLAction extends CallableSystemAction {
 
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
     public void performAction() {
         try {
             final NotifyDescriptor.InputLine desc = new NotifyDescriptor.InputLine("Enter name", "Create new query");
@@ -39,20 +54,24 @@ public final class NewSQLAction extends CallableSystemAction {
                     return;
                 }
 
-                FilterNode activeNode = Utilities.actionsGlobalContext().lookup(FilterNode.class);
-                ProjectCookie projNode = activeNode.getCookie(ProjectCookie.class);
-                //TODO Nullpointer checken
-                FileObject dir = projNode.getProject().getProjectDirectory().getFileObject(JPressoFileManager.DIR_SQL);
-                //FileObject dir = ((ConnectionManagementNode) activeNode).getProject().getProjectDirectory().getFileObject(JPressoProject.CONNECTION_DIR);
+                final FilterNode activeNode = Utilities.actionsGlobalContext().lookup(FilterNode.class);
+                final ProjectCookie projNode = activeNode.getCookie(ProjectCookie.class);
+                // TODO Nullpointer checken
+                final FileObject dir = projNode.getProject()
+                            .getProjectDirectory()
+                            .getFileObject(JPressoFileManager.DIR_SQL);
+                // FileObject dir = ((ConnectionManagementNode)
+                // activeNode).getProject().getProjectDirectory().getFileObject(JPressoProject.CONNECTION_DIR);
                 if (dir != null) {
-                    String dirString = FileUtil.toFile(dir).getAbsolutePath();
+                    final String dirString = FileUtil.toFile(dir).getAbsolutePath();
                     filename = FileUtil.findFreeFileName(dir, filename, JPressoFileManager.END_SQL);
-                    SQLRun qr = new SQLRun();
-                    File dest = new File(dirString + File.separator + filename + "." + JPressoFileManager.END_SQL);
+                    final SQLRun qr = new SQLRun();
+                    final File dest = new File(dirString + File.separator + filename + "."
+                                    + JPressoFileManager.END_SQL);
                     JPressoFileManager.getDefault().persist(dest, qr);
                     FileUtil.toFileObject(dest).getParent().refresh();
-                    DataObject dob = DataObject.find(FileUtil.toFileObject(dest));
-                    OpenCookie oc = dob.getLookup().lookup(OpenCookie.class);
+                    final DataObject dob = DataObject.find(FileUtil.toFileObject(dest));
+                    final OpenCookie oc = dob.getLookup().lookup(OpenCookie.class);
                     if (oc != null) {
                         oc.open();
                     }
@@ -61,9 +80,9 @@ public final class NewSQLAction extends CallableSystemAction {
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
-
     }
 
+    @Override
     public String getName() {
         return NbBundle.getMessage(NewSQLAction.class, "CTL_NewSQLAction");
     }
@@ -75,6 +94,7 @@ public final class NewSQLAction extends CallableSystemAction {
         putValue("noIconInMenu", Boolean.TRUE);
     }
 
+    @Override
     public HelpCtx getHelpCtx() {
         return HelpCtx.DEFAULT_HELP;
     }

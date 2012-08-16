@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * JDBCImportExecutor.java
  *
@@ -5,50 +12,75 @@
  */
 package de.cismet.jpresso.core.finalizer;
 
-import de.cismet.jpresso.core.kernel.FieldDescription;
-import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
-import de.cismet.jpresso.core.kernel.Finalizer;
-import de.cismet.jpresso.core.kernel.ImportMetaInfo;
-import de.cismet.jpresso.core.kernel.IntermedTable;
-import de.cismet.jpresso.core.utils.TypeSafeCollections;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.cismet.jpresso.core.kernel.FieldDescription;
+import de.cismet.jpresso.core.kernel.Finalizer;
+import de.cismet.jpresso.core.kernel.ImportMetaInfo;
+import de.cismet.jpresso.core.kernel.IntermedTable;
+import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
 /**
- * @author  srichter
+ * DOCUMENT ME!
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public final class SequenceFinalizer_BU extends Finalizer {
 
-    /** Logger */
-    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
-    private boolean debug = log.isDebugEnabled();
+    //~ Static fields/initializers ---------------------------------------------
+
     public static final int MAX_LOG_ERROR = 20;
-    /** Holds value of property rollback. */
-    private String rollback;
-    private final StringBuilder buff = new StringBuilder();
-    boolean rb;
-    private final Map<String, Integer> positions = TypeSafeCollections.newHashMap();
-    private final Map<String, Map<FieldDescription, Integer>> fieldNumbers = TypeSafeCollections.newHashMap();
     private static final String LASTVAL = "select lastval()";
     private static final String NEXTVAL_PRE = "nextval('";
     private static final String NEXTVAL_POST = "_seq')";
+
+    //~ Instance fields --------------------------------------------------------
+
+    boolean rb;
+
+    /** Logger. */
+    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+    private boolean debug = log.isDebugEnabled();
+    /** Holds value of property rollback. */
+    private String rollback;
+    private final StringBuilder buff = new StringBuilder();
+    private final Map<String, Integer> positions = TypeSafeCollections.newHashMap();
+    private final Map<String, Map<FieldDescription, Integer>> fieldNumbers = TypeSafeCollections.newHashMap();
     private String sequences = "";
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   in  DOCUMENT ME!
+     *
+     * @throws  JPressoException  DOCUMENT ME!
+     */
     public void setSequences(final String in) throws JPressoException {
         this.sequences = in;
     }
 
-    /** Setter for property rollback.
-     * @param rollback New value of property rollback.
+    /**
+     * Setter for property rollback.
      *
+     * @param   rollback  New value of property rollback.
+     *
+     * @throws  IllegalArgumentException  DOCUMENT ME!
      */
     public void setRollback(final String rollback) throws IllegalArgumentException {
-        log.debug("Rollback got: " + rollback);
+        if (log.isDebugEnabled()) {
+            log.debug("Rollback got: " + rollback);
+        }
         // :-(
         // GEFAHR
         this.rollback = rollback;
@@ -58,16 +90,23 @@ public final class SequenceFinalizer_BU extends Finalizer {
         } else if (rollback.equalsIgnoreCase("false")) {
             rb = false;
         } else {
-            throw new IllegalArgumentException("Illegal Rollback argument. Found " + rollback + "! Please provide 'true' or 'false'!");
+            throw new IllegalArgumentException("Illegal Rollback argument. Found " + rollback
+                        + "! Please provide 'true' or 'false'!");
         }
     }
 
     /**
      * The method that actually performs all the writing to DB.
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
      */
     @Override
     public long finalise() throws Exception {
-        log.debug("finalise");
+        if (log.isDebugEnabled()) {
+            log.debug("finalise");
+        }
         final ImportMetaInfo imi = getIntermedTables().getMetaInfo();
         final String[] tabStrings = sequences.split(",");
         for (final String cur : tabStrings) {
@@ -102,7 +141,7 @@ public final class SequenceFinalizer_BU extends Finalizer {
                     }
                 }
             } else {
-                //TODO
+                // TODO
             }
         }
         long errorCounter = 0;
@@ -117,8 +156,10 @@ public final class SequenceFinalizer_BU extends Finalizer {
             final int pos = positions.get(tableName);
             System.out.println("finalizing ---> " + tableName);
             if (debug) {
-                String debugString = "Import into table: " + tableName + " (" + tableRowCount + " rows)\n";
-                log.debug(debugString);
+                final String debugString = "Import into table: " + tableName + " (" + tableRowCount + " rows)\n";
+                if (log.isDebugEnabled()) {
+                    log.debug(debugString);
+                }
             }
             buff.append("\n" + "Import into table: " + tableName + " (" + tableRowCount + " rows)\n");
             int logErrorCounter = 0;
@@ -133,7 +174,9 @@ public final class SequenceFinalizer_BU extends Finalizer {
                 }
                 stmnt = getFixedPartOfInsertStatement(itab) + getValuesForInsert(itab, j);
                 if (debug) {
-                    log.debug("Statement: " + stmnt);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Statement: " + stmnt);
+                    }
                 }
                 final Statement s = conn.createStatement();
                 try {
@@ -149,9 +192,11 @@ public final class SequenceFinalizer_BU extends Finalizer {
                     ++logErrorCounter;
                     final String msg = "Error at:" + stmnt + ": " + ex;
                     log.error(msg);
-                    log.debug(msg + stmnt, ex);
+                    if (log.isDebugEnabled()) {
+                        log.debug(msg + stmnt, ex);
+                    }
                     setProgressValue(tableName, j + 1, logErrorCounter);
-                    //switch to rollback as error occured
+                    // switch to rollback as error occured
                     rb = true;
                     if (logErrorCounter < MAX_LOG_ERROR) {
                         logs += "    Import error @ statement:" + stmnt + "\n" + ex.toString() + "\n";
@@ -161,12 +206,17 @@ public final class SequenceFinalizer_BU extends Finalizer {
                 }
             }
             final Map<FieldDescription, Integer> toUpdate = fieldNumbers.get(tableName);
-            if (toUpdate != null && !toUpdate.isEmpty()) {
-                for (final Entry<FieldDescription,Integer> entry : toUpdate.entrySet()) {
+            if ((toUpdate != null) && !toUpdate.isEmpty()) {
+                for (final Entry<FieldDescription, Integer> entry : toUpdate.entrySet()) {
                     final IntermedTable masterTab = getIntermedTables().getIntermedTable(entry.getKey().getTableName());
                     final int updatePos = entry.getValue();
                     for (int i = 0; i < masterTab.getRowCount(); ++i) {
-                        masterTab.setValueAt(itab.getValueAt(Integer.parseInt(masterTab.getValueAt(i, updatePos)) - offset, pos), i, updatePos);
+                        masterTab.setValueAt(itab.getValueAt(
+                                Integer.parseInt(masterTab.getValueAt(i, updatePos))
+                                        - offset,
+                                pos),
+                            i,
+                            updatePos);
                     }
                 }
             }
@@ -180,10 +230,11 @@ public final class SequenceFinalizer_BU extends Finalizer {
             }
             curVal.close();
         } catch (SQLException ex) {
-
             final String msg = "Error on: ROLLBACK: " + ex;
             log.error(msg);
-            log.debug(msg);
+            if (log.isDebugEnabled()) {
+                log.debug(msg);
+            }
             logs += "    Import error .. rollback statement\n" + ex.toString() + "\n";
 //            System.out.println("done.");
         }
@@ -197,17 +248,45 @@ public final class SequenceFinalizer_BU extends Finalizer {
         return errorCounter;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   itab      DOCUMENT ME!
+     * @param   position  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  JPressoException  DOCUMENT ME!
+     */
     protected String getValuesForInsert(final IntermedTable itab, final int position) throws JPressoException {
         return "(" + itab.getRowStringWithGivenEnclosingChar(position, ",") + ")";
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   itab  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  JPressoException  DOCUMENT ME!
+     */
     protected String getFixedPartOfInsertStatement(final IntermedTable itab) throws JPressoException {
         return "INSERT INTO " + itab.getTableName() + "(" + getFieldList(itab) + ") VALUES";
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   itab  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  JPressoException  DOCUMENT ME!
+     */
     protected String getFieldList(final IntermedTable itab) throws JPressoException {
         final StringBuilder sBuff = new StringBuilder();
-        for (int i = 0; i < itab.getColumnCount() - 1; ++i) {
+        for (int i = 0; i < (itab.getColumnCount() - 1); ++i) {
             sBuff.append(itab.getColumnName(i)).append(",");
         }
         sBuff.append(itab.getColumnName(itab.getColumnCount() - 1));

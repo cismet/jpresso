@@ -1,13 +1,19 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.project.filetypes.action;
 
-import de.cismet.jpresso.project.filetypes.connection.ConnectionDataNode;
-import de.cismet.jpresso.project.filetypes.query.QueryDataNode;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.actions.RenameAction;
@@ -15,15 +21,25 @@ import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
+import de.cismet.jpresso.project.filetypes.connection.ConnectionDataNode;
+import de.cismet.jpresso.project.filetypes.query.QueryDataNode;
+
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
 public final class JPNodeRenameAction extends RenameAction {
 
+    //~ Methods ----------------------------------------------------------------
+
     @Override
-    //TODO nullpointer prüfen!
-    protected void performAction(Node[] activatedNodes) {
+    // TODO nullpointer prüfen!
+    protected void performAction(final Node[] activatedNodes) {
         ProgressHandle ph = null;
         try {
             final Node node = activatedNodes[0]; // we suppose that one node is activated
-            NotifyDescriptor.InputLine dlg = new NotifyDescriptor.InputLine(
+            final NotifyDescriptor.InputLine dlg = new NotifyDescriptor.InputLine(
                     NbBundle.getMessage(RenameAction.class, "CTL_RenameLabel"),
                     NbBundle.getMessage(RenameAction.class, "CTL_RenameTitle"));
             dlg.setInputText(node.getName());
@@ -51,18 +67,18 @@ public final class JPNodeRenameAction extends RenameAction {
 ////                            RefactoringEngine.refactorQuery(qNode, oldfilename, oldfilename);
 //                        }
 //                        else {
-                            node.setName(newname); // NOI18N
+                        node.setName(newname); // NOI18N
 //                        }
                     }
-
                 } catch (IllegalArgumentException e) {
                     // determine if "printStackTrace"  and  "new annotation" of this exception is needed
-                    boolean needToAnnotate = Exceptions.findLocalizedMessage(e) == null;
+                    final boolean needToAnnotate = Exceptions.findLocalizedMessage(e) == null;
 
                     // annotate new localized message only if there is no localized message yet
                     if (needToAnnotate) {
-                        Exceptions.attachLocalizedMessage(e,
-                                NbBundle.getMessage(RenameAction.class,
+                        Exceptions.attachLocalizedMessage(
+                            e,
+                            NbBundle.getMessage(RenameAction.class,
                                 "MSG_BadFormat",
                                 node.getName(),
                                 newname));
@@ -77,6 +93,4 @@ public final class JPNodeRenameAction extends RenameAction {
             }
         }
     }
-    }
-    
-
+}

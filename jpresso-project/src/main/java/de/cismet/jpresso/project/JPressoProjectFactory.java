@@ -1,54 +1,83 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.project;
 
-import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
-import java.io.IOException;
 import org.netbeans.api.project.Project;
 import org.netbeans.spi.project.ProjectState;
+
 import org.openide.filesystems.FileObject;
 
+import java.io.IOException;
+
+import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
+
 /**
- * Creates instances of JPressoProjects
- * 
- * @author srichter
+ * Creates instances of JPressoProjects.
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public final class JPressoProjectFactory implements org.netbeans.spi.project.ProjectFactory {
 
+    //~ Instance fields --------------------------------------------------------
+
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
 
-    public JPressoProjectFactory() {
+    //~ Constructors -----------------------------------------------------------
 
-    }
-    
     /**
-     * 
-     * @param projectDirectory
-     * @return
+     * Creates a new JPressoProjectFactory object.
      */
-    public final boolean isProject(final FileObject projectDirectory) {
+    public JPressoProjectFactory() {
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   projectDirectory  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    @Override
+    public boolean isProject(final FileObject projectDirectory) {
         return projectDirectory.getFileObject(JPressoFileManager.DIR_JPP) != null;
     }
 
     /**
-     * 
-     * @param dir
-     * @param state
-     * @return
-     * @throws java.io.IOException
+     * DOCUMENT ME!
+     *
+     * @param   dir    DOCUMENT ME!
+     * @param   state  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  IOException  DOCUMENT ME!
      */
+    @Override
     public Project loadProject(final FileObject dir, final ProjectState state) throws IOException {
         return isProject(dir) ? new JPressoProject(dir, state) : null;
     }
-    
+
     /**
-     * 
-     * @param project
-     * @throws java.io.IOException
-     * @throws java.lang.ClassCastException
+     * DOCUMENT ME!
+     *
+     * @param   project  DOCUMENT ME!
+     *
+     * @throws  IOException         DOCUMENT ME!
+     * @throws  ClassCastException  DOCUMENT ME!
      */
+    @Override
     public void saveProject(final Project project) throws IOException, ClassCastException {
 //        FileObject projectRoot = project.getProjectDirectory();
 //        if (projectRoot.getFileObject(PROJECT_DIR) == null) {

@@ -1,9 +1,24 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package de.cismet.jpresso.project.filetypes;
 
-import de.cismet.jpresso.core.utils.TypeSafeCollections;
 import java.util.HashMap;
 
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
 public abstract class DefaultURLProvider {
+
+    //~ Static fields/initializers ---------------------------------------------
 
     private static final HashMap<String, String> drivers = TypeSafeCollections.newHashMap(75);
 
@@ -32,7 +47,9 @@ public abstract class DefaultURLProvider {
 
         drivers.put("org.apache.derby.jdbc.EmbeddedDriver", "jdbc:derby:<DB>");
 
-        drivers.put("org.apache.derby.jdbc.ClientDriver", "jdbc:derby://<HOST>[:<PORT>]/databaseName[;attr1=value1[;...]]");
+        drivers.put(
+            "org.apache.derby.jdbc.ClientDriver",
+            "jdbc:derby://<HOST>[:<PORT>]/databaseName[;attr1=value1[;...]]");
 
         drivers.put("com.ibm.db2.jcc.DB2Driver", "jdbc:db2://<hostname>:<port>/<database>");
 
@@ -46,9 +63,13 @@ public abstract class DefaultURLProvider {
 
         drivers.put("ids.sql.IDSDriver", "jdbc:ids://<HOST>:<PORT>/conn?dsn='<ODBC_DSN_NAME>'");
 
-        drivers.put("com.informix.jdbc.IfxDriver", "jdbc:informix-sqli://<HOST>:<PORT>/<DB>:INFORMIXSERVER=<SERVER_NAME>");
+        drivers.put(
+            "com.informix.jdbc.IfxDriver",
+            "jdbc:informix-sqli://<HOST>:<PORT>/<DB>:INFORMIXSERVER=<SERVER_NAME>");
 
-        drivers.put("com.ddtek.jdbc.informix.InformixDriver", "jdbc:datadirect:informix://<HOST>:<PORT>;informixServer=<SERVER_NAME>;databaseName=<DB>");
+        drivers.put(
+            "com.ddtek.jdbc.informix.InformixDriver",
+            "jdbc:datadirect:informix://<HOST>:<PORT>;informixServer=<SERVER_NAME>;databaseName=<DB>");
 
         drivers.put("jdbc.idbDriver", "jdbc:idb:<DB>");
 
@@ -76,13 +97,17 @@ public abstract class DefaultURLProvider {
 
         drivers.put("com.mckoi.JDBCDriver", "jdbc:mckoi:local://<DB>");
 
-        drivers.put("com.ddtek.jdbc.sqlserver.SQLServerDriver", "jdbc:datadirect:sqlserver://<HOST>:<PORT>[;databaseName=<DB>]");
+        drivers.put(
+            "com.ddtek.jdbc.sqlserver.SQLServerDriver",
+            "jdbc:datadirect:sqlserver://<HOST>:<PORT>[;databaseName=<DB>]");
 
         drivers.put("com.ashna.jturbo.driver.Driver", "jdbc:JTurbo://<HOST>:<PORT>/<DB>");
 
         drivers.put("com.inet.tds.TdsDriver", "jdbc:inetdae:<HOST>:<PORT>?database=<DB>");
 
-        drivers.put("com.microsoft.jdbc.sqlserver.SQLServerDriver", "jdbc:microsoft:sqlserver://<HOST>:<PORT>[;DatabaseName=<DB>]");
+        drivers.put(
+            "com.microsoft.jdbc.sqlserver.SQLServerDriver",
+            "jdbc:microsoft:sqlserver://<HOST>:<PORT>[;DatabaseName=<DB>]");
 
         drivers.put("com.microsoft.sqlserver.jdbc.SQLServerDriver", "jdbc:sqlserver://<HOST>:<PORT>;databaseName=<DB>");
 
@@ -110,18 +135,25 @@ public abstract class DefaultURLProvider {
 
         drivers.put("com.sun.sql.jdbc.sqlserver.SQLServerDriver", "jdbc:sun:sqlserver://server_name[:portNumber]");
 
-        drivers.put("com.sun.sql.jdbc.db2.DB2Driver", "jdbc:sun:db2://server_name:portNumber;databaseName=DATABASENAME");
+        drivers.put(
+            "com.sun.sql.jdbc.db2.DB2Driver",
+            "jdbc:sun:db2://server_name:portNumber;databaseName=DATABASENAME");
 
-        drivers.put("com.sun.sql.jdbc.oracle.OracleDriver", "jdbc:sun:oracle://server_name[:portNumber][;SID=DATABASENAME]");
+        drivers.put(
+            "com.sun.sql.jdbc.oracle.OracleDriver",
+            "jdbc:sun:oracle://server_name[:portNumber][;SID=DATABASENAME]");
 
         drivers.put("com.sun.sql.jdbc.sybase.SybaseDriver", "jdbc:sun:sybase://server_name[:portNumber]");
     }
-    
+
+    //~ Methods ----------------------------------------------------------------
+
     /**
      * Lookup the standart URL to a database with the given driver classname.
-     * 
-     * @param classname
-     * @return
+     *
+     * @param   classname  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
     public static final String getDefaultURL(final String classname) {
         final String ret = drivers.get(classname);

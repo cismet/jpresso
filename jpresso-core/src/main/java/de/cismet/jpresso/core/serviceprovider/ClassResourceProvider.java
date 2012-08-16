@@ -1,82 +1,103 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.core.serviceprovider;
 
-import de.cismet.jpresso.core.data.DriverDescription;
-import de.cismet.jpresso.core.serviceprovider.exceptions.DuplicateEntryException;
 import java.io.File;
+
 import java.util.List;
 import java.util.Set;
 
+import de.cismet.jpresso.core.data.DriverDescription;
+import de.cismet.jpresso.core.serviceprovider.exceptions.DuplicateEntryException;
+
 /**
  * Provides important resources to obtain certain classes like drivers.
- * 
- * @author srichter
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public interface ClassResourceProvider {
 
-    /**
-     * 
-     * @return a drivermanager
-     */
-    public DynamicDriverManager getDriverManager();
+    //~ Methods ----------------------------------------------------------------
 
     /**
-     * 
-     * @return a dynamic classloader
+     * DOCUMENT ME!
+     *
+     * @return  a drivermanager
      */
-    public DynamicCompileClassLoader getDynClassLoader();
+    DynamicDriverManager getDriverManager();
 
     /**
-     * 
-     * @return read-only set of classpath files.
+     * DOCUMENT ME!
+     *
+     * @return  a dynamic classloader
      */
-    public Set<File> getProjectClasspath();
+    DynamicCompileClassLoader getDynClassLoader();
 
     /**
-     * 
-     * @return read-only list of driver descriptions.
+     * DOCUMENT ME!
+     *
+     * @return  read-only set of classpath files.
      */
-    public List<DriverDescription> getDriverDescriptions();
+    Set<File> getProjectClasspath();
 
     /**
-     * 
-     * @return the project's directory
+     * DOCUMENT ME!
+     *
+     * @return  read-only list of driver descriptions.
      */
-    public File getProjectDir();
-    
+    List<DriverDescription> getDriverDescriptions();
+
     /**
-     * 
-     * @return the project's code directory
+     * DOCUMENT ME!
+     *
+     * @return  the project's directory
      */
-    public File getCodeDir();
+    File getProjectDir();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  the project's code directory
+     */
+    File getCodeDir();
 
     /**
      * Change the project's driver despription list.
-     * 
-     * @param driverDescriptions
-     * @throws de.cismet.jpressocore.exceptions.DuplicateEntryException
+     *
+     * @param   driverDescriptions  DOCUMENT ME!
+     *
+     * @throws  DuplicateEntryException  de.cismet.jpressocore.exceptions.DuplicateEntryException
      */
-    public void changeProjectDriverList(List<DriverDescription> driverDescriptions) throws DuplicateEntryException;
+    void changeProjectDriverList(List<DriverDescription> driverDescriptions) throws DuplicateEntryException;
 
     /**
      * Change the project's classpath.
-     * 
-     * @param newClassPath
+     *
+     * @param  newClassPath  DOCUMENT ME!
      */
-    public void changeProjectClassPath(List<File> newClassPath);
+    void changeProjectClassPath(List<File> newClassPath);
 
     /**
-     * 
-     * @return the delegation filter suggested for classloading.
+     * DOCUMENT ME!
+     *
+     * @return  the delegation filter suggested for classloading.
      */
-    public String getDelegationFilter();
-    
+    String getDelegationFilter();
+
     /**
-     * 
-     * @return
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    public File getProjectPlanFile();
+    File getProjectPlanFile();
 }

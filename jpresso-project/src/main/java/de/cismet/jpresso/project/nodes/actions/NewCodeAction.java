@@ -1,16 +1,16 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.project.nodes.actions;
 
-import de.cismet.jpresso.core.data.DatabaseConnection;
-import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
-import de.cismet.jpresso.project.ProjectCookie;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.NotifyDescriptor.InputLine;
@@ -24,16 +24,33 @@ import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.util.actions.CallableSystemAction;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import de.cismet.jpresso.core.data.DatabaseConnection;
+import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
+
+import de.cismet.jpresso.project.ProjectCookie;
+
 /**
  * TODO should be Node action!
- * @author srichter
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public final class NewCodeAction extends CallableSystemAction {
 
+    //~ Instance fields --------------------------------------------------------
+
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
 
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
     public void performAction() {
-        NotifyDescriptor.InputLine desc = new NotifyDescriptor.InputLine("Enter name", "New code file");
+        final NotifyDescriptor.InputLine desc = new NotifyDescriptor.InputLine("Enter name", "New code file");
         DialogDisplayer.getDefault().notify(desc);
         if (desc.getValue().equals(InputLine.OK_OPTION)) {
             String filename = desc.getInputText();
@@ -42,18 +59,20 @@ public final class NewCodeAction extends CallableSystemAction {
             }
 
             try {
-                FilterNode activeNode = Utilities.actionsGlobalContext().lookup(FilterNode.class);
-                ProjectCookie projNode = activeNode.getCookie(ProjectCookie.class);
-                FileObject dir = projNode.getProject().getProjectDirectory().getFileObject(JPressoFileManager.DIR_CDE);
+                final FilterNode activeNode = Utilities.actionsGlobalContext().lookup(FilterNode.class);
+                final ProjectCookie projNode = activeNode.getCookie(ProjectCookie.class);
+                final FileObject dir = projNode.getProject()
+                            .getProjectDirectory()
+                            .getFileObject(JPressoFileManager.DIR_CDE);
                 if (dir != null) {
-                    String dirString = FileUtil.toFile(dir).getAbsolutePath();
+                    final String dirString = FileUtil.toFile(dir).getAbsolutePath();
                     filename = FileUtil.findFreeFileName(dir, filename, JPressoFileManager.END_JAVA);
 //                    DatabaseConnection dc = new DatabaseConnection();
 //                File dest = new File(dirString + File.separator + filename + "." + JPressoFileManager.END_JAVA);
 //                dest.createNewFile();
-                    String file = dirString + File.separator + filename + "." + JPressoFileManager.END_JAVA;
+                    final String file = dirString + File.separator + filename + "." + JPressoFileManager.END_JAVA;
                     try {
-                        BufferedWriter out = new BufferedWriter(new FileWriter(file));
+                        final BufferedWriter out = new BufferedWriter(new FileWriter(file));
                         out.write("package code;\n\npublic class " + filename + " extends AssignerBase {\n}");
                         out.close();
                     } catch (IOException e) {
@@ -61,22 +80,26 @@ public final class NewCodeAction extends CallableSystemAction {
                     }
                     final DataObject dob = DataObject.find(FileUtil.toFileObject(new File(file)));
                     if (dob != null) {
-                        OpenCookie oc = dob.getCookie(OpenCookie.class);
+                        final OpenCookie oc = dob.getCookie(OpenCookie.class);
                         if (oc != null) {
                             oc.open();
                         }
                     }
-                    log.debug("Datei anlegen: " + dirString + File.separator + filename + "." + JPressoFileManager.END_JAVA);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Datei anlegen: " + dirString + File.separator + filename + "."
+                                    + JPressoFileManager.END_JAVA);
+                    }
                 }
             } catch (IOException ex) {
-                String message = ("Can not create file: " + filename + "." + JPressoFileManager.END_JAVA);
+                final String message = ("Can not create file: " + filename + "." + JPressoFileManager.END_JAVA);
                 log.error(message, ex);
-                NotifyDescriptor err = new NotifyDescriptor.Exception(ex, message);
+                final NotifyDescriptor err = new NotifyDescriptor.Exception(ex, message);
                 DialogDisplayer.getDefault().notify(err);
             }
         }
     }
 
+    @Override
     public String getName() {
         return NbBundle.getMessage(NewCodeAction.class, "CTL_NewCodeAction");
     }
@@ -88,6 +111,7 @@ public final class NewCodeAction extends CallableSystemAction {
         putValue("noIconInMenu", Boolean.TRUE);
     }
 
+    @Override
     public HelpCtx getHelpCtx() {
         return HelpCtx.DEFAULT_HELP;
     }

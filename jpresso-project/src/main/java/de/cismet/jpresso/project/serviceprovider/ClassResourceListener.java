@@ -1,32 +1,45 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.project.serviceprovider;
 
-import de.cismet.jpresso.core.data.DriverDescription;
 import java.io.File;
+
 import java.util.List;
 
+import de.cismet.jpresso.core.data.DriverDescription;
+
 /**
- * A listener for changes on the projects known-driver list or classpaths
- * 
- * @author srichter
+ * A listener for changes on the projects known-driver list or classpaths.
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public interface ClassResourceListener {
 
+    //~ Methods ----------------------------------------------------------------
+
     /**
      * Call if the DriverDescriptionList for the DriverManager has changed. List entries must be unique!
-     * 
-     * @param driverPath
-     * @throws de.cismet.drivermanager.exception.DuplicateEntryException
+     *
+     * @param   driverPath  DOCUMENT ME!
+     *
+     * @throws  Exception  de.cismet.drivermanager.exception.DuplicateEntryException
      */
-    public void projectDriverListChanged(List<DriverDescription> driverPath) throws Exception;
-    
+    void projectDriverListChanged(List<DriverDescription> driverPath) throws Exception;
+
     /**
      * Call if the list of external classpath jars has changed.
-     * 
-     * @param newClassPath
+     *
+     * @param  newClassPath  DOCUMENT ME!
      */
-    public void projectClassPathChanged(List<File> newClassPath);
+    void projectClassPathChanged(List<File> newClassPath);
 }

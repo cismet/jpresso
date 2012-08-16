@@ -1,10 +1,16 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.core.kernel;
 
-import de.cismet.jpresso.core.utils.TypeSafeCollections;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -14,30 +20,53 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
 /**
- * Represents a directed graph with vertices and edges
- * 
- * @author stefan
+ * Represents a directed graph with vertices and edges.
+ *
+ * @author   stefan
+ * @version  $Revision$, $Date$
  */
 public class DirectedGraph<T> {
 
+    //~ Static fields/initializers ---------------------------------------------
+
+    public static final int VISITED = 0;
+    public static final int COMPLETED = 1;
+
+    //~ Instance fields --------------------------------------------------------
+
+    // adjacency list that uses a HashMap to map each vertex to its list of neighbor vertices
+    private final Map<T, Set<T>> adjacencyList = TypeSafeCollections.newHashMap();
+    private final Comparator<T> comparator;
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new DirectedGraph object.
+     */
     public DirectedGraph() {
         this.comparator = null;
     }
 
-    public DirectedGraph(Comparator<T> graphSortComparator) {
+    /**
+     * Creates a new DirectedGraph object.
+     *
+     * @param  graphSortComparator  DOCUMENT ME!
+     */
+    public DirectedGraph(final Comparator<T> graphSortComparator) {
         this.comparator = graphSortComparator;
     }
-    public static final int VISITED = 0;
-    public static final int COMPLETED = 1;
-    //adjacency list that uses a HashMap to map each vertex to its list of neighbor vertices
-    private final Map<T, Set<T>> adjacencyList = TypeSafeCollections.newHashMap();
-    private final Comparator<T> comparator;
+
+    //~ Methods ----------------------------------------------------------------
 
     /**
-     * Add a new vertex.  Nothing happens if it's already in.
+     * Add a new vertex. Nothing happens if it's already in.
+     *
+     * @param  vertex  DOCUMENT ME!
      */
-    public void addVertex(T vertex) {
+    public void addVertex(final T vertex) {
         if (adjacencyList.containsKey(vertex)) {
             return;
         }
@@ -46,18 +75,24 @@ public class DirectedGraph<T> {
 
     /**
      * Vertex in the graph?
+     *
+     * @param   vertex  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    public boolean contains(T vertex) {
+    public boolean contains(final T vertex) {
         return adjacencyList.containsKey(vertex);
     }
 
     /**
-     * Add an edge from one vertex to another to the graph.
-     * If vertex is not already in, it's added.
-     * 
-     * Multi-edges and self-loops are possible.
+     * Add an edge from one vertex to another to the graph. If vertex is not already in, it's added.
+     *
+     * <p>Multi-edges and self-loops are possible.</p>
+     *
+     * @param  from  DOCUMENT ME!
+     * @param  to    DOCUMENT ME!
      */
-    public void addEdge(T from, T to) {
+    public void addEdge(final T from, final T to) {
         this.addVertex(from);
         this.addVertex(to);
         adjacencyList.get(from).add(to);
@@ -65,10 +100,13 @@ public class DirectedGraph<T> {
 
     /**
      * Remove an edge from the graph.
-     * 
-     * @throws IllegalArgumentException if the vertex does not exist in the graph
+     *
+     * @param   from  DOCUMENT ME!
+     * @param   to    DOCUMENT ME!
+     *
+     * @throws  IllegalArgumentException  if the vertex does not exist in the graph
      */
-    public void remove(T from, T to) {
+    public void remove(final T from, final T to) {
         if (!(this.contains(from) && this.contains(to))) {
             throw new IllegalArgumentException("Nonexistent vertex");
         }
@@ -76,9 +114,12 @@ public class DirectedGraph<T> {
     }
 
     /**
-     * Topological sorts the graph using and returns the order as list.
-     * It tries to bring Objects on one common level in a sorted order.
-     * If a loop is detected, it returns null as no sorting is possible.
+     * Topological sorts the graph using and returns the order as list. It tries to bring Objects on one common level in
+     * a sorted order. If a loop is detected, it returns null as no sorting is possible.
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  IllegalStateException  DOCUMENT ME!
      */
     public final Set<T> orderedTopologicalSort() {
         final Set<T> result = TypeSafeCollections.newLinkedHashSet();
@@ -98,7 +139,7 @@ public class DirectedGraph<T> {
                 final Entry<T, Set<T>> entry = it.next();
                 item = entry.getKey();
                 final Set<T> chk = entry.getValue();
-                if (chk == null || chk.isEmpty()) {
+                if ((chk == null) || chk.isEmpty()) {
                     it.remove();
                     current.add(item);
                     for (final Set<T> set : orderedAdjacencyListCopy.values()) {
@@ -111,11 +152,15 @@ public class DirectedGraph<T> {
             }
 
             result.addAll(current);
-
         }
         return result;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public final Set<T> reverseOrderedTopologicalSort() {
         final List<T> tmp = TypeSafeCollections.newArrayList(orderedTopologicalSort());
         Collections.reverse(tmp);

@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -8,27 +15,166 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
+ * DOCUMENT ME!
  *
- * @author srichter
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 @XStreamAlias("Reference")
 public final class Reference {
+    //~ Static fields/initializers ---------------------------------------------
+
     // <editor-fold defaultstate="collapsed" desc="Constructors">
+    private static final String DOT = ".";
 
-    public Reference(Reference ref) {
-        this.referencingTable = ref.referencingField;
-        this.referencingField = ref.referencingField;
-        this.referencedTable = ref.referencedTable;
-        this.referencedField = ref.referencedField;
-        this.comparing = ref.comparing;
-        this.enclosingChar = ref.enclosingChar;
+    /**
+     * <editor-fold defaultstate="collapsed" desc="Setters & Getters">.
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getReferencingTable() {
+        if (referencingTable == null) {
+            referencingTable = "";
+        }
+        return referencingTable;
+//        return referencingTable.toUpperCase();
     }
 
-    public Reference() {
-        referencingTable = referencingField = referencedTable = referencedField = enclosingChar = "";
-        comparing = false;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  table  DOCUMENT ME!
+     */
+    public void setReferencingTable(final String table) {
+        if (table != null) {
+            this.referencingTable = table.trim();
+        } else {
+            this.referencingTable = "";
+        }
     }
-    // </editor-fold>
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getReferencingField() {
+        if (referencingField == null) {
+            referencingField = "";
+        }
+        return referencingField;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  field  DOCUMENT ME!
+     */
+    public void setReferencingField(final String field) {
+        if (field != null) {
+            this.referencingField = field.trim();
+        } else {
+            this.referencingField = "";
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isComparing() {
+        return comparing;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  foreignKeyComparing  DOCUMENT ME!
+     */
+    public void setComparing(final boolean foreignKeyComparing) {
+        this.comparing = foreignKeyComparing;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getEnclosingChar() {
+        if (enclosingChar == null) {
+            enclosingChar = "";
+        }
+        return enclosingChar;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  enclosingChar  DOCUMENT ME!
+     */
+    public void setEnclosingChar(final String enclosingChar) {
+        if (enclosingChar != null) {
+            this.enclosingChar = enclosingChar;
+        } else {
+            this.enclosingChar = "";
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getReferencedTable() {
+        if (referencedTable == null) {
+            referencedTable = "";
+        }
+        return referencedTable;
+//        return referencedTable.toUpperCase();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  table  DOCUMENT ME!
+     */
+    public void setReferencedTable(final String table) {
+        if (table != null) {
+            this.referencedTable = table.trim();
+        } else {
+            this.referencedTable = "";
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getReferencedField() {
+        if (referencedField == null) {
+            referencedField = "";
+        }
+        return referencedField;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  field  DOCUMENT ME!
+     */
+    public void setReferencedField(final String field) {
+        if (field != null) {
+            this.referencedField = field.trim();
+        } else {
+            this.referencedField = "";
+        }
+    }
+// </editor-fold>
+
+    //~ Instance fields --------------------------------------------------------
+
     @XStreamAsAttribute
     private String referencingTable;
     @XStreamAsAttribute
@@ -41,119 +187,74 @@ public final class Reference {
     private boolean comparing;
     @XStreamAsAttribute
     private String enclosingChar;
-    private static final String DOT = ".";
 
-    // <editor-fold defaultstate="collapsed" desc="Setters & Getters">
-    public String getReferencingTable() {
-        if (referencingTable == null) {
-            referencingTable = "";
-        }
-        return referencingTable;
-//        return referencingTable.toUpperCase();
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new Reference object.
+     */
+    public Reference() {
+        referencingTable = referencingField = referencedTable = referencedField = enclosingChar = "";
+        comparing = false;
+    }
+    // </editor-fold>
+
+    /**
+     * Creates a new Reference object.
+     *
+     * @param  ref  DOCUMENT ME!
+     */
+    public Reference(final Reference ref) {
+        this.referencingTable = ref.referencingField;
+        this.referencingField = ref.referencingField;
+        this.referencedTable = ref.referencedTable;
+        this.referencedField = ref.referencedField;
+        this.comparing = ref.comparing;
+        this.enclosingChar = ref.enclosingChar;
     }
 
-    public void setReferencingTable(final String table) {
-        if (table != null) {
-            this.referencingTable = table.trim();
-        } else {
-            this.referencingTable = "";
-        }
-    }
+    //~ Methods ----------------------------------------------------------------
 
-    public String getReferencingField() {
-        if (referencingField == null) {
-            referencingField = "";
-        }
-        return referencingField;
-    }
-
-    public void setReferencingField(final String field) {
-        if (field != null) {
-            this.referencingField = field.trim();
-        } else {
-            this.referencingField = "";
-        }
-    }
-
-    public boolean isComparing() {
-        return comparing;
-    }
-
-    public void setComparing(final boolean foreignKeyComparing) {
-        this.comparing = foreignKeyComparing;
-    }
-
-    public String getEnclosingChar() {
-        if (enclosingChar == null) {
-            enclosingChar = "";
-        }
-        return enclosingChar;
-    }
-
-    public void setEnclosingChar(final String enclosingChar) {
-        if (enclosingChar != null) {
-            this.enclosingChar = enclosingChar;
-        } else {
-            this.enclosingChar = "";
-        }
-    }
-
-    public String getReferencedTable() {
-        if (referencedTable == null) {
-            referencedTable = "";
-        }
-        return referencedTable;
-//        return referencedTable.toUpperCase();
-    }
-
-    public void setReferencedTable(final String table) {
-        if (table != null) {
-            this.referencedTable = table.trim();
-        } else {
-            this.referencedTable = "";
-        }
-    }
-
-    public String getReferencedField() {
-        if (referencedField == null) {
-            referencedField = "";
-        }
-        return referencedField;
-    }
-
-    public void setReferencedField(final String field) {
-        if (field != null) {
-            this.referencedField = field.trim();
-        } else {
-            this.referencedField = "";
-        }
-    }
-// </editor-fold>
-
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Reference copy() {
         return new Reference(this);
     }
 
-    public final String getCompleteReferencing() {
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getCompleteReferencing() {
         return referencingTable + DOT + referencingField;
     }
 
-    public final String getCompleteReferenced() {
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getCompleteReferenced() {
         return referencedTable + DOT + referencedField;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj instanceof Reference) {
-            final Reference other = (Reference) obj;
-            return other.getCompleteReferenced().equals(this.getCompleteReferenced()) && other.getCompleteReferencing().equals(this.getCompleteReferencing());
+            final Reference other = (Reference)obj;
+            return other.getCompleteReferenced().equals(this.getCompleteReferenced())
+                        && other.getCompleteReferencing().equals(this.getCompleteReferencing());
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return 29 * getCompleteReferenced().hashCode() + 7 * getCompleteReferencing().hashCode();
+        return (29 * getCompleteReferenced().hashCode()) + (7 * getCompleteReferencing().hashCode());
     }
 
     @Override

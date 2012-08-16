@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -6,43 +13,50 @@ package de.cismet.jpresso.core.serviceacceptor;
 
 /**
  * Interface for classes that can handle progress values.
- * 
- * @author stefan
+ *
+ * @author   stefan
+ * @version  $Revision$, $Date$
  */
 public interface ProgressListener {
-    
+
+    //~ Methods ----------------------------------------------------------------
+
     /**
-     * 
-     * @param name
+     * DOCUMENT ME!
+     *
+     * @param  name  DOCUMENT ME!
      */
-    public void start(String name);
-    
+    void start(String name);
+
     /**
-     * 
-     * @param name
-     * @param workUnits
+     * DOCUMENT ME!
+     *
+     * @param  name       DOCUMENT ME!
+     * @param  workUnits  DOCUMENT ME!
      */
-    public void start(String name, int workUnits);
-    
+    void start(String name, int workUnits);
+
     /**
-     * 
+     * DOCUMENT ME!
      */
-    public void finish();
-    
+    void finish();
+
     /**
-     * 
-     * @param progress
+     * DOCUMENT ME!
+     *
+     * @param  progress  DOCUMENT ME!
      */
-    public void switchToDeterminate(int progress);
-    
+    void switchToDeterminate(int progress);
+
     /**
-     * 
+     * DOCUMENT ME!
      */
-    public void switchToIndeterminate();
-    
+    void switchToIndeterminate();
+
     /**
-     * 
-     * @param progress
+     * DOCUMENT ME!
+     *
+     * @param  progress  DOCUMENT ME!
      */
-    public void progress(int progress);
+    void progress(int progress);
 }

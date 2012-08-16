@@ -1,105 +1,144 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.project.templates;
 
-import de.cismet.jpresso.core.utils.TypeSafeCollections;
-import java.awt.Component;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.MessageFormat;
-import java.util.Enumeration;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import javax.swing.JComponent;
-import javax.swing.event.ChangeListener;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.spi.project.ui.support.ProjectChooser;
 import org.netbeans.spi.project.ui.templates.support.Templates;
+
 import org.openide.WizardDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.xml.XMLUtil;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
 import org.xml.sax.InputSource;
 
-public class EmptyJPressoProjectWizardIterator implements WizardDescriptor./*Progress*/InstantiatingIterator {
+import java.awt.Component;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import java.text.MessageFormat;
+
+import java.util.Enumeration;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import javax.swing.JComponent;
+import javax.swing.event.ChangeListener;
+
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
+public class EmptyJPressoProjectWizardIterator implements WizardDescriptor.InstantiatingIterator {
+
+    //~ Instance fields --------------------------------------------------------
 
     private int index;
     private WizardDescriptor.Panel[] panels;
     private WizardDescriptor wiz;
 
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new EmptyJPressoProjectWizardIterator object.
+     */
     public EmptyJPressoProjectWizardIterator() {
     }
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public static EmptyJPressoProjectWizardIterator createIterator() {
         return new EmptyJPressoProjectWizardIterator();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     private WizardDescriptor.Panel[] createPanels() {
-        return new WizardDescriptor.Panel[]{
-            new EmptyJPressoProjectWizardPanel()
-        
-    
-
-       
-          ,
-            };
+        return new WizardDescriptor.Panel[] { new EmptyJPressoProjectWizardPanel(), };
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     private String[] createSteps() {
-        return new String[] {
-            NbBundle.getMessage(EmptyJPressoProjectWizardIterator.class, "LBL_CreateProjectStep")
-        };
+        return new String[] { NbBundle.getMessage(EmptyJPressoProjectWizardIterator.class, "LBL_CreateProjectStep") };
     }
 
-    public Set/*<FileObject>*/ instantiate(/*ProgressHandle handle*/) throws IOException {
-        Set<FileObject> resultSet = TypeSafeCollections.newLinkedHashSet();
-        File dirF = FileUtil.normalizeFile((File) wiz.getProperty("projdir"));
+    @Override
+    public Set                               /*<FileObject>*/ instantiate( /*ProgressHandle handle*/)
+            throws IOException {
+        final Set<FileObject> resultSet = TypeSafeCollections.newLinkedHashSet();
+        final File dirF = FileUtil.normalizeFile((File)wiz.getProperty("projdir"));
         dirF.mkdirs();
 
-        FileObject template = Templates.getTemplate(wiz);
-        FileObject dir = FileUtil.toFileObject(dirF);
+        final FileObject template = Templates.getTemplate(wiz);
+        final FileObject dir = FileUtil.toFileObject(dirF);
         unZipFile(template.getInputStream(), dir);
 
         // Always open top dir as a project:
         resultSet.add(dir);
         // Look for nested projects to open as well:
-        Enumeration<? extends FileObject> e = dir.getFolders(true);
+        final Enumeration<? extends FileObject> e = dir.getFolders(true);
         while (e.hasMoreElements()) {
-            FileObject subfolder = e.nextElement();
+            final FileObject subfolder = e.nextElement();
             if (ProjectManager.getDefault().isProject(subfolder)) {
                 resultSet.add(subfolder);
             }
         }
 
-        File parent = dirF.getParentFile();
-        if (parent != null && parent.exists()) {
+        final File parent = dirF.getParentFile();
+        if ((parent != null) && parent.exists()) {
             ProjectChooser.setProjectsFolder(parent);
         }
 
         return resultSet;
     }
 
-    public void initialize(WizardDescriptor wiz) {
+    @Override
+    public void initialize(final WizardDescriptor wiz) {
         this.wiz = wiz;
         index = 0;
         panels = createPanels();
         // Make sure list of steps is accurate.
-        String[] steps = createSteps();
+        final String[] steps = createSteps();
         for (int i = 0; i < panels.length; i++) {
-            Component c = panels[i].getComponent();
+            final Component c = panels[i].getComponent();
             if (steps[i] == null) {
                 // Default step name to component name of panel.
                 // Mainly useful for getting the name of the target
@@ -107,7 +146,7 @@ public class EmptyJPressoProjectWizardIterator implements WizardDescriptor./*Pro
                 steps[i] = c.getName();
             }
             if (c instanceof JComponent) { // assume Swing components
-                JComponent jc = (JComponent) c;
+                final JComponent jc = (JComponent)c;
                 // Step #.
                 jc.putClientProperty("WizardPanel_contentSelectedIndex", i);
                 // Step name (actually the whole list for reference).
@@ -116,26 +155,31 @@ public class EmptyJPressoProjectWizardIterator implements WizardDescriptor./*Pro
         }
     }
 
-    public void uninitialize(WizardDescriptor wiz) {
+    @Override
+    public void uninitialize(final WizardDescriptor wiz) {
         this.wiz.putProperty("projdir", null);
         this.wiz.putProperty("name", null);
         this.wiz = null;
         panels = null;
     }
 
+    @Override
     public String name() {
         return MessageFormat.format("{0} of {1}",
-                new Object[]{index + 1, panels.length});
+                new Object[] { index + 1, panels.length });
     }
 
+    @Override
     public boolean hasNext() {
-        return index < panels.length - 1;
+        return index < (panels.length - 1);
     }
 
+    @Override
     public boolean hasPrevious() {
         return index > 0;
     }
 
+    @Override
     public void nextPanel() {
         if (!hasNext()) {
             throw new NoSuchElementException();
@@ -143,6 +187,7 @@ public class EmptyJPressoProjectWizardIterator implements WizardDescriptor./*Pro
         index++;
     }
 
+    @Override
     public void previousPanel() {
         if (!hasPrevious()) {
             throw new NoSuchElementException();
@@ -150,26 +195,37 @@ public class EmptyJPressoProjectWizardIterator implements WizardDescriptor./*Pro
         index--;
     }
 
+    @Override
     public WizardDescriptor.Panel current() {
         return panels[index];
     }
 
     // If nothing unusual changes in the middle of the wizard, simply:
-    public final void addChangeListener(ChangeListener l) {
+    @Override
+    public final void addChangeListener(final ChangeListener l) {
     }
 
-    public final void removeChangeListener(ChangeListener l) {
+    @Override
+    public final void removeChangeListener(final ChangeListener l) {
     }
 
-    private static void unZipFile(InputStream source, FileObject projectRoot) throws IOException {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   source       DOCUMENT ME!
+     * @param   projectRoot  DOCUMENT ME!
+     *
+     * @throws  IOException  DOCUMENT ME!
+     */
+    private static void unZipFile(final InputStream source, final FileObject projectRoot) throws IOException {
         try {
-            ZipInputStream str = new ZipInputStream(source);
+            final ZipInputStream str = new ZipInputStream(source);
             ZipEntry entry;
             while ((entry = str.getNextEntry()) != null) {
                 if (entry.isDirectory()) {
                     FileUtil.createFolder(projectRoot, entry.getName());
                 } else {
-                    FileObject fo = FileUtil.createData(projectRoot, entry.getName());
+                    final FileObject fo = FileUtil.createData(projectRoot, entry.getName());
                     if ("nbproject/project.xml".equals(entry.getName())) {
                         // Special handling for setting name of Ant-based projects; customize as needed:
                         filterProjectXML(fo, str, projectRoot.getName());
@@ -183,8 +239,16 @@ public class EmptyJPressoProjectWizardIterator implements WizardDescriptor./*Pro
         }
     }
 
-    private static void writeFile(ZipInputStream str, FileObject fo) throws IOException {
-        OutputStream out = fo.getOutputStream();
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   str  DOCUMENT ME!
+     * @param   fo   DOCUMENT ME!
+     *
+     * @throws  IOException  DOCUMENT ME!
+     */
+    private static void writeFile(final ZipInputStream str, final FileObject fo) throws IOException {
+        final OutputStream out = fo.getOutputStream();
         try {
             FileUtil.copy(str, out);
         } finally {
@@ -192,17 +256,31 @@ public class EmptyJPressoProjectWizardIterator implements WizardDescriptor./*Pro
         }
     }
 
-    private static void filterProjectXML(FileObject fo, ZipInputStream str, String name) throws IOException {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   fo    DOCUMENT ME!
+     * @param   str   DOCUMENT ME!
+     * @param   name  DOCUMENT ME!
+     *
+     * @throws  IOException  DOCUMENT ME!
+     */
+    private static void filterProjectXML(final FileObject fo, final ZipInputStream str, final String name)
+            throws IOException {
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
             FileUtil.copy(str, baos);
-            Document doc = XMLUtil.parse(new InputSource(new ByteArrayInputStream(baos.toByteArray())), false, false, null, null);
-            NodeList nl = doc.getDocumentElement().getElementsByTagName("name");
+            final Document doc = XMLUtil.parse(new InputSource(new ByteArrayInputStream(baos.toByteArray())),
+                    false,
+                    false,
+                    null,
+                    null);
+            final NodeList nl = doc.getDocumentElement().getElementsByTagName("name");
             if (nl != null) {
                 for (int i = 0; i < nl.getLength(); i++) {
-                    Element el = (Element) nl.item(i);
-                    if (el.getParentNode() != null && "data".equals(el.getParentNode().getNodeName())) {
-                        NodeList nl2 = el.getChildNodes();
+                    final Element el = (Element)nl.item(i);
+                    if ((el.getParentNode() != null) && "data".equals(el.getParentNode().getNodeName())) {
+                        final NodeList nl2 = el.getChildNodes();
                         if (nl2.getLength() > 0) {
                             nl2.item(0).setNodeValue(name);
                         }
@@ -210,7 +288,7 @@ public class EmptyJPressoProjectWizardIterator implements WizardDescriptor./*Pro
                     }
                 }
             }
-            OutputStream out = fo.getOutputStream();
+            final OutputStream out = fo.getOutputStream();
             try {
                 XMLUtil.write(doc, out, "UTF-8");
             } finally {
@@ -220,6 +298,5 @@ public class EmptyJPressoProjectWizardIterator implements WizardDescriptor./*Pro
             Exceptions.printStackTrace(ex);
             writeFile(str, fo);
         }
-
     }
 }

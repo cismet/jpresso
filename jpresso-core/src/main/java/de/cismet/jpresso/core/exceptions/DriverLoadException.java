@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -5,24 +12,47 @@
 package de.cismet.jpresso.core.exceptions;
 
 /**
+ * DOCUMENT ME!
  *
- * @author stefan
+ * @author   stefan
+ * @version  $Revision$, $Date$
  */
 public class DriverLoadException extends Exception {
 
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new DriverLoadException object.
+     */
     public DriverLoadException() {
         super();
     }
 
-    public DriverLoadException(String msg) {
+    /**
+     * Creates a new DriverLoadException object.
+     *
+     * @param  msg  DOCUMENT ME!
+     */
+    public DriverLoadException(final String msg) {
         super(msg);
     }
 
-    public DriverLoadException(Exception ex) {
+    /**
+     * Creates a new DriverLoadException object.
+     *
+     * @param  ex  DOCUMENT ME!
+     */
+    public DriverLoadException(final Exception ex) {
         super(ex);
     }
 
-    public DriverLoadException(String msg, Exception ex) {
+    /**
+     * Creates a new DriverLoadException object.
+     *
+     * @param  msg  DOCUMENT ME!
+     * @param  ex   DOCUMENT ME!
+     */
+    public DriverLoadException(final String msg, final Exception ex) {
         super(msg, ex);
     }
 }

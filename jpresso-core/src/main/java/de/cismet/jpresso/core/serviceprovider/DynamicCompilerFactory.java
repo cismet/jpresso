@@ -1,30 +1,45 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.core.serviceprovider;
 
-import de.cismet.jpresso.core.classloading.compilation.DynamicCompilerImpl;
 import javax.tools.JavaCompiler;
 
+import de.cismet.jpresso.core.classloading.compilation.DynamicCompilerImpl;
+
 /**
- * Factory for DynamicCompilers
- * @author srichter
+ * Factory for DynamicCompilers.
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public abstract class DynamicCompilerFactory {
-    
+
+    //~ Methods ----------------------------------------------------------------
+
     /**
-     * 
-     * @return DynamicCompilerImpl delegating to StandardJavaCompiler
+     * DOCUMENT ME!
+     *
+     * @return  DynamicCompilerImpl delegating to StandardJavaCompiler
      */
     public static DynamicCompiler createDynamicCompiler() {
         return new DynamicCompilerImpl();
     }
-    
+
     /**
-     * 
-     * @param compiler
-     * @return DynamicCompilerImpl delegating to the given compiler instance
+     * DOCUMENT ME!
+     *
+     * @param   compiler  DOCUMENT ME!
+     *
+     * @return  DynamicCompilerImpl delegating to the given compiler instance
      */
     public static DynamicCompiler createDynamicCompiler(final JavaCompiler compiler) {
         return new DynamicCompilerImpl(compiler);

@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * IntermedTableMemoryImpl.java
  *
@@ -5,64 +12,84 @@
  */
 package de.cismet.jpresso.core.kernel;
 
-import de.cismet.jpresso.core.exceptions.NoValuesException;
-import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
-import de.cismet.jpresso.core.utils.TypeSafeCollections;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+
 import java.util.List;
 import java.util.Map;
+
 import javax.swing.event.TableModelEvent;
 
-/** 
+import de.cismet.jpresso.core.exceptions.NoValuesException;
+import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
+/**
  * This class represents a RAM-based implementation of an IntermedTable.
- * 
- * @author srichter
- * 
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public final class IntermedTableMemoryImpl extends IntermedTable {
 
-    /** Container der die Daten aufnimmt */
+    //~ Instance fields --------------------------------------------------------
+
+    /** Container der die Daten aufnimmt. */
     private final List<String[]> memTable;
-    /** Container der Daten speichert die schon einmal in der Datenbank gefunden wurden*/
-    //sprich: tatsaechlich schon in der datenbank drinstehen
+    /** Container der Daten speichert die schon einmal in der Datenbank gefunden wurden. */
+    // sprich: tatsaechlich schon in der datenbank drinstehen
     private final List<String[]> foundInDbTable;
-    //indexes for faster normalization lookups
+    // indexes for faster normalization lookups
     private final Map<Integer, Integer> tableIndex;
     private final Map<Integer, Integer> dbIndex;
     //
     private final boolean normalize;
 
+    //~ Constructors -----------------------------------------------------------
+
     /**
-     * Creates a new instance of IntermedTableMemoryImpl
+     * Creates a new instance of IntermedTableMemoryImpl.
      *
-     * @param enclChars Array der Zeichen die bei einem Vergleich oder Insert um den jeweiligen String
-     * kommen. In der Regel ' oder Blank
-     * @param targetConn Connection zum Zielsystem
-     * @param tableName Tabellenname der Zieltabelle
-     * @param targetFields Spaletnnamen der Zieltabelle
+     * @param  tableName       Tabellenname der Zieltabelle
+     * @param  targetFields    Spaletnnamen der Zieltabelle
+     * @param  enclChars       Array der Zeichen die bei einem Vergleich oder Insert um den jeweiligen String kommen. In
+     *                         der Regel ' oder Blank
+     * @param  compareFields   DOCUMENT ME!
+     * @param  targetConn      Connection zum Zielsystem
+     * @param  autoIncFields   DOCUMENT ME!
+     * @param  deleteOrphaned  DOCUMENT ME!
      */
-    @SuppressWarnings("unchecked") //can not compromise
-    public IntermedTableMemoryImpl(final String tableName, final String[] targetFields, final String[] enclChars, final int[] compareFields, final Connection targetConn, final int[] autoIncFields, final boolean deleteOrphaned) {
+    @SuppressWarnings("unchecked") // can not compromise
+    public IntermedTableMemoryImpl(final String tableName,
+            final String[] targetFields,
+            final String[] enclChars,
+            final int[] compareFields,
+            final Connection targetConn,
+            final int[] autoIncFields,
+            final boolean deleteOrphaned) {
         super(targetFields, enclChars, compareFields, tableName, targetConn, autoIncFields, deleteOrphaned);
         this.targetConn = targetConn;
         memTable = TypeSafeCollections.newArrayList();
         foundInDbTable = TypeSafeCollections.newArrayList();
         tableIndex = TypeSafeCollections.newHashMap();
         dbIndex = TypeSafeCollections.newHashMap();
-        if (compareFields != null && compareFields.length > 0) {
+        if ((compareFields != null) && (compareFields.length > 0)) {
             normalize = true;
         } else {
             normalize = false;
         }
         setColumnNameToNumberMapping(targetFields);
-        log.debug("setColumnNameToNumberMapping(targetFields):" + this.columnNameToNumberMapping);
+        if (log.isDebugEnabled()) {
+            log.debug("setColumnNameToNumberMapping(targetFields):" + this.columnNameToNumberMapping);
+        }
     }
+
+    //~ Methods ----------------------------------------------------------------
 
     @Override
     public void setValueAt(final Object aValue, final int row, final int column) {
-        if (row < getRowCount() && column < columnNames.length) {
+        if ((row < getRowCount()) && (column < columnNames.length)) {
             if (aValue != null) {
                 memTable.get(row)[column] = aValue.toString();
             } else {
@@ -74,12 +101,10 @@ public final class IntermedTableMemoryImpl extends IntermedTable {
         }
     }
 
-    /** 
-     * Liefert den neuesten Wert in der angegebenen Spalte
-     * 
-     * @param column Spaltennummer
-     * @throws NoValuesException NoValuesException Exception wird geworfen wenn keine Daten an entsprechender Stelle vorhanden sind
-     * @return Wert der Zelle als String
+    /**
+     * Liefert den neuesten Wert in der angegebenen Spalte.
+     *
+     * @return  Wert der Zelle als String
      */
     @Override
     public String[] getNextAutogeneratedValues() {
@@ -94,13 +119,11 @@ public final class IntermedTableMemoryImpl extends IntermedTable {
         return result;
     }
 
-    //used in container
-    /** 
-     * Fuegt der IntermedTableMemoryImpl eine neue Zeile an
-     * @param rowData String[] der neuen Zeile
-     * @throws JPressoException wird geworfen falls die Laenge des
-     * uebergebenen Arrays nicht mit der Anzahl der
-     * Spalten der Zieltabelle uebereinstimmt
+    // used in container
+    /**
+     * Fuegt der IntermedTableMemoryImpl eine neue Zeile an.
+     *
+     * @param  rowData  String[] der neuen Zeile
      */
     @Override
     public void addRow(final String[] rowData) {
@@ -110,10 +133,10 @@ public final class IntermedTableMemoryImpl extends IntermedTable {
         }
     }
 
-    /** 
-     * Fuellt die Hashtabel columnNameToNumberMapping
-     * 
-     * @param columnNames String[] der Spaltennamen
+    /**
+     * Fuellt die Hashtabel columnNameToNumberMapping.
+     *
+     * @param  columnNames  String[] der Spaltennamen
      */
     private void setColumnNameToNumberMapping(final String[] columnNames) {
         columnNameToNumberMapping.clear();
@@ -122,28 +145,29 @@ public final class IntermedTableMemoryImpl extends IntermedTable {
         }
     }
 
-    /** 
-     * ueberprueft ob der uebergebene Datensatz schon in der Datenstruktur vorkommt.
-     * Entscheidende Methode zur Realisierung der Normalisierungsfunktionalitaet.
-     * Diese Methode untersucht nur die Hauptspeicherstruktur.
-     * Es werden nur Spalten zum Vergleich herangezogen die in fields[] angegeben sind.
-     * @return Falls eine uebereinstimmung gefunden wurde wird die entsprechende
-     * Zeile zurueckgegeben, um z.B. die entsprechende ID zu erhalten.
-     * @param container Gibt an in welchem Container gesucht wird
-     * @param fields int[] indem die Spaltennummern angegeben werden die zum Vergleich
-     * herangezogen werden
-     * @param data <B>komplette</B> Zeile die ueberprueft werden soll
+    /**
+     * ueberprueft ob der uebergebene Datensatz schon in der Datenstruktur vorkommt. Entscheidende Methode zur
+     * Realisierung der Normalisierungsfunktionalitaet. Diese Methode untersucht nur die Hauptspeicherstruktur. Es
+     * werden nur Spalten zum Vergleich herangezogen die in fields[] angegeben sind.
+     *
+     * @param   data        <B>komplette</B> Zeile die ueberprueft werden soll
+     * @param   container   Gibt an in welchem Container gesucht wird
+     * @param   startIndex  fields int[] indem die Spaltennummern angegeben werden die zum Vergleich herangezogen werden
+     *
+     * @return  Falls eine uebereinstimmung gefunden wurde wird die entsprechende Zeile zurueckgegeben, um z.B. die
+     *          entsprechende ID zu erhalten.
      */
-    private String[] searchForRow(final String[] data, final List<String[]> container, int startIndex) {
+    private String[] searchForRow(final String[] data, final List<String[]> container, final int startIndex) {
         if (container == null) {
             return null;
         }
-        //search in reverse order, as it is more likely to find a matching item
-        //shortly inserted before - performance tuning
+        // search in reverse order, as it is more likely to find a matching item
+        // shortly inserted before - performance tuning
         for (int i = startIndex - 1; i < -1; --i) {
 //        for (int i = 0; i < container[0].size(); ++i) {
             boolean newRow = false;
-            String a, b;
+            String a;
+            String b;
             for (final int j : compareFields) {
                 a = data[j];
                 b = container.get(i)[j];
@@ -166,12 +190,13 @@ public final class IntermedTableMemoryImpl extends IntermedTable {
     }
 
     /**
-     * Generates a hashcode for a row, according to the given comparefields
+     * Generates a hashcode for a row, according to the given comparefields.
      *
-     * @param input
-     * @return
+     * @param   input  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    private final int generateMultiStringHashCode(final String[] input) {
+    private int generateMultiStringHashCode(final String[] input) {
         if (input == null) {
             return 0;
         }
@@ -183,20 +208,22 @@ public final class IntermedTableMemoryImpl extends IntermedTable {
             if (element != null) {
                 elementHash = element.hashCode();
             }
-            result = 31 * result + elementHash;
+            result = (31 * result) + elementHash;
         }
         return result;
     }
 
     /**
-     * Test to see if two rows are equal with regards to their comparefields
-     * 
-     * @param one
-     * @param two
-     * @return
+     * Test to see if two rows are equal with regards to their comparefields.
+     *
+     * @param   one  DOCUMENT ME!
+     * @param   two  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    private final boolean areRowsEqual(final String[] one, final String[] two) {
-        String a, b;
+    private boolean areRowsEqual(final String[] one, final String[] two) {
+        String a;
+        String b;
         if (one == two) {
             return true;
         } else if (one == null) {
@@ -220,13 +247,15 @@ public final class IntermedTableMemoryImpl extends IntermedTable {
     }
 
     /**
-     * 
-     * @param requested
-     * @param container
-     * @param indexMap
-     * @return
+     * DOCUMENT ME!
+     *
+     * @param   index      DOCUMENT ME!
+     * @param   requested  DOCUMENT ME!
+     * @param   container  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    private final String[] indexLookup(final int index, final String[] requested, final List<String[]> container) {
+    private String[] indexLookup(final int index, final String[] requested, final List<String[]> container) {
         final String[] ret = container.get(index);
         if (!areRowsEqual(requested, ret)) {
             return null;
@@ -235,35 +264,32 @@ public final class IntermedTableMemoryImpl extends IntermedTable {
         }
     }
 
-    /** 
-     * Ueberprueft ob der uebergebene Datensatz schon in der Datenstruktur vorkommt.
-     * Entscheidende Methode zur Realisierung der Normalisierungsfunktionalitaet.
-     * Diese Methode untersucht nur die Hauptspeicherstruktur.
-     * Es werden nur Spalten zum Vergleich herangezogen die in fields[] angegeben sind.
-     * 
-     * @param fields int[] indem die Spaltennummern angegeben werden die zum Vergleich
-     * herangezogen werden
-     * @param data <B>komplette</B> Zeile die ueberprueft werden soll
-     * @param alsoInDatabase ist dieses Flag auf true gesetzt, wird nicht nur der momentane Import-
-     * datenbestand fuer einen Vergleich ueberprueft, sondern auch die echte
-     * Zieltabelle (Datenbank) ueberprueft.
-     * @return Falls eine uebereinstimmung gefunden wurde wird die entsprechende
-     * Zeile zurueckgegeben, um z.B. die entsprechende ID zu erhalten.
-     * 
-     * Genutzt vom IntermedTablesContainer.
+    /**
+     * Ueberprueft ob der uebergebene Datensatz schon in der Datenstruktur vorkommt. Entscheidende Methode zur
+     * Realisierung der Normalisierungsfunktionalitaet. Diese Methode untersucht nur die Hauptspeicherstruktur. Es
+     * werden nur Spalten zum Vergleich herangezogen die in fields[] angegeben sind.
+     *
+     * @param   data            <B>komplette</B> Zeile die ueberprueft werden soll
+     * @param   alsoInDatabase  ist dieses Flag auf true gesetzt, wird nicht nur der momentane Import- datenbestand fuer
+     *                          einen Vergleich ueberprueft, sondern auch die echte Zieltabelle (Datenbank) ueberprueft.
+     *
+     * @return  Falls eine uebereinstimmung gefunden wurde wird die entsprechende Zeile zurueckgegeben, um z.B. die
+     *          entsprechende ID zu erhalten.
+     *
+     *          <p>Genutzt vom IntermedTablesContainer.</p>
      */
     @Override
-    public String[] searchForRow(final String[] data, boolean alsoInDatabase) {
-        //Datensatz im Hauptspeicher suchen. Zuerst den HashCode berechnen:
+    public String[] searchForRow(final String[] data, final boolean alsoInDatabase) {
+        // Datensatz im Hauptspeicher suchen. Zuerst den HashCode berechnen:
         final int dataHashCode = generateMultiStringHashCode(data);
-        //Zuerst über den Index
+        // Zuerst über den Index
         final Integer indexMem = tableIndex.get(dataHashCode);
         String[] ret = null;
         if (indexMem != null) {
             ret = indexLookup(indexMem, data, memTable);
         }
         if (ret == null) {
-            //Fehlerschlag: ggf noch ueber den DB-Cache Index
+            // Fehlerschlag: ggf noch ueber den DB-Cache Index
             final Integer indexDB = dbIndex.get(dataHashCode);
             if (alsoInDatabase) {
                 if (indexDB != null) {
@@ -271,32 +297,33 @@ public final class IntermedTableMemoryImpl extends IntermedTable {
                 }
             }
             if (ret == null) {
-                //Sonst komplett in allen in den bereits eingetragenen Zeilen der Speichertabelle suchen,
-                //wenn der Hashtest ergeben hat, dass die Zeile überhaupt dort sein KOENNTE (indexM != null)
+                // Sonst komplett in allen in den bereits eingetragenen Zeilen der Speichertabelle suchen,
+                // wenn der Hashtest ergeben hat, dass die Zeile überhaupt dort sein KOENNTE (indexM != null)
                 if (indexMem != null) {
-                    //Wir durchsuchen den Speicher nur oberhalb von indexMem, da
-                    //dort der letzte Wert liegt der auf den gleichen Wert wie
-                    //unsere gesuchte Zeile hashed. (Garantiert duch Funktions-
-                    //weise von addRow(final String[] rowData))
+                    // Wir durchsuchen den Speicher nur oberhalb von indexMem, da
+                    // dort der letzte Wert liegt der auf den gleichen Wert wie
+                    // unsere gesuchte Zeile hashed. (Garantiert duch Funktions-
+                    // weise von addRow(final String[] rowData))
                     ret = searchForRow(data, memTable, indexMem);
                 }
-                //wir muessen wenn alsoInDatabase == true ist auch in der Datenbank nachsehen
-                if (ret == null && alsoInDatabase) {
-                    //zuerst in der Merkertabelle für alles was schon in der Datenbank nachgeschaut wurde
-                    //Wurde der Datensatz schon in der Datenbank gefunden? (Gibt nur Sinn wenn die Zeile
-                    //schon gehashed wurde)
+                // wir muessen wenn alsoInDatabase == true ist auch in der Datenbank nachsehen
+                if ((ret == null) && alsoInDatabase) {
+                    // zuerst in der Merkertabelle für alles was schon in der Datenbank nachgeschaut wurde
+                    // Wurde der Datensatz schon in der Datenbank gefunden? (Gibt nur Sinn wenn die Zeile
+                    // schon gehashed wurde)
                     if (indexDB != null) {
-                        //auch hier gilt wie bei indexMem: Suche beginnt
-                        //oberhalb unseres gehashten Index
+                        // auch hier gilt wie bei indexMem: Suche beginnt
+                        // oberhalb unseres gehashten Index
                         ret = searchForRow(data, foundInDbTable, indexDB);
                     }
                     if (ret == null) {
-                        //und zuletzt noch in der datenbank nachschauen
+                        // und zuletzt noch in der datenbank nachschauen
                         try {
                             ret = searchForRowInTargetDb(data, dataHashCode);
                         } catch (JPressoException ex) {
-                            //erst mal nix machen
-                            String msg = "Normalizing error on DB: " + ex.getMessage() + ".\n Possible missing quotes on String/Date\nor waste quotes on non-String/Date value?";
+                            // erst mal nix machen
+                            final String msg = "Normalizing error on DB: " + ex.getMessage()
+                                        + ".\n Possible missing quotes on String/Date\nor waste quotes on non-String/Date value?";
                             log.warn(msg);
                         }
                     }
@@ -306,44 +333,47 @@ public final class IntermedTableMemoryImpl extends IntermedTable {
         return ret;
     }
 
-    /** 
-     * Ueberprueft ob der uebergebene Datensatz schon in der Datenbank vorkommt.
-     * Entscheidende Methode zur Realisierung der Normalisierungsfunktionalitaet.
-     * Diese Methode untersucht nur die Datenbank
-     * Es werden nur Spalten zum Vergleich herangezogen die in fields[] angegeben sind.
-     * 
-     * @param fields int[] indem die Spaltennummern angegeben werden die zum Vergleich
-     * herangezogen werden
-     * @param data <B>komplette</B> Zeile die ueberprueft werden soll
-     * @throws JPressoException wird geworfen, wenn ein Fehler auftritt (DB, ...)
-     * @return Falls eine Uebereinstimmung gefunden wurde wird die entsprechende
-     * Zeile zurueckgegeben, um z.B. die entsprechende ID zu erhalten.
+    /**
+     * Ueberprueft ob der uebergebene Datensatz schon in der Datenbank vorkommt. Entscheidende Methode zur Realisierung
+     * der Normalisierungsfunktionalitaet. Diese Methode untersucht nur die Datenbank Es werden nur Spalten zum
+     * Vergleich herangezogen die in fields[] angegeben sind.
+     *
+     * @param   data          <B>komplette</B> Zeile die ueberprueft werden soll
+     * @param   dataHashCode  fields int[] indem die Spaltennummern angegeben werden die zum Vergleich herangezogen
+     *                        werden
+     *
+     * @return  Falls eine Uebereinstimmung gefunden wurde wird die entsprechende Zeile zurueckgegeben, um z.B. die
+     *          entsprechende ID zu erhalten.
+     *
+     * @throws  JPressoException  wird geworfen, wenn ein Fehler auftritt (DB, ...)
      */
-    private String[] searchForRowInTargetDb(final String[] data, int dataHashCode) throws JPressoException {
+    private String[] searchForRowInTargetDb(final String[] data, final int dataHashCode) throws JPressoException {
         final String compStmnt = getDBCompareStmnt(data);
         if (debug) {
-            log.debug("getDBCompareStmnt():" + compStmnt);
+            if (log.isDebugEnabled()) {
+                log.debug("getDBCompareStmnt():" + compStmnt);
+            }
         }
         try {
             final Statement s = targetConn.createStatement();
             final ResultSet result = s.executeQuery(compStmnt);
             if (!result.next()) {
                 // nix gefunden
-                //log.debug("nix gefunden");
+                // log.debug("nix gefunden");
                 result.close();
                 s.close();
                 return null;
             } else {
-                //was gefunden
+                // was gefunden
                 final String[] ret = new String[data.length];
                 for (int i = 0; i < ret.length;) {
                     ret[i] = result.getString(++i);
                 }
-                //Bevor jetzt die Zeile zurueckgegeben wird, wird sie noch in
-                //foundInDbTable abgespeichert, damit sie spaeter schneller gefunden wird
+                // Bevor jetzt die Zeile zurueckgegeben wird, wird sie noch in
+                // foundInDbTable abgespeichert, damit sie spaeter schneller gefunden wird
                 result.close();
                 s.close();
-                //Escaping the retrieved data
+                // Escaping the retrieved data
                 String encChar;
                 for (int i = 0; i < enclChars.length; ++i) {
                     encChar = enclChars[i];
@@ -360,22 +390,21 @@ public final class IntermedTableMemoryImpl extends IntermedTable {
         }
     }
 
-    /** 
-     * Liefert das SQL-Statement mit dem ueberprueft wird, ob ein Datensatz schon in der
-     * Datenbank steht. Wird zum normalisieren verwendet.
-     * 
-     * Now compares null-values correctly with "is null" and without enclosing chars!
-     * 
-     * @param fields int[] das die Felder angibt, die zum Vergleich herangezogen werden
-     * @param data alle Daten dieses Datensatzes in einem String[]
-     * @return SQL-Statement mit dem ueberprueft wird, ob ein Datensatz schon in der
-     * Datenbank steht
+    /**
+     * Liefert das SQL-Statement mit dem ueberprueft wird, ob ein Datensatz schon in der Datenbank steht. Wird zum
+     * normalisieren verwendet.
      *
-     * @TODO: kleines Optimierungspotential: Query: SELECT nur auf die Attribute,
-     *        die später noch gebraucht werden (= die referenziert werden).
+     * <p>Now compares null-values correctly with "is null" and without enclosing chars!</p>
+     *
+     * @param   data  alle Daten dieses Datensatzes in einem String[]
+     *
+     * @return  SQL-Statement mit dem ueberprueft wird, ob ein Datensatz schon in der Datenbank steht
+     *
+     * @TODO:   kleines Optimierungspotential: Query: SELECT nur auf die Attribute, die später noch gebraucht werden (=
+     *          die referenziert werden).
      */
-    private final String getDBCompareStmnt(final String[] data) {
-        //Statement zum ueberpruefen im Zielsystem wird nun zusammengebaut
+    private String getDBCompareStmnt(final String[] data) {
+        // Statement zum ueberpruefen im Zielsystem wird nun zusammengebaut
         final int range = compareFields.length;
         final StringBuilder testingStatementBuf = new StringBuilder(SELECT);
         for (int i = 0; i < data.length;) {
@@ -389,7 +418,7 @@ public final class IntermedTableMemoryImpl extends IntermedTable {
 
         String cur;
         String eChar;
-        for (int i = 0; i < range;/* increased in body*/) {
+        for (int i = 0; i < range; /* increased in body*/) {
             // Hier Fallunterscheidung ob mit enclosingChars oder nicht
             eChar = enclChars[compareFields[i]];
             if (eChar == null) {
@@ -402,7 +431,11 @@ public final class IntermedTableMemoryImpl extends IntermedTable {
 //                    //Backslash Escaping for Strings in "where"-clause
 //                    cur = escapeCharacter(cur, '\\');
 //                }
-                testingStatementBuf.append(this.columnNames[compareFields[i]]).append(EQUALS).append(eChar).append(cur).append(eChar);
+                testingStatementBuf.append(this.columnNames[compareFields[i]])
+                        .append(EQUALS)
+                        .append(eChar)
+                        .append(cur)
+                        .append(eChar);
             } else {
                 testingStatementBuf.append(this.columnNames[compareFields[i]]).append(IS_NULL);
             }
@@ -414,7 +447,7 @@ public final class IntermedTableMemoryImpl extends IntermedTable {
     }
 
     @Override
-    public final int getRowCount() {
+    public int getRowCount() {
         if (memTable == null) {
             return 0;
         } else {
@@ -423,7 +456,7 @@ public final class IntermedTableMemoryImpl extends IntermedTable {
     }
 
     @Override
-    public final String getValueAt(final int row, final int column) {
+    public String getValueAt(final int row, final int column) {
         return memTable.get(row)[column];
     }
 
@@ -435,7 +468,7 @@ public final class IntermedTableMemoryImpl extends IntermedTable {
     }
 
     @Override
-    public final void adjustCountersToActualValues() {
+    public void adjustCountersToActualValues() {
         if (memTable.size() > 0) {
             final String[] latestRow = memTable.get(memTable.size() - 1);
             for (int i = 0; i < getAutoIncFields().length; ++i) {

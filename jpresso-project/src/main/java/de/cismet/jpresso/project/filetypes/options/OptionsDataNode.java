@@ -1,31 +1,61 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.project.filetypes.options;
 
-import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
 import org.openide.loaders.DataNode;
 import org.openide.nodes.Children;
 import org.openide.util.Lookup;
 
+import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
+
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
 public final class OptionsDataNode extends DataNode {
+
+    //~ Static fields/initializers ---------------------------------------------
 
     private static final String IMAGE_ICON_BASE = "de/cismet/jpresso/project/res/kservices.png";
 
-    public OptionsDataNode(OptionsDataObject obj) {
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new OptionsDataNode object.
+     *
+     * @param  obj  DOCUMENT ME!
+     */
+    public OptionsDataNode(final OptionsDataObject obj) {
         super(obj, Children.LEAF);
         setIconBaseWithExtension(IMAGE_ICON_BASE);
     }
 
-    OptionsDataNode(OptionsDataObject obj, Lookup lookup) {
+    /**
+     * Creates a new OptionsDataNode object.
+     *
+     * @param  obj     DOCUMENT ME!
+     * @param  lookup  DOCUMENT ME!
+     */
+    OptionsDataNode(final OptionsDataObject obj, final Lookup lookup) {
         super(obj, Children.LEAF, lookup);
         setIconBaseWithExtension(IMAGE_ICON_BASE);
     }
 
+    //~ Methods ----------------------------------------------------------------
+
     @Override
     public String getName() {
-        org.openide.filesystems.FileObject fo = getDataObject().getPrimaryFile();
+        final org.openide.filesystems.FileObject fo = getDataObject().getPrimaryFile();
         if ((fo.getName() + "." + fo.getExt()).equals(JPressoFileManager.PROJECT_OPTIONS)) {
             return "Options";
         } else {
@@ -56,7 +86,7 @@ public final class OptionsDataNode extends DataNode {
     @Override
     public boolean canCopy() {
         return false;
-    }//    /** Creates a property sheet. */
+    } // /** Creates a property sheet. */
 //    @Override
 //    protected Sheet createSheet() {
 //        Sheet s = super.createSheet();

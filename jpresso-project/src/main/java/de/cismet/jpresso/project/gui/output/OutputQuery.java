@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * OutputQuery.java
  *
@@ -5,34 +12,57 @@
  */
 package de.cismet.jpresso.project.gui.output;
 
-import de.cismet.jpresso.project.gui.output.filtering.TableSortDecorator;
 import java.awt.Color;
 import java.awt.Component;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
+import de.cismet.jpresso.project.gui.output.filtering.TableSortDecorator;
+
 /**
+ * DOCUMENT ME!
  *
- * @author  srichter
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public class OutputQuery extends JPanel {
 
-    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+    //~ Static fields/initializers ---------------------------------------------
+
     public static final String NULL = "<NULL>";
 
-    /** Creates new form OutputQuery */
+    //~ Instance fields --------------------------------------------------------
+
+    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTable jTable1;
+    private javax.swing.JScrollPane scpOut;
+    // End of variables declaration//GEN-END:variables
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates new form OutputQuery.
+     */
     public OutputQuery() {
         initComponents();
         setName("Query");
-
     }
 
-    public OutputQuery(ResultSet rs, int maxRows) {
+    /**
+     * Creates a new OutputQuery object.
+     *
+     * @param  rs       DOCUMENT ME!
+     * @param  maxRows  DOCUMENT ME!
+     */
+    public OutputQuery(final ResultSet rs, final int maxRows) {
         initComponents();
         try {
             setName("Query");
@@ -43,33 +73,41 @@ public class OutputQuery extends JPanel {
         }
     }
 
-    public void update(ResultSet resultSet) throws SQLException {
+    //~ Methods ----------------------------------------------------------------
 
-        ResultSetMetaData metaData = resultSet.getMetaData();
-        String[] columnNames = new String[metaData.getColumnCount()];
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   resultSet  DOCUMENT ME!
+     *
+     * @throws  SQLException  DOCUMENT ME!
+     */
+    public void update(final ResultSet resultSet) throws SQLException {
+        final ResultSetMetaData metaData = resultSet.getMetaData();
+        final String[] columnNames = new String[metaData.getColumnCount()];
 
         for (int i = 0; i < columnNames.length; i++) {
             columnNames[i] = metaData.getColumnLabel(i + 1);
 //            columnNames[i] = metaData.getColumnName(i + 1);
         }
 
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
+        final DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0) {
 
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
+                @Override
+                public boolean isCellEditable(final int row, final int column) {
+                    return false;
+                }
+            };
+
         int i = 1;
 
+        while (resultSet.next()) { // && i < this.maxRows) {
 
-        while (resultSet.next()) {// && i < this.maxRows) {
-
-            Object[] objects = new Object[metaData.getColumnCount()];
+            final Object[] objects = new Object[metaData.getColumnCount()];
             for (int j = 0; j < objects.length; ++j) {
-                Object cur = resultSet.getObject(j + 1);
-                //FIX: BLOB-stop: if not, large BLOBs could fill up our memory, as they
-                //stay referenced as long as this table is in memory!!!
+                final Object cur = resultSet.getObject(j + 1);
+                // FIX: BLOB-stop: if not, large BLOBs could fill up our memory, as they
+                // stay referenced as long as this table is in memory!!!
                 if (cur != null) {
                     objects[j] = cur.toString();
                 } else {
@@ -80,32 +118,41 @@ public class OutputQuery extends JPanel {
             tableModel.addRow(objects);
             ++i;
         }
-        DefaultTableCellRenderer r = new DefaultTableCellRenderer() {
+        final DefaultTableCellRenderer r = new DefaultTableCellRenderer() {
 
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                if (value.equals(NULL)) {
-                    c.setForeground(Color.LIGHT_GRAY);
-                } else {
-                    c.setForeground(Color.BLACK);
+                @Override
+                public Component getTableCellRendererComponent(final JTable table,
+                        final Object value,
+                        final boolean isSelected,
+                        final boolean hasFocus,
+                        final int row,
+                        final int column) {
+                    final Component c = super.getTableCellRendererComponent(
+                            table,
+                            value,
+                            isSelected,
+                            hasFocus,
+                            row,
+                            column);
+                    if (value.equals(NULL)) {
+                        c.setForeground(Color.LIGHT_GRAY);
+                    } else {
+                        c.setForeground(Color.BLACK);
+                    }
+                    return c;
                 }
-                return c;
-            }
-        };
+            };
 //        tblIntermed.setDefaultRenderer(String.class, r);
         jTable1.setDefaultRenderer(Object.class, r);
         jTable1.setModel(tableModel);
     }
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
+     * content of this method is always regenerated by the Form Editor.
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
         scpOut = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
 
@@ -114,19 +161,10 @@ public class OutputQuery extends JPanel {
         scpOut.setPreferredSize(new java.awt.Dimension(200, 150));
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-
-            }
-        ));
+                new Object[][] {},
+                new String[] {}));
         scpOut.setViewportView(jTable1);
 
         add(scpOut, java.awt.BorderLayout.CENTER);
-    }// </editor-fold>//GEN-END:initComponents
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTable jTable1;
-    private javax.swing.JScrollPane scpOut;
-    // End of variables declaration//GEN-END:variables
+    } // </editor-fold>//GEN-END:initComponents
 }

@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -9,28 +16,25 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+
 import java.util.Formatter;
 import java.util.Iterator;
 
 /**
- * DataSource implementation for JDBC
+ * DataSource implementation for JDBC.
  *
- * @author srichter
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public final class DatabaseDataSource implements DataSource {
 
-    private static final String COUNT_STMNT = "select count(*) as rcount from (%1$2s) as t";
+    //~ Static fields/initializers ---------------------------------------------
 
-    public DatabaseDataSource(final Connection con, final String query, final int fetchSize) throws SQLException {
-        if (con == null || query == null) {
-            throw new NullPointerException();
-        }
-        this.query = query + "\n"; //append newline against "--" comments
-        this.con = con;
-        this.fetchSize = fetchSize;
-        refreshResultSet();
-    }
+    private static final String COUNT_STMNT = "select count(*) as rcount from (%1$2s) as t";
     private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DatabaseDataSource.class);
+
+    //~ Instance fields --------------------------------------------------------
+
     private final Connection con;
     private ResultSet cachedResultSet;
     private ResultSetMetaData metaData;
@@ -39,8 +43,32 @@ public final class DatabaseDataSource implements DataSource {
     private int fetchSize = NO_FETCH_SIZE;
     private final String query;
 
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new DatabaseDataSource object.
+     *
+     * @param   con        DOCUMENT ME!
+     * @param   query      DOCUMENT ME!
+     * @param   fetchSize  DOCUMENT ME!
+     *
+     * @throws  SQLException          DOCUMENT ME!
+     * @throws  NullPointerException  DOCUMENT ME!
+     */
+    public DatabaseDataSource(final Connection con, final String query, final int fetchSize) throws SQLException {
+        if ((con == null) || (query == null)) {
+            throw new NullPointerException();
+        }
+        this.query = query + "\n"; // append newline against "--" comments
+        this.con = con;
+        this.fetchSize = fetchSize;
+        refreshResultSet();
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
     @Override
-    public final int getColumnCount() {
+    public int getColumnCount() {
         try {
             return metaData.getColumnCount();
         } catch (SQLException ex) {
@@ -50,14 +78,16 @@ public final class DatabaseDataSource implements DataSource {
     }
 
     /**
+     * DOCUMENT ME!
      *
-     * @param index, between 0 and getColumnCount()
-     * @return
+     * @param   index  between 0 and getColumnCount()
+     *
+     * @return  DOCUMENT ME!
      */
     @Override
-    public final String getColumnLabel(int index) {
+    public String getColumnLabel(final int index) {
         try {
-            //on jdbc, they start with 1...
+            // on jdbc, they start with 1...
             return metaData.getColumnLabel(index + 1);
         } catch (SQLException ex) {
             log.error(ex, ex);
@@ -66,8 +96,8 @@ public final class DatabaseDataSource implements DataSource {
     }
 
     @Override
-    public final Iterator<String[]> iterator() {
-        //this order is important, as getRowCount affects cachedResultSet!
+    public Iterator<String[]> iterator() {
+        // this order is important, as getRowCount affects cachedResultSet!
         final int rowCount = getRowCount();
         if (cachedResultSet == null) {
             refreshResultSet();
@@ -78,7 +108,7 @@ public final class DatabaseDataSource implements DataSource {
     }
 
     @Override
-    public final boolean close() {
+    public boolean close() {
         try {
             con.close();
             return true;
@@ -89,7 +119,7 @@ public final class DatabaseDataSource implements DataSource {
     }
 
     @Override
-    public final int getRowCount() {
+    public int getRowCount() {
         if (cachedRowCount < 0) {
             final Formatter formatter = new Formatter(new StringBuilder());
             final String countQuery = formatter.format(COUNT_STMNT, query).toString();
@@ -108,11 +138,13 @@ public final class DatabaseDataSource implements DataSource {
             if (cachedRowCount < 0) {
                 try {
                     if (!con.getAutoCommit()) {
-                        //known bug: org.postgresql.util.PSQLException: FEHLER: Portal C_3 existiert nicht
+                        // known bug: org.postgresql.util.PSQLException: FEHLER: Portal C_3 existiert nicht
                         con.rollback();
                     }
                 } catch (Exception ex) {
-                    log.debug(ex);
+                    if (log.isDebugEnabled()) {
+                        log.debug(ex);
+                    }
                 }
 
                 cachedRowCount = getRowCountFailSafte();
@@ -122,6 +154,11 @@ public final class DatabaseDataSource implements DataSource {
         return cachedRowCount;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     private Statement createStatement() {
         Statement stmnt = null;
         try {
@@ -137,6 +174,11 @@ public final class DatabaseDataSource implements DataSource {
         return stmnt;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     private int getRowCountFailSafte() {
         if (cachedResultSet == null) {
             refreshResultSet();
@@ -157,28 +199,42 @@ public final class DatabaseDataSource implements DataSource {
         return 0;
     }
 
-    private static void closeResultSetAndStatementSilently(ResultSet rs) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  rs  DOCUMENT ME!
+     */
+    private static void closeResultSetAndStatementSilently(final ResultSet rs) {
         if (rs != null) {
             try {
                 rs.close();
                 rs.getStatement().close();
             } catch (Exception ex) {
-                log.debug("Error on closing resultset and statement!", ex);
+                if (log.isDebugEnabled()) {
+                    log.debug("Error on closing resultset and statement!", ex);
+                }
             }
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     private void refreshResultSet() {
         try {
             final Statement stmnt = createStatement();
             if (fetchSize != NO_FETCH_SIZE) {
                 try {
-                    //postgres fix
+                    // postgres fix
                     con.setAutoCommit(false);
                     stmnt.setFetchSize(fetchSize);
-                    log.debug("Setting connection fetch size = " + fetchSize);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Setting connection fetch size = " + fetchSize);
+                    }
                 } catch (Exception ex) {
-                    log.debug("Error on setting fetch size!", ex);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Error on setting fetch size!", ex);
+                    }
                 }
             }
             closeResultSetAndStatementSilently(cachedResultSet);
@@ -201,6 +257,9 @@ public final class DatabaseDataSource implements DataSource {
         return true;
     }
 
+    // some jalopy issues in this section
+
+    //J-
     final class ResultSetIterator implements Iterator<String[]> {
 
         public ResultSetIterator(final ResultSet rs, int rowCount) {
@@ -251,4 +310,5 @@ public final class DatabaseDataSource implements DataSource {
             return ret;
         }
     }
+    //J+
 }

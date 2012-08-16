@@ -1,16 +1,24 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.project.gui.editors;
 
-import de.cismet.jpresso.core.utils.TypeSafeCollections;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+
 import javax.swing.JTable;
 import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
@@ -18,52 +26,106 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
 /**
+ * DOCUMENT ME!
  *
- * @author srichter
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public class ColorfulJTable extends JTable {
 
+    //~ Instance fields --------------------------------------------------------
+
+    private final Map<Integer, Map<Integer, Color>> colorMap = TypeSafeCollections.newHashMap();
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new ColorfulJTable object.
+     */
     public ColorfulJTable() {
         super();
     }
 
-    public ColorfulJTable(TableModel tm, TableColumnModel cm) {
-        super(tm, cm);
-    }
-
-    public ColorfulJTable(int rows, int cols) {
-        super(rows, cols);
-    }
-
-    public ColorfulJTable(TableModel tm) {
+    /**
+     * Creates a new ColorfulJTable object.
+     *
+     * @param  tm  DOCUMENT ME!
+     */
+    public ColorfulJTable(final TableModel tm) {
         super(tm);
     }
 
-    public ColorfulJTable(Object[][] rowData, String[] columnNames) {
+    /**
+     * Creates a new ColorfulJTable object.
+     *
+     * @param  tm  DOCUMENT ME!
+     * @param  cm  DOCUMENT ME!
+     */
+    public ColorfulJTable(final TableModel tm, final TableColumnModel cm) {
+        super(tm, cm);
+    }
+
+    /**
+     * Creates a new ColorfulJTable object.
+     *
+     * @param  rows  DOCUMENT ME!
+     * @param  cols  DOCUMENT ME!
+     */
+    public ColorfulJTable(final int rows, final int cols) {
+        super(rows, cols);
+    }
+
+    /**
+     * Creates a new ColorfulJTable object.
+     *
+     * @param  rowData      DOCUMENT ME!
+     * @param  columnNames  DOCUMENT ME!
+     */
+    public ColorfulJTable(final Object[][] rowData, final String[] columnNames) {
         super(rowData, columnNames);
     }
 
-    public ColorfulJTable(Vector rowData, Vector columnNames) {
+    /**
+     * Creates a new ColorfulJTable object.
+     *
+     * @param  rowData      DOCUMENT ME!
+     * @param  columnNames  DOCUMENT ME!
+     */
+    public ColorfulJTable(final Vector rowData, final Vector columnNames) {
         super(rowData, columnNames);
     }
 
-    public ColorfulJTable(TableModel tm, TableColumnModel cm, ListSelectionModel sm) {
+    /**
+     * Creates a new ColorfulJTable object.
+     *
+     * @param  tm  DOCUMENT ME!
+     * @param  cm  DOCUMENT ME!
+     * @param  sm  DOCUMENT ME!
+     */
+    public ColorfulJTable(final TableModel tm, final TableColumnModel cm, final ListSelectionModel sm) {
         super(tm, cm, sm);
     }
-    private final Map<Integer, Map<Integer, Color>> colorMap = TypeSafeCollections.newHashMap();
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     */
     public void clearColors() {
         colorMap.clear();
     }
 
     /**
-     * 
-     * @param row
-     * @param column
-     * @param color
+     * DOCUMENT ME!
+     *
+     * @param  row     DOCUMENT ME!
+     * @param  column  DOCUMENT ME!
+     * @param  color   DOCUMENT ME!
      */
-    public void setColor(int row, int column, Color color) {
+    public void setColor(int row, final int column, final Color color) {
         if (color != null) {
             row = convertRowIndexToModel(row);
 //            column = convertColumnIndexToModel(column);
@@ -79,7 +141,7 @@ public class ColorfulJTable extends JTable {
     @Override
     public boolean getScrollableTracksViewportHeight() {
         // fetch the table's parent
-        Container viewport = getParent();
+        final Container viewport = getParent();
 
         // if the parent is not a viewport, calling this isn't useful
         if (!(viewport instanceof JViewport)) {
@@ -92,22 +154,23 @@ public class ColorfulJTable extends JTable {
     }
 
     /**
-     * 
-     * @param renderer
-     * @param row
-     * @param column
-     * @return
+     * DOCUMENT ME!
+     *
+     * @param   renderer  DOCUMENT ME!
+     * @param   row       DOCUMENT ME!
+     * @param   column    DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
     @Override
     public Component prepareRenderer(final TableCellRenderer renderer, int row, int column) {
-
         final Component c = super.prepareRenderer(renderer, row, column);
 
         if (!isRowSelected(row)) {
             row = convertRowIndexToModel(row);
             column = convertColumnIndexToModel(column);
             final Map<Integer, Color> rowMap = colorMap.get(row);
-            final Color color = rowMap != null ? rowMap.get(column) : null;
+            final Color color = (rowMap != null) ? rowMap.get(column) : null;
             if (color != null) {
                 c.setBackground(color);
             } else {

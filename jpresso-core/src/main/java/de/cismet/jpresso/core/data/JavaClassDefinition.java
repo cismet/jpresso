@@ -1,37 +1,53 @@
-
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package de.cismet.jpresso.core.data;
 
 /**
  * Definition for a Java class. Consists of classname and sourcecode.
- * 
- * @author srichter
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public class JavaClassDefinition {
-    
+
+    //~ Instance fields --------------------------------------------------------
+
+    private final String className;
+    private final String sourceCode;
+
+    //~ Constructors -----------------------------------------------------------
+
     /**
-     * 
-     * @param className
-     * @param sourceCode
+     * Creates a new JavaClassDefinition object.
+     *
+     * @param  className   DOCUMENT ME!
+     * @param  sourceCode  DOCUMENT ME!
      */
-    public JavaClassDefinition(String className, String sourceCode) {
+    public JavaClassDefinition(final String className, final String sourceCode) {
         this.className = className;
         this.sourceCode = sourceCode;
     }
 
-    private final String className;
-    private final String sourceCode;
-    
+    //~ Methods ----------------------------------------------------------------
+
     /**
-     * 
-     * @return the class name
+     * DOCUMENT ME!
+     *
+     * @return  the class name
      */
     public String getClassName() {
         return className;
     }
-    
+
     /**
-     * 
-     * @return the class source code
+     * DOCUMENT ME!
+     *
+     * @return  the class source code
      */
     public String getSourceCode() {
         return sourceCode;

@@ -1,8 +1,19 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.core.execution;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import de.cismet.jpresso.core.data.DatabaseConnection;
 import de.cismet.jpresso.core.data.JPLoadable;
@@ -10,35 +21,49 @@ import de.cismet.jpresso.core.data.JPressoRun;
 import de.cismet.jpresso.core.data.SQLRun;
 import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 /**
  * A class that loads ant executable objects from file.
- * 
- * @author srichter
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 final class AntUniversalLoader {
 
-    private final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(getClass());
+    //~ Static fields/initializers ---------------------------------------------
+
     public static final JPressoFileManager FILEMANAGER = JPressoFileManager.getDefault();
+
+    //~ Instance fields --------------------------------------------------------
+
+    private final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(getClass());
     private final String projectDir;
 
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new AntUniversalLoader object.
+     *
+     * @param  projectDir  DOCUMENT ME!
+     */
     public AntUniversalLoader(final String projectDir) {
         this.projectDir = projectDir;
     }
 
+    //~ Methods ----------------------------------------------------------------
+
     /**
-     * Loads an AntExecutableInterface implementing objects from the file
-     * named like the parameter in the project known to this.
-     * 
-     * @param pureFileNameWithExt
-     * @return
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
+     * Loads an AntExecutableInterface implementing objects from the file named like the parameter in the project known
+     * to this.
+     *
+     * @param   pureFileNameWithExt  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  FileNotFoundException     DOCUMENT ME!
+     * @throws  IOException               DOCUMENT ME!
+     * @throws  IllegalArgumentException  DOCUMENT ME!
      */
-    public final JPLoadable load(final String pureFileNameWithExt) throws FileNotFoundException, IOException {
+    public JPLoadable load(final String pureFileNameWithExt) throws FileNotFoundException, IOException {
         final String extension = pureFileNameWithExt.substring(pureFileNameWithExt.length() - 3);
         final String pathElement = JPressoFileManager.DIRECTORY_LOOKUP.get(extension);
         if (pathElement == null) {
@@ -61,15 +86,16 @@ final class AntUniversalLoader {
     }
 
     /**
-     * Loads multiple AntExecutableInterface implementing objects from multiple
-     * files.
-     * 
-     * @param files
-     * @return
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
+     * Loads multiple AntExecutableInterface implementing objects from multiple files.
+     *
+     * @param   files  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  FileNotFoundException  DOCUMENT ME!
+     * @throws  IOException            DOCUMENT ME!
      */
-    public final JPLoadable[] load(final String... files) throws FileNotFoundException, IOException {
+    public JPLoadable[] load(final String... files) throws FileNotFoundException, IOException {
         final JPLoadable[] result = new JPLoadable[files.length];
         int i = 0;
         for (final String s : files) {

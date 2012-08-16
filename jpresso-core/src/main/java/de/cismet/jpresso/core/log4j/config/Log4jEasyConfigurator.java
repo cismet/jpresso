@@ -1,22 +1,38 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.core.log4j.config;
 
-import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+
 import java.util.Properties;
 
+import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
+
 /**
+ * DOCUMENT ME!
  *
- * @author srichter
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public class Log4jEasyConfigurator {
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     */
     public static void configLog4j() {
         final String home = System.getProperty("user.home");
         final File logConf = new File(home, JPressoFileManager.LOG_CONFIG);
@@ -28,7 +44,7 @@ public class Log4jEasyConfigurator {
                 p.load(new BufferedInputStream(fis));
                 System.out.println("Loading log4J configuration from file.");
             } catch (Exception ex) {
-                //ignore
+                // ignore
             } finally {
                 if (fis != null) {
                     try {

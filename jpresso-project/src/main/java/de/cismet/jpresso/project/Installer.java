@@ -1,14 +1,16 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.project;
 
-import de.cismet.jpresso.core.data.ProjectOptions;
-import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
-import de.cismet.jpresso.project.filetypes.AntHandler;
-import de.cismet.jpresso.core.log4j.config.Log4jEasyConfigurator;
-import java.io.IOException;
 import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileSystem;
@@ -16,12 +18,23 @@ import org.openide.filesystems.FileUtil;
 import org.openide.filesystems.Repository;
 import org.openide.modules.ModuleInstall;
 
+import java.io.IOException;
+
+import de.cismet.jpresso.core.data.ProjectOptions;
+import de.cismet.jpresso.core.log4j.config.Log4jEasyConfigurator;
+import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
+
+import de.cismet.jpresso.project.filetypes.AntHandler;
+
 /**
- * Manages a module's lifecycle. Remember that an installer is optional and
- * often not needed at all. This is executed before the module is installed.
- * We use it to prepare our logger.
+ * Manages a module's lifecycle. Remember that an installer is optional and often not needed at all. This is executed
+ * before the module is installed. We use it to prepare our logger.
+ *
+ * @version  $Revision$, $Date$
  */
 public class Installer extends ModuleInstall {
+
+    //~ Methods ----------------------------------------------------------------
 
     @Override
     public void restored() {
@@ -34,7 +47,6 @@ public class Installer extends ModuleInstall {
                 final ProjectOptions po = new ProjectOptions();
                 JPressoFileManager.getDefault().persist(FileUtil.toFile(result), po);
             } catch (IOException ex) {
-
                 ErrorManager.getDefault().notify(ex);
             }
         }

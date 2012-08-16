@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * WrongNameException.java
  *
@@ -5,27 +12,40 @@
  */
 package de.cismet.jpresso.core.serviceprovider.exceptions;
 
-import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
 import de.cismet.jpresso.core.kernel.*;
 
-/** Wird geworfen wenn beim "finalizen" was schief geht, viele reflection fehler
+/**
+ * Wird geworfen wenn beim "finalizen" was schief geht, viele reflection fehler.
  *
- * @author hell
+ * @author   hell
+ * @version  $Revision$, $Date$
  */
 public class FinalizerException extends JPressoException {
 
-    /** Creates a new instance of FinalizerException */
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new instance of FinalizerException.
+     */
     public FinalizerException() {
     }
 
-    /** Creates a new instance of FinalizerException
-     * @param s Beschreibung der Exception
+    /**
+     * Creates a new instance of FinalizerException.
+     *
+     * @param  s  Beschreibung der Exception
      */
-    public FinalizerException(String s) {
+    public FinalizerException(final String s) {
         super(s);
     }
 
-    public FinalizerException(String s, Throwable e) {
+    /**
+     * Creates a new FinalizerException object.
+     *
+     * @param  s  DOCUMENT ME!
+     * @param  e  DOCUMENT ME!
+     */
+    public FinalizerException(final String s, final Throwable e) {
         super(s, e);
     }
 }

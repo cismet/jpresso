@@ -1,39 +1,63 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.core.finalizer.autovalue;
 
-import de.cismet.jpresso.core.utils.TypeSafeCollections;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import java.util.List;
 import java.util.Map;
 
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
 /**
+ * DOCUMENT ME!
  *
- * @author srichter
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public class PostgresAutoValuImpl implements AutoValueStrategy {
 
-    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
-    public final String SEQUENCE_FIND_QUERY = "SELECT max(adsrc) FROM pg_attrdef WHERE adrelid = (SELECT max(oid) FROM pg_class WHERE relname ilike ?)";
-    public final String SEQUENCE_FIND_QUERY_TODO = "SELECT n.nspname, c.relname, a.attname, def.adsrc FROM pg_catalog.pg_namespace n JOIN pg_catalog.pg_class c ON ( c.relnamespace = n.oid ) JOIN pg_catalog.pg_attribute a ON ( a.attrelid= c.oid ) JOIN pg_catalog.pg_type t ON ( a.atttypid = t.oid ) LEFT JOIN pg_catalog.pg_attrdef def ON ( a.attrelid = def.adrelid AND a.attnum = def.adnum ) LEFT JOIN pg_catalog.pg_description dsc ON ( c.oid = dsc.objoid AND a.attnum = dsc.objsubid ) LEFT JOIN pg_catalog.pg_class dc ON ( dc.oid = dsc.classoid AND dc.relname= 'pg_class' ) LEFT JOIN pg_catalog.pg_namespace dn ON ( dc.relnamespace= dn.oid  AND dn.nspname = 'pg_catalog' ) WHERE a.attnum > 0 AND NOT a.attisdropped AND n.nspname LIKE 'public' AND c.relname LIKE ? AND a.attname LIKE '%' AND def.adsrc IS NOT NULL";
+    //~ Instance fields --------------------------------------------------------
+
+    public final String SEQUENCE_FIND_QUERY =
+        "SELECT max(adsrc) FROM pg_attrdef WHERE adrelid = (SELECT max(oid) FROM pg_class WHERE relname ilike ?)";
+    public final String SEQUENCE_FIND_QUERY_TODO =
+        "SELECT n.nspname, c.relname, a.attname, def.adsrc FROM pg_catalog.pg_namespace n JOIN pg_catalog.pg_class c ON ( c.relnamespace = n.oid ) JOIN pg_catalog.pg_attribute a ON ( a.attrelid= c.oid ) JOIN pg_catalog.pg_type t ON ( a.atttypid = t.oid ) LEFT JOIN pg_catalog.pg_attrdef def ON ( a.attrelid = def.adrelid AND a.attnum = def.adnum ) LEFT JOIN pg_catalog.pg_description dsc ON ( c.oid = dsc.objoid AND a.attnum = dsc.objsubid ) LEFT JOIN pg_catalog.pg_class dc ON ( dc.oid = dsc.classoid AND dc.relname= 'pg_class' ) LEFT JOIN pg_catalog.pg_namespace dn ON ( dc.relnamespace= dn.oid  AND dn.nspname = 'pg_catalog' ) WHERE a.attnum > 0 AND NOT a.attisdropped AND n.nspname LIKE 'public' AND c.relname LIKE ? AND a.attname LIKE '%' AND def.adsrc IS NOT NULL";
     public final String DRIVER_CLASS = "PostgreSQL";
     public final Map<String, PreparedStatement> autoValStatements;
     public PreparedStatement findNextValStatementForTable = null;
     public Connection connection = null;
     public PreparedStatement currentNextVal = null;
+
+    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private boolean configured = false;
 
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new PostgresAutoValuImpl object.
+     */
     public PostgresAutoValuImpl() {
         autoValStatements = TypeSafeCollections.newHashMap();
     }
 
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
     public String nextValue() throws SQLException {
-        if (configured && currentNextVal != null) {
+        if (configured && (currentNextVal != null)) {
             final ResultSet rs = currentNextVal.executeQuery();
             if (rs.next()) {
                 final String ret = rs.getString(1);
@@ -43,11 +67,13 @@ public class PostgresAutoValuImpl implements AutoValueStrategy {
                 throw new IllegalStateException();
             }
         } else {
-            throw new IllegalStateException(getClass() + " is not configured properly! Check if configure(...) was called before usage!");
+            throw new IllegalStateException(getClass()
+                        + " is not configured properly! Check if configure(...) was called before usage!");
         }
     }
 
-    public void setCurrentFields(String tableName, List<String> fieldNames) throws SQLException {
+    @Override
+    public void setCurrentFields(final String tableName, final List<String> fieldNames) throws SQLException {
         if (configured) {
             currentNextVal = autoValStatements.get(tableName);
             if (currentNextVal == null) {
@@ -62,7 +88,8 @@ public class PostgresAutoValuImpl implements AutoValueStrategy {
         }
     }
 
-    public void finish(boolean rollback) {
+    @Override
+    public void finish(final boolean rollback) {
         if (configured) {
             for (final PreparedStatement ps : autoValStatements.values()) {
                 try {
@@ -77,21 +104,24 @@ public class PostgresAutoValuImpl implements AutoValueStrategy {
                 }
             }
             autoValStatements.clear();
-        //TODO: maybe reset sequences on rollback?
+            // TODO: maybe reset sequences on rollback?
         }
     }
 
+    @Override
     public String getSupportedDriver() {
         return DRIVER_CLASS;
     }
 
-    public void configure(Connection con, String config) {
+    @Override
+    public void configure(final Connection con, final String config) {
         if (con == null) {
             throw new NullPointerException("Connection is null!");
         }
         try {
             if (!con.getMetaData().getDatabaseProductName().equalsIgnoreCase(DRIVER_CLASS)) {
-                throw new IllegalStateException(getClass() + " does not support driver " + con.getMetaData().getDriverName() + "!\nSupported driver is " + DRIVER_CLASS + ".");
+                throw new IllegalStateException(getClass() + " does not support driver "
+                            + con.getMetaData().getDriverName() + "!\nSupported driver is " + DRIVER_CLASS + ".");
             }
         } catch (SQLException ex) {
             throw new IllegalStateException(ex);

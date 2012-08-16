@@ -1,21 +1,46 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.core.kernel;
 
-import de.cismet.jpresso.core.utils.TypeSafeCollections;
 import java.util.List;
 
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
 /**
- * An infinite read-only ListIterator, that always jumps to position 0 after end has been reached
- * @param <T>
+ * An infinite read-only ListIterator, that always jumps to position 0 after end has been reached.
  *
- * @author stefan
+ * @param    <T>
+ *
+ * @author   stefan
+ * @version  $Revision$, $Date$
  */
 public final class ListCirculator<T> {
 
-    public ListCirculator(List<? extends T> list) {
+    //~ Instance fields --------------------------------------------------------
+
+    private int cursor;
+    private final List<T> internalList;
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new ListCirculator object.
+     *
+     * @param   list  DOCUMENT ME!
+     *
+     * @throws  IllegalArgumentException  DOCUMENT ME!
+     * @throws  IllegalStateException     DOCUMENT ME!
+     */
+    public ListCirculator(final List<? extends T> list) {
         if (list == null) {
             throw new IllegalArgumentException("Null not allowed!");
         }
@@ -26,10 +51,15 @@ public final class ListCirculator<T> {
         this.internalList.addAll(list);
         this.cursor = 0;
     }
-    private int cursor;
-    private final List<T> internalList;
 
-    public final T next() {
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public T next() {
         if (!(++cursor < internalList.size())) {
             cursor = 0;
         }

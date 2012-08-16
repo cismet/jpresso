@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -6,16 +13,29 @@ package de.cismet.jpresso.project.gui.editors;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.swing.JTable;
 
 /**
  * Not yet finished....
- * @author srichter
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public class FindReplace {
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  tab          DOCUMENT ME!
+     * @param  pattern      DOCUMENT ME!
+     * @param  replacement  DOCUMENT ME!
+     * @param  col          DOCUMENT ME!
+     */
     public void replaceAll(final JTable tab, final String pattern, final String replacement, final int col) {
-        if (tab == null || replacement == null || col < 0 || col > tab.getColumnCount()) {
+        if ((tab == null) || (replacement == null) || (col < 0) || (col > tab.getColumnCount())) {
             return;
         }
         final Pattern regPat = Pattern.compile(pattern);
@@ -23,7 +43,7 @@ public class FindReplace {
         for (int i = 0; i < tab.getRowCount(); ++i) {
             final Object o = tab.getValueAt(i, col);
             if (o instanceof String) {
-                final Matcher matcher = regPat.matcher((String) o);
+                final Matcher matcher = regPat.matcher((String)o);
                 output = matcher.replaceAll(replacement);
                 tab.setValueAt(output, i, col);
             }

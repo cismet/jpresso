@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * OptionsTopComponent.java
  *
@@ -5,41 +12,58 @@
  */
 package de.cismet.jpresso.project.gui.options;
 
-import de.cismet.jpresso.project.serviceprovider.ClassResourceListener;
-import de.cismet.jpresso.project.serviceprovider.ProjectClassResourceProvider;
-import de.cismet.jpresso.project.gui.AbstractJPTopComponent;
-import de.cismet.jpresso.core.data.DriverDescription;
-import de.cismet.jpresso.core.data.ProjectOptions;
-import de.cismet.jpresso.core.serviceprovider.exceptions.DuplicateEntryException;
-import de.cismet.jpresso.project.filetypes.options.OptionsDataObject;
 import java.awt.BorderLayout;
+
 import java.io.File;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import de.cismet.jpresso.core.data.DriverDescription;
+import de.cismet.jpresso.core.data.ProjectOptions;
+import de.cismet.jpresso.core.serviceprovider.exceptions.DuplicateEntryException;
+
+import de.cismet.jpresso.project.filetypes.options.OptionsDataObject;
+import de.cismet.jpresso.project.gui.AbstractJPTopComponent;
+import de.cismet.jpresso.project.serviceprovider.ClassResourceListener;
+import de.cismet.jpresso.project.serviceprovider.ProjectClassResourceProvider;
+
 /**
  * TopComponent to visualize a project's global options.
- * 
- * @author  srichter
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public final class OptionsTopComponent extends AbstractJPTopComponent<OptionsDataObject> {
 
+    //~ Static fields/initializers ---------------------------------------------
+
     private static final String PREFERRED_ID = "OptionsTopComponent";
+
+    //~ Instance fields --------------------------------------------------------
+
     private final OptionsDataObject options;
     private final Vector<ClassResourceListener> listener;
     private final ProjectOptionsEditor editor;
     private boolean classPathChanged;
     private boolean driverChanged;
 
-    /** Creates new form OptionsTopComponent */
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates new form OptionsTopComponent.
+     *
+     * @param  data  DOCUMENT ME!
+     */
     public OptionsTopComponent(final OptionsDataObject data) {
         super(data);
         options = data;
         initComponents();
-        //TODO nullpointer check crp!
+        // TODO nullpointer check crp!
         final ProjectClassResourceProvider crp = getProject().getLookup().lookup(ProjectClassResourceProvider.class);
         listener = new Vector<ClassResourceListener>();
         this.addListener(crp);
@@ -47,24 +71,32 @@ public final class OptionsTopComponent extends AbstractJPTopComponent<OptionsDat
         this.add(editor, BorderLayout.CENTER);
         this.editor.addListener(new ProjectOptionsEditorListener() {
 
-            public void projectDriverListChanged(List<DriverDescription> driverPath) throws DuplicateEntryException {
-                driverChanged = true;
-                getData().setModified(true);
-            }
+                @Override
+                public void projectDriverListChanged(final List<DriverDescription> driverPath)
+                        throws DuplicateEntryException {
+                    driverChanged = true;
+                    getData().setModified(true);
+                }
 
-            public void projectClassPathChanged(List<File> newClassPath) {
-                classPathChanged = true;
-                getData().setModified(true);
-            }
+                @Override
+                public void projectClassPathChanged(final List<File> newClassPath) {
+                    classPathChanged = true;
+                    getData().setModified(true);
+                }
 
-            public void otherOptionsChanged() {
-                getData().setModified(true);
-            }
-        });
-        log.debug("OptionsTopComponent created!");
+                @Override
+                public void otherOptionsChanged() {
+                    getData().setModified(true);
+                }
+            });
+        if (log.isDebugEnabled()) {
+            log.debug("OptionsTopComponent created!");
+        }
         classPathChanged = false;
         driverChanged = false;
     }
+
+    //~ Methods ----------------------------------------------------------------
 
     @Override
     protected String preferredID() {
@@ -72,39 +104,39 @@ public final class OptionsTopComponent extends AbstractJPTopComponent<OptionsDat
     }
 
     /**
-     * @see org.openide.windows.TopComponent
+     * @see  org.openide.windows.TopComponent
      */
     @Override
-    public final String getDisplayName() {
+    public String getDisplayName() {
         final String saveMark = getData().isModified() ? MARK_MODIFIED : EMPTY;
-        if (getData() == null || getData().getPrimaryFile() == null || getData().getPrimaryFile().getParent() == null || getData().getPrimaryFile().getParent().getParent() == null) {
+        if ((getData() == null) || (getData().getPrimaryFile() == null)
+                    || (getData().getPrimaryFile().getParent() == null)
+                    || (getData().getPrimaryFile().getParent().getParent() == null)) {
             return getName() + saveMark;
         } else {
-            return getName() + PROJECT_NAME_PREFIX + getData().getPrimaryFile().getParent().getName() + PROJECT_NAME_POSTFIX + saveMark;
+            return getName() + PROJECT_NAME_PREFIX + getData().getPrimaryFile().getParent().getName()
+                        + PROJECT_NAME_POSTFIX + saveMark;
         }
     }
 
     /**
-     * @see org.openide.windows.TopComponent
+     * @see  org.openide.windows.TopComponent
      */
     @Override
     public String getName() {
         return "Options";
-
     }
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
+     * content of this method is always regenerated by the Form Editor.
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
         setMinimumSize(new java.awt.Dimension(593, 697));
         setPreferredSize(new java.awt.Dimension(593, 697));
         setLayout(new java.awt.BorderLayout());
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
@@ -114,8 +146,8 @@ public final class OptionsTopComponent extends AbstractJPTopComponent<OptionsDat
     }
 
     @Override
-    public void addOutput(JPanel out) {
-        //nothing...has no output
+    public void addOutput(final JPanel out) {
+        // nothing...has no output
     }
 
     @Override
@@ -135,7 +167,12 @@ public final class OptionsTopComponent extends AbstractJPTopComponent<OptionsDat
                 try {
                     l.projectDriverListChanged(opt.getDriver());
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(this, "Can not save:\n" + "Driver aliases must be unique! Found duplicated alias!", "Duplicated Driver Alias", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Can not save:\n"
+                                + "Driver aliases must be unique! Found duplicated alias!",
+                        "Duplicated Driver Alias",
+                        JOptionPane.WARNING_MESSAGE);
                     return false;
                 }
             }
@@ -147,14 +184,27 @@ public final class OptionsTopComponent extends AbstractJPTopComponent<OptionsDat
         return true;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  l  DOCUMENT ME!
+     */
     public void addListener(final ClassResourceListener l) {
         listener.add(l);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  l  DOCUMENT ME!
+     */
     public void removeListener(final ClassResourceListener l) {
         listener.remove(l);
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     public void removeAllListener() {
         listener.clear();
     }

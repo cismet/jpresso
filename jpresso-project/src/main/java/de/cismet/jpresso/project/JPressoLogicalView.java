@@ -1,12 +1,18 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.project;
 
-import de.cismet.jpresso.project.filetypes.cookies.ConnectionListModelProvider;
-import de.cismet.jpresso.project.filetypes.cookies.QueryListModelProvider;
 import org.netbeans.spi.project.ui.LogicalViewProvider;
+
 import org.openide.explorer.view.NodeListModel;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataFilter;
@@ -16,59 +22,73 @@ import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 
+import de.cismet.jpresso.project.filetypes.cookies.ConnectionListModelProvider;
+import de.cismet.jpresso.project.filetypes.cookies.QueryListModelProvider;
+
 /**
- * Represents the LogivalView of a JPresso Project. The LogicalView is what you
- * can see e.g. as a tree-structure in Netbeans navigator window. It is mainly
- * represented by the project's top-level node, which has all other nodes in 
+ * Represents the LogivalView of a JPresso Project. The LogicalView is what you can see e.g. as a tree-structure in
+ * Netbeans navigator window. It is mainly represented by the project's top-level node, which has all other nodes in
  * parent-child relations below it.
- * 
- * @author srichter
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
-public final class JPressoLogicalView implements LogicalViewProvider, ConnectionListModelProvider, QueryListModelProvider {
-    
-    //the project
+public final class JPressoLogicalView implements LogicalViewProvider,
+    ConnectionListModelProvider,
+    QueryListModelProvider {
+
+    //~ Instance fields --------------------------------------------------------
+
+    // the project
     private final JPressoProject project;
-    //the top-level project node
+    // the top-level project node
     private JPressoProjectNode projectNode;
-    //a nodelistmodel for all connections
+    // a nodelistmodel for all connections
     private ConnectionListModelProvider conProv;
-    //a nodelistmodel for all connections
+    // a nodelistmodel for all connections
     private QueryListModelProvider qryProv;
-    
+
+    //~ Constructors -----------------------------------------------------------
+
     /**
-     * 
-     * @param project
+     * Creates a new JPressoLogicalView object.
+     *
+     * @param  project  DOCUMENT ME!
      */
-    public JPressoLogicalView(JPressoProject project) {
+    public JPressoLogicalView(final JPressoProject project) {
         this.project = project;
         conProv = null;
         qryProv = null;
     }
-    
+
+    //~ Methods ----------------------------------------------------------------
+
     /**
      * Create the LogicalView and return its top-level node.
-     * 
-     * @return the top-level (project) node with a structure of children.
+     *
+     * @return  the top-level (project) node with a structure of children.
      */
+    @Override
     public Node createLogicalView() {
-        //Get the scenes directory, creating if deleted
+        // Get the scenes directory, creating if deleted
         final FileObject main = project.getProjectDirectory();
 
-        //Get the DataObject that represents it
+        // Get the DataObject that represents it
         final DataFolder projDirDataObject = DataFolder.findFolder(main);
 
         final Children children = projDirDataObject.createNodeChildren(new DataFilter() {
 
-            public boolean acceptDataObject(final DataObject dataObject) {
-                if (dataObject.getPrimaryFile().getExt().equalsIgnoreCase("properties")) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            });
+                    @Override
+                    public boolean acceptDataObject(final DataObject dataObject) {
+                        if (dataObject.getPrimaryFile().getExt().equalsIgnoreCase("properties")) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                });
 
-        Node n = new AbstractNode(children);
+        final Node n = new AbstractNode(children);
 
 //        try {
         final JPressoProjectNode pn = new JPressoProjectNode(n, project);
@@ -86,37 +106,42 @@ public final class JPressoLogicalView implements LogicalViewProvider, Connection
 
     /**
      * Dummy implementation. Not important.
-     * 
-     * @param root
-     * @param target
-     * @return
+     *
+     * @param   root    DOCUMENT ME!
+     * @param   target  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
+    @Override
     public Node findPath(final Node root, final Object target) {
         return null;
     }
-    
+
     /**
-     * 
-     * @return
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
     JPressoProjectNode getProjectNode() {
         return projectNode;
     }
-    
+
     /**
-     * 
-     * @param projectNode
+     * DOCUMENT ME!
+     *
+     * @param  projectNode  DOCUMENT ME!
      */
     void setProjectNode(final JPressoProjectNode projectNode) {
         this.projectNode = projectNode;
     }
-    
+
     /**
-     * 
-     * @return a NodeListModel containing all nodes under the 
-     * ConnectionManagementNode (e.g. for use in the selection combobox 
-     * in the runs).
+     * DOCUMENT ME!
+     *
+     * @return  a NodeListModel containing all nodes under the ConnectionManagementNode (e.g. for use in the selection
+     *          combobox in the runs).
      */
+    @Override
     public NodeListModel getConnectionListModel() {
         if (conProv != null) {
             return conProv.getConnectionListModel();
@@ -125,13 +150,14 @@ public final class JPressoLogicalView implements LogicalViewProvider, Connection
             return conProv.getConnectionListModel();
         }
     }
-    
+
     /**
-     * 
-     * @return a NodeListModel containing all nodes under the 
-     * QueryManagementNode (e.g. for use in the selection combobox 
-     * in the runs).
+     * DOCUMENT ME!
+     *
+     * @return  a NodeListModel containing all nodes under the QueryManagementNode (e.g. for use in the selection
+     *          combobox in the runs).
      */
+    @Override
     public NodeListModel getQueryListModel() {
         if (qryProv != null) {
             return qryProv.getQueryListModel();
@@ -140,9 +166,9 @@ public final class JPressoLogicalView implements LogicalViewProvider, Connection
             return qryProv.getQueryListModel();
         }
     }
-    
+
     /**
-     * 
+     * DOCUMENT ME!
      */
     private void findListProvider() {
         final Node projNode = getProjectNode();

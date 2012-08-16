@@ -1,58 +1,83 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.core.drivermanager.loading;
 
-import de.cismet.jpresso.core.drivermanager.loading.*;
-import de.cismet.jpresso.core.exceptions.DriverLoadException;
-import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
-import de.cismet.jpresso.core.serviceprovider.exceptions.DriverLoaderCreateException;
 import java.io.File;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+
 import java.sql.Driver;
+
 import java.util.Arrays;
 
+import de.cismet.jpresso.core.exceptions.DriverLoadException;
+import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
+import de.cismet.jpresso.core.serviceprovider.exceptions.DriverLoaderCreateException;
+
 /**
- * A wrapper around the DriverClassLoader, which should guarantee,
- * that our jar with Cleaner.class is always on the classpath of the loader.
- * It handels automatic driver deregistration, to avoid classloader memory leaks.
- * Furthermore, it provides methods to deal with jars, as well as
- * as driver scanning method, finding all JDBC drivers in a jar.
- * 
- * @author stefan
+ * A wrapper around the DriverClassLoader, which should guarantee, that our jar with Cleaner.class is always on the
+ * classpath of the loader. It handels automatic driver deregistration, to avoid classloader memory leaks. Furthermore,
+ * it provides methods to deal with jars, as well as as driver scanning method, finding all JDBC drivers in a jar.
+ *
+ * @author   stefan
+ * @version  $Revision$, $Date$
  */
 public class DynamicDriverClassLoader {
 
-    private final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
-    //our modified URLClassLoader, which we delegate to.
-    private final DriverClassLoader driverLoader;
-    //the helperclass for DriverManager deregistration
-    private final Class cleaner;
-    //the classloaders classpath
-    private final URL[] path;
-    private final File[] files;
+    //~ Static fields/initializers ---------------------------------------------
+
     public static final String ENDING_DOT_CLASS = "." + JPressoFileManager.END_CLASS;
     public static final String JAR_SEPARATOR_SLASH = "/";
     public static final String DOT = ".";
 
+    //~ Instance fields --------------------------------------------------------
+
+    private final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+    // our modified URLClassLoader, which we delegate to.
+    private final DriverClassLoader driverLoader;
+    // the helperclass for DriverManager deregistration
+    private final Class cleaner;
+    // the classloaders classpath
+    private final URL[] path;
+    private final File[] files;
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new DynamicDriverClassLoader object.
+     *
+     * @param   jar  DOCUMENT ME!
+     *
+     * @throws  DriverLoaderCreateException  DOCUMENT ME!
+     */
     @SuppressWarnings("deprecation")
     public DynamicDriverClassLoader(final File... jar) throws DriverLoaderCreateException {
-        //TODO DANGER !! (e.g. when starting a class with ant from the console).
-        //In such cases, specify a path to Cleaner.class here!
-        //Try to find jar with Cleaner Class in it
+        // TODO DANGER !! (e.g. when starting a class with ant from the console).
+        // In such cases, specify a path to Cleaner.class here!
+        // Try to find jar with Cleaner Class in it
         this.files = jar.clone();
         final URL cleaningHelperClassURL = JPressoFileManager.locateJarForClass(Cleaner.class);
         final URL[] urls = new URL[files.length + 1];
         try {
             this.path = new URL[files.length];
             for (int i = 0; i < files.length; ++i) {
-                //needs deprecated method to handle files with spaces which are %20 otherwise
+                // needs deprecated method to handle files with spaces which are %20 otherwise
                 path[i] = files[i].toURL();
             }
-            log.debug("DriverClassLoader path: " + Arrays.deepToString(urls));
+            if (log.isDebugEnabled()) {
+                log.debug("DriverClassLoader path: " + Arrays.deepToString(urls));
+            }
         } catch (MalformedURLException ex) {
             throw new DriverLoaderCreateException(ex);
         }
@@ -72,15 +97,19 @@ public class DynamicDriverClassLoader {
         if (this.cleaner == null) {
             throw new DriverLoaderCreateException();
         }
-
     }
 
+    //~ Methods ----------------------------------------------------------------
+
     /**
-     * 
-     * 
-     * @param name
-     * @return an instance of the class with the given canonical name in the classloaders path, if it is a java.sql.Driver
-     * @throws de.cismet.drivermanager.exception.DriverLoadException
+     * DOCUMENT ME!
+     *
+     * @param   name  DOCUMENT ME!
+     *
+     * @return  an instance of the class with the given canonical name in the classloaders path, if it is a
+     *          java.sql.Driver
+     *
+     * @throws  DriverLoadException  de.cismet.drivermanager.exception.DriverLoadException
      */
     public Driver loadDriver(final String name) throws DriverLoadException {
         Class driverClass = null;
@@ -91,9 +120,9 @@ public class DynamicDriverClassLoader {
         } catch (ClassNotFoundException ex) {
             throw new DriverLoadException(ex);
         }
-        if (driverClass != null && Driver.class.isAssignableFrom(driverClass) && !driverClass.isInterface()) {
+        if ((driverClass != null) && Driver.class.isAssignableFrom(driverClass) && !driverClass.isInterface()) {
             try {
-                current = (Driver) driverClass.newInstance();
+                current = (Driver)driverClass.newInstance();
             } catch (InstantiationException ex) {
                 throw new DriverLoadException(ex);
             } catch (IllegalAccessException ex) {
@@ -102,52 +131,75 @@ public class DynamicDriverClassLoader {
             deregisterAll();
             return current;
         } else {
-            throw new DriverLoadException("Class " + name + " is does not implemtent the java.sql.Driver interface or is an interface/abstract class itself!");
+            throw new DriverLoadException("Class " + name
+                        + " is does not implemtent the java.sql.Driver interface or is an interface/abstract class itself!");
         }
-
     }
 
     /**
-     * 
-     * @param resourceName
-     * @return a class with the given canonical name in the classloaders path, if it is a java.sql.Driver
+     * DOCUMENT ME!
+     *
+     * @param   resourceName  DOCUMENT ME!
+     *
+     * @return  a class with the given canonical name in the classloaders path, if it is a java.sql.Driver
+     *
+     * @throws  DriverLoadException  DOCUMENT ME!
      */
     public final Class loadDriverClassFromFile(final String resourceName) throws DriverLoadException {
         if (resourceName.endsWith(ENDING_DOT_CLASS)) {
             Class driverClass = null;
             try {
 //                driverClass = Class.forName(resourceName.substring(0, resourceName.length() - 6).replaceAll(JAR_SEPARATOR_SLASH, DOT), false, driverLoader);
-                driverClass = Class.forName(resourceName.substring(0, resourceName.length() - 6).replace(JAR_SEPARATOR_SLASH, DOT), false, driverLoader);
+                driverClass = Class.forName(resourceName.substring(0, resourceName.length() - 6).replace(
+                            JAR_SEPARATOR_SLASH,
+                            DOT),
+                        false,
+                        driverLoader);
             } catch (Throwable ex) {
-                //expected to happen -> ignore
+                // expected to happen -> ignore
             }
-            if (driverClass != null && Driver.class.isAssignableFrom(driverClass) && !driverClass.isInterface()) {
+            if ((driverClass != null) && Driver.class.isAssignableFrom(driverClass) && !driverClass.isInterface()) {
                 return driverClass;
             }
         }
-        throw new DriverLoadException("Class " + resourceName + " is does not implemtent the java.sql.Driver interface or is an interface/abstract class itself!");
+        throw new DriverLoadException("Class " + resourceName
+                    + " is does not implemtent the java.sql.Driver interface or is an interface/abstract class itself!");
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  IllegalStateException  DOCUMENT ME!
+     */
     public DynamicDriverClassLoader copy() {
         try {
             return new DynamicDriverClassLoader(files);
         } catch (DriverLoaderCreateException ex) {
-            throw new IllegalStateException("Unexpected Exception while cloning DynamicClassLoader with path " + Arrays.deepToString(path) + ". Files referenced still present?", ex);
+            throw new IllegalStateException("Unexpected Exception while cloning DynamicClassLoader with path "
+                        + Arrays.deepToString(path) + ". Files referenced still present?",
+                ex);
         }
     }
 
     /**
-     * 
-     * @return the URL of this loaders classpath
+     * DOCUMENT ME!
+     *
+     * @return  the URL of this loaders classpath
      */
     public URL[] getPath() {
         return path.clone();
     }
 
     /**
-     * 
-     * @param cleaner
-     * @param loader
+     * DOCUMENT ME!
+     *
+     * @param   cleaner  DOCUMENT ME!
+     * @param   loader   DOCUMENT ME!
+     *
+     * @throws  NullPointerException   DOCUMENT ME!
+     * @throws  IllegalStateException  DOCUMENT ME!
      */
     private void deregisterAll(final Class cleaner, final ClassLoader loader) {
         if (loader == null) {
@@ -155,11 +207,11 @@ public class DynamicDriverClassLoader {
         }
         try {
             if (cleaner == null) {
-                //if there should be no cleaner, create one...
+                // if there should be no cleaner, create one...
                 final Class cleanerload = Class.forName(Cleaner.class.getCanonicalName(), true, loader);
                 deregisterAll(cleanerload, loader);
             } else {
-                //cleaner standard-constructor invokes cleaning-procedure
+                // cleaner standard-constructor invokes cleaning-procedure
                 cleaner.newInstance();
             }
         } catch (Exception ex) {
@@ -169,33 +221,50 @@ public class DynamicDriverClassLoader {
     }
 
     /**
-     * 
+     * DOCUMENT ME!
      */
     private void deregisterAll() {
         deregisterAll(cleaner, driverLoader);
     }
 
-    public static final boolean instanceOf(Object o) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   o  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static final boolean instanceOf(final Object o) {
         return o instanceof DriverClassLoader;
     }
 }
 
 /**
- * The internal child-first-delegation URLClassLoader which does the actual loading.
- * (Otherwise the cache of parent-classloaders will be flooded on scanning large jars!)
- * 
- * @author stefan
+ * The internal child-first-delegation URLClassLoader which does the actual loading. (Otherwise the cache of
+ * parent-classloaders will be flooded on scanning large jars!)
+ *
+ * @author   stefan
+ * @version  $Revision$, $Date$
  */
 class DriverClassLoader extends URLClassLoader {
 
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new DriverClassLoader object.
+     *
+     * @param  urls  DOCUMENT ME!
+     */
     protected DriverClassLoader(final URL[] urls) {
         super(urls, null);
     }
 
+    //~ Methods ----------------------------------------------------------------
+
     @Override
     public final synchronized Class<?> loadClass(final String name) throws ClassNotFoundException {
         try {
-            //if (name.equals(Cleaner.class.getCanonicalName())) {
+            // if (name.equals(Cleaner.class.getCanonicalName())) {
             // First check whether it's already been loaded, if so use it
             Class loadedClass = findLoadedClass(name);
             // Not loaded, try to load it

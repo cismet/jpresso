@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * JDBCImportExecutor.java
  *
@@ -5,46 +12,78 @@
  */
 package de.cismet.jpresso.core.finalizer;
 
-import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
-import de.cismet.jpresso.core.kernel.Finalizer;
-import de.cismet.jpresso.core.kernel.IntermedTable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import de.cismet.jpresso.core.kernel.Finalizer;
+import de.cismet.jpresso.core.kernel.IntermedTable;
+import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
+
 /**
- * @author  srichter
+ * DOCUMENT ME!
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public final class BatchFinalizer extends Finalizer {
 
-    /** Logger */
+    //~ Static fields/initializers ---------------------------------------------
+
+    public static final int MAX_LOG_ERROR = 20;
+
+    //~ Instance fields --------------------------------------------------------
+
+    /** Logger. */
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private boolean debug = log.isDebugEnabled();
-    public static final int MAX_LOG_ERROR = 20;
     /** Holds value of property rollback. */
     private final StringBuilder buff = new StringBuilder();
     private boolean rb = true;
     private boolean force = false;
     private String[] updateSequences = null;
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   param  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  IllegalArgumentException  DOCUMENT ME!
+     */
     private boolean evalString(final String param) {
         if (param != null) {
-
             if (param.equalsIgnoreCase("true")) {
                 return true;
             } else if (param.equalsIgnoreCase("false")) {
                 return false;
             } else {
-                throw new IllegalArgumentException("Illegal Rollback argument. Found " + param + "! Please provide 'true' or 'false'!");
+                throw new IllegalArgumentException("Illegal Rollback argument. Found " + param
+                            + "! Please provide 'true' or 'false'!");
             }
         }
         return false;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  in  DOCUMENT ME!
+     */
     public void setForceWrite(final String in) {
         force = evalString(in);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   in  DOCUMENT ME!
+     *
+     * @throws  IllegalArgumentException  DOCUMENT ME!
+     */
     public void setUpdateSequences(final String in) {
         if (in != null) {
             try {
@@ -54,20 +93,24 @@ public final class BatchFinalizer extends Finalizer {
                         updateSequences[i] = updateSequences[i].trim();
                     }
                 } else {
-                    updateSequences = new String[]{in.trim()};
+                    updateSequences = new String[] { in.trim() };
                 }
             } catch (Exception e) {
-                throw new IllegalArgumentException("Illegal UpdateSequences argument. Found " + in + "!\nPlease provide a list like: Tabname1:Sequence1[, Tabname2:Sequence2,...]!");
+                throw new IllegalArgumentException("Illegal UpdateSequences argument. Found " + in
+                            + "!\nPlease provide a list like: Tabname1:Sequence1[, Tabname2:Sequence2,...]!");
             }
         }
     }
 
-    /** Setter for property param.
-     * @param param New value of property param.
+    /**
+     * Setter for property param.
      *
+     * @param  rollback  param New value of property param.
      */
     public void setRollback(final String rollback) {
-        log.debug("Rollback got: " + rollback);
+        if (log.isDebugEnabled()) {
+            log.debug("Rollback got: " + rollback);
+        }
         if (evalString(rollback)) {
             log.info("Rollback was set true. The transcation will be rolled back!");
             rb = true;
@@ -76,12 +119,18 @@ public final class BatchFinalizer extends Finalizer {
         }
     }
 
-    /** 
+    /**
      * The method that actually performs all the writing to DB.
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
      */
     @Override
     public long finalise() throws Exception {
-        log.debug("finalise");
+        if (log.isDebugEnabled()) {
+            log.debug("finalise");
+        }
         long errorCounter = 0;
         String stmnt;
         final Connection conn = getIntermedTables().getTargetConn();
@@ -96,8 +145,10 @@ public final class BatchFinalizer extends Finalizer {
             final int tableRowCount = itab.getRowCount();
             System.out.println("finalizing ---> " + tableName);
             if (debug) {
-                String debugString = "Import into table: " + tableName + " (" + tableRowCount + " rows)\n";
-                log.debug(debugString);
+                final String debugString = "Import into table: " + tableName + " (" + tableRowCount + " rows)\n";
+                if (log.isDebugEnabled()) {
+                    log.debug(debugString);
+                }
             }
             buff.append("\n" + "Import into table: " + tableName + " (" + tableRowCount + " rows)\n");
 
@@ -105,7 +156,7 @@ public final class BatchFinalizer extends Finalizer {
             final Statement s = conn.createStatement();
             int j = 0;
             for (; j < tableRowCount; ++j) {
-                //TODO processCancelCommand handling in superclass
+                // TODO processCancelCommand handling in superclass
                 if (isCanceled()) {
                     conn.rollback();
                     log.info("cancel -> rollback");
@@ -115,7 +166,9 @@ public final class BatchFinalizer extends Finalizer {
                 }
                 stmnt = getFixedPartOfInsertStatement(itab) + getValuesForInsert(itab, j);
                 if (debug) {
-                    log.debug("Statement: " + stmnt);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Statement: " + stmnt);
+                    }
                 }
                 try {
                     s.addBatch(stmnt);
@@ -125,9 +178,11 @@ public final class BatchFinalizer extends Finalizer {
                     ++logErrorCounter;
                     final String msg = "Error at:" + stmnt + ": " + ex;
                     log.error(msg);
-                    log.debug(msg + stmnt, ex);
+                    if (log.isDebugEnabled()) {
+                        log.debug(msg + stmnt, ex);
+                    }
                     setProgressValue(tableName, j + 1, logErrorCounter);
-                    //switch to rollback as error occured
+                    // switch to rollback as error occured
                     rb = true;
                     if (logErrorCounter < MAX_LOG_ERROR) {
                         logs += "    Import error @ statement:" + stmnt + "\n" + ex.toString() + "\n";
@@ -153,7 +208,7 @@ public final class BatchFinalizer extends Finalizer {
                     }
                 } while (sqlEx != null);
                 setProgressValue(tableName, j, errorCounter);
-                //switch to rollback as error occured
+                // switch to rollback as error occured
                 rb = true;
             }
         }
@@ -166,18 +221,21 @@ public final class BatchFinalizer extends Finalizer {
                     final Statement s = conn.createStatement();
                     for (final String seq : updateSequences) {
                         final String[] split = seq.split(":");
-                        if (split != null && split.length == 2) {
-                            s.execute("SELECT SETVAL('" + split[1].trim() + "',(SELECT max(ID)+1 FROM " + split[0].trim() + "))");
+                        if ((split != null) && (split.length == 2)) {
+                            s.execute("SELECT SETVAL('" + split[1].trim() + "',(SELECT max(ID)+1 FROM "
+                                        + split[0].trim() + "))");
                         }
                     }
                     s.close();
                 }
             }
-            //.execute("ROLLBACK");
+            // .execute("ROLLBACK");
         } catch (SQLException ex) {
             final String msg = "Error on: ROLLBACK or COMMIT: " + ex;
             log.error(msg);
-            log.debug(msg);
+            if (log.isDebugEnabled()) {
+                log.debug(msg);
+            }
             logs += "    Import error .. rollback statement\n" + ex.toString() + "\n";
         }
         log.info("Import finished");
@@ -186,17 +244,45 @@ public final class BatchFinalizer extends Finalizer {
         return errorCounter;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   itab      DOCUMENT ME!
+     * @param   position  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  JPressoException  DOCUMENT ME!
+     */
     protected String getValuesForInsert(final IntermedTable itab, final int position) throws JPressoException {
         return "(" + itab.getRowStringWithGivenEnclosingChar(position, ",") + ")";
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   itab  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  JPressoException  DOCUMENT ME!
+     */
     protected String getFixedPartOfInsertStatement(final IntermedTable itab) throws JPressoException {
         return "INSERT INTO " + itab.getTableName() + "(" + getFieldList(itab) + ") VALUES";
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   itab  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  JPressoException  DOCUMENT ME!
+     */
     protected String getFieldList(final IntermedTable itab) throws JPressoException {
         final StringBuilder sBuff = new StringBuilder();
-        for (int i = 0; i < itab.getColumnCount() - 1; ++i) {
+        for (int i = 0; i < (itab.getColumnCount() - 1); ++i) {
             sBuff.append(itab.getColumnName(i)).append(",");
         }
         sBuff.append(itab.getColumnName(itab.getColumnCount() - 1));

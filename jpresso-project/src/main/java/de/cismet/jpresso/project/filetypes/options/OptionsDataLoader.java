@@ -1,25 +1,49 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.project.filetypes.options;
 
-import de.cismet.jpresso.core.data.ProjectOptions;
-import de.cismet.jpresso.project.filetypes.JPFileLoader;
-import java.io.IOException;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObjectExistsException;
 import org.openide.loaders.MultiDataObject;
 import org.openide.util.NbBundle;
 
+import java.io.IOException;
+
+import de.cismet.jpresso.core.data.ProjectOptions;
+
+import de.cismet.jpresso.project.filetypes.JPFileLoader;
+
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
 public class OptionsDataLoader extends JPFileLoader<ProjectOptions> {
+
+    //~ Static fields/initializers ---------------------------------------------
 
     public static final String REQUIRED_MIME = "text/x-jpresso-options";
     private static final long serialVersionUID = 1L;
 
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new OptionsDataLoader object.
+     */
     public OptionsDataLoader() {
         super("de.cismet.jpresso.project.filetypes.options.OptionsDataObject");
     }
+
+    //~ Methods ----------------------------------------------------------------
 
     @Override
     protected String defaultDisplayName() {
@@ -32,7 +56,9 @@ public class OptionsDataLoader extends JPFileLoader<ProjectOptions> {
         getExtensions().addMimeType(REQUIRED_MIME);
     }
 
-    protected MultiDataObject createMultiObject(FileObject primaryFile) throws DataObjectExistsException, IOException {
+    @Override
+    protected MultiDataObject createMultiObject(final FileObject primaryFile) throws DataObjectExistsException,
+        IOException {
         return new OptionsDataObject(primaryFile, this, loadData(primaryFile));
     }
 

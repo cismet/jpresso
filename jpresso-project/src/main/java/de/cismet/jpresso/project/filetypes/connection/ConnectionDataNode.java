@@ -1,36 +1,68 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.project.filetypes.connection;
 
-import de.cismet.jpresso.project.filetypes.action.JPNodeRenameAction;
-import de.cismet.jpresso.project.filetypes.refactoring.RefactoringEngine;
-import java.io.IOException;
-import javax.swing.Action;
 import org.openide.loaders.DataNode;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.Children;
 import org.openide.util.Lookup;
 import org.openide.util.actions.SystemAction;
 
+import java.io.IOException;
+
+import javax.swing.Action;
+
+import de.cismet.jpresso.project.filetypes.action.JPNodeRenameAction;
+import de.cismet.jpresso.project.filetypes.refactoring.RefactoringEngine;
+
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
 public final class ConnectionDataNode extends DataNode {
+
+    //~ Static fields/initializers ---------------------------------------------
 
     private static final String IMAGE_ICON_BASE = "de/cismet/jpresso/project/res/database.png";
 
-    public ConnectionDataNode(DataObject obj) {
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new ConnectionDataNode object.
+     *
+     * @param  obj  DOCUMENT ME!
+     */
+    public ConnectionDataNode(final DataObject obj) {
         super(obj, Children.LEAF);
         setIconBaseWithExtension(IMAGE_ICON_BASE);
     }
 
-    ConnectionDataNode(DataObject obj, Lookup lookup) {
+    /**
+     * Creates a new ConnectionDataNode object.
+     *
+     * @param  obj     DOCUMENT ME!
+     * @param  lookup  DOCUMENT ME!
+     */
+    ConnectionDataNode(final DataObject obj, final Lookup lookup) {
         super(obj, Children.LEAF, lookup);
         setIconBaseWithExtension(IMAGE_ICON_BASE);
     }
 
+    //~ Methods ----------------------------------------------------------------
+
     @Override
-    public Action[] getActions(boolean context) {
-        Action[] superResult = super.getActions(context);
+    public Action[] getActions(final boolean context) {
+        final Action[] superResult = super.getActions(context);
         superResult[7] = SystemAction.get(JPNodeRenameAction.class);
         return superResult;
     }
@@ -51,7 +83,6 @@ public final class ConnectionDataNode extends DataNode {
         super.destroy();
     }
 
-
 //    /** Creates a property sheet. */
 //    @Override
 //    protected Sheet createSheet() {
@@ -64,8 +95,5 @@ public final class ConnectionDataNode extends DataNode {
 //        // TODO add some relevant properties: ss.put(...)
 //        return s;
 //    }
-    
-    
 
 }
-

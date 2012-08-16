@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * ConnectionEditor.java
  *
@@ -5,48 +12,90 @@
  */
 package de.cismet.jpresso.project.gui.editors;
 
-import de.cismet.jpresso.core.data.DriverDescription;
-import de.cismet.jpresso.project.gui.output.*;
-import de.cismet.jpresso.core.data.DatabaseConnection;
-import de.cismet.jpresso.project.gui.AbstractJPTopComponent;
-import de.cismet.jpresso.core.serviceprovider.ClassResourceProvider;
-import de.cismet.jpresso.core.serviceprovider.DynamicDriverManager;
-import de.cismet.jpresso.core.utils.TypeSafeCollections;
-import de.cismet.jpresso.project.filetypes.DefaultURLProvider;
-import de.cismet.jpresso.project.serviceprovider.ExecutorProvider;
+import org.openide.util.Exceptions;
+
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
+
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.text.Document;
-import org.openide.util.Exceptions;
+
+import de.cismet.jpresso.core.data.DatabaseConnection;
+import de.cismet.jpresso.core.data.DriverDescription;
+import de.cismet.jpresso.core.serviceprovider.ClassResourceProvider;
+import de.cismet.jpresso.core.serviceprovider.DynamicDriverManager;
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
+import de.cismet.jpresso.project.filetypes.DefaultURLProvider;
+import de.cismet.jpresso.project.gui.AbstractJPTopComponent;
+import de.cismet.jpresso.project.gui.output.*;
+import de.cismet.jpresso.project.serviceprovider.ExecutorProvider;
 
 /**
- * @author  srichter
+ * DOCUMENT ME!
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public final class ConnectionEditor extends TopComponentFinderPanel {
+
+    //~ Instance fields --------------------------------------------------------
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel pnlMain;
+    private javax.swing.JScrollPane scpTargetParam;
+    private javax.swing.JTextField txtTargetDriver;
+    private javax.swing.JTextArea txtTargetParam;
+    private javax.swing.JTextField txtTargetUrl;
+
+    //~ Instance fields --------------------------------------------------------
 
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private DatabaseConnection tgt;
     private DriverDescription lastChosenDD;
 
-    /** Creates new form ConnectionEditor */
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates new form ConnectionEditor.
+     */
     public ConnectionEditor() {
         this(null);
     }
 
+    /**
+     * Creates a new ConnectionEditor object.
+     *
+     * @param  t  DOCUMENT ME!
+     */
     public ConnectionEditor(final DatabaseConnection t) {
         this.tgt = t;
         initComponents();
         setContent(t);
     }
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public DatabaseConnection getTargetConContent() {
         final DatabaseConnection target = new DatabaseConnection();
         target.setDriverClass(txtTargetDriver.getText().trim());
@@ -66,6 +115,11 @@ public final class ConnectionEditor extends TopComponentFinderPanel {
         return target;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public DatabaseConnection getContent() {
         final DatabaseConnection target = new DatabaseConnection();
 
@@ -73,7 +127,7 @@ public final class ConnectionEditor extends TopComponentFinderPanel {
         target.setUrl(txtTargetUrl.getText().trim());
 
         final String tParam = txtTargetParam.getText().trim();
-        Properties p = new Properties();
+        final Properties p = new Properties();
         final String[] tp = tParam.split("\n");
         for (final String s : tp) {
             final String[] keyValue = s.split(":=");
@@ -86,12 +140,20 @@ public final class ConnectionEditor extends TopComponentFinderPanel {
         return target;
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     private void clearUndoRedo() {
         UndoRedoSupport.discardAllEdits(txtTargetUrl);
         UndoRedoSupport.discardAllEdits(txtTargetDriver);
         UndoRedoSupport.discardAllEdits(txtTargetParam);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  t  DOCUMENT ME!
+     */
     public void setContent(final DatabaseConnection t) {
         if (t == null) {
             setTgt(new DatabaseConnection());
@@ -109,7 +171,8 @@ public final class ConnectionEditor extends TopComponentFinderPanel {
             String tParams = "";
             final Properties p = target.getProps();
             for (final String txt : p.stringPropertyNames()) {
-                tParams = new StringBuffer(tParams).append(txt).append(":=").append(p.getProperty(txt)).append("\n").toString();
+                tParams = new StringBuffer(tParams).append(txt).append(":=").append(p.getProperty(txt)).append("\n")
+                            .toString();
             }
             txtTargetParam.setText(tParams.trim());
         } else {
@@ -118,9 +181,14 @@ public final class ConnectionEditor extends TopComponentFinderPanel {
             txtTargetParam.setText("");
         }
         clearUndoRedo();
-    //}
+        // }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  b  DOCUMENT ME!
+     */
     public void setEditable(final boolean b) {
         txtTargetDriver.setEditable(b);
         txtTargetParam.setEditable(b);
@@ -130,10 +198,9 @@ public final class ConnectionEditor extends TopComponentFinderPanel {
         jButton2.setVisible(b);
     }
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
+     * content of this method is always regenerated by the Form Editor.
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -154,10 +221,26 @@ public final class ConnectionEditor extends TopComponentFinderPanel {
 
         setLayout(new java.awt.BorderLayout());
 
-        pnlMain.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(null, "Connection Editor", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
+        pnlMain.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createTitledBorder(
+                    null,
+                    "Connection Editor",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                    new java.awt.Font("Dialog", 0, 12),
+                    javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")),
+                javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
         pnlMain.setLayout(new java.awt.GridBagLayout());
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(null, "Driver", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), javax.swing.UIManager.getDefaults().getColor("ComboBox.selectionBackground")), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
+        jPanel1.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createTitledBorder(
+                    null,
+                    "Driver",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                    new java.awt.Font("Dialog", 0, 12),
+                    javax.swing.UIManager.getDefaults().getColor("ComboBox.selectionBackground")),
+                javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
         jButton1.setText("...");
@@ -165,10 +248,12 @@ public final class ConnectionEditor extends TopComponentFinderPanel {
         jButton1.setMinimumSize(new java.awt.Dimension(35, 18));
         jButton1.setPreferredSize(new java.awt.Dimension(35, 18));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -195,7 +280,15 @@ public final class ConnectionEditor extends TopComponentFinderPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         pnlMain.add(jPanel1, gridBagConstraints);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(null, "URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
+        jPanel2.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createTitledBorder(
+                    null,
+                    "URL",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                    new java.awt.Font("Dialog", 0, 12),
+                    javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")),
+                javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
         jPanel2.setLayout(new java.awt.GridBagLayout());
 
         UndoRedoSupport.decorate(txtTargetUrl);
@@ -210,10 +303,12 @@ public final class ConnectionEditor extends TopComponentFinderPanel {
         jButton2.setMinimumSize(new java.awt.Dimension(35, 18));
         jButton2.setPreferredSize(new java.awt.Dimension(35, 18));
         jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton2ActionPerformed(evt);
+                }
+            });
         jPanel2.add(jButton2, new java.awt.GridBagConstraints());
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -225,7 +320,15 @@ public final class ConnectionEditor extends TopComponentFinderPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         pnlMain.add(jPanel2, gridBagConstraints);
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(null, "Additional Parameter", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
+        jPanel3.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createTitledBorder(
+                    null,
+                    "Additional Parameter",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                    new java.awt.Font("Dialog", 0, 12),
+                    javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")),
+                javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
         jPanel3.setMinimumSize(new java.awt.Dimension(275, 65));
         jPanel3.setPreferredSize(new java.awt.Dimension(275, 65));
         jPanel3.setLayout(new java.awt.BorderLayout());
@@ -259,16 +362,24 @@ public final class ConnectionEditor extends TopComponentFinderPanel {
         pnlMain.add(jPanel4, gridBagConstraints);
 
         add(pnlMain, java.awt.BorderLayout.CENTER);
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         final Enumeration<Driver> dmDrv = DriverManager.getDrivers();
-        final DynamicDriverManager man = findTopComponent().getProject().getLookup().lookup(ClassResourceProvider.class).getDriverManager();
+        final DynamicDriverManager man = findTopComponent().getProject()
+                    .getLookup()
+                    .lookup(ClassResourceProvider.class)
+                    .getDriverManager();
         final List<String> aliases = TypeSafeCollections.newArrayList();
         while (dmDrv.hasMoreElements()) {
             aliases.add(dmDrv.nextElement().getClass().getCanonicalName());
         }
-        for (DriverDescription dd : man.getValidDrivers()) {
+        for (final DriverDescription dd : man.getValidDrivers()) {
             aliases.add(dd.getName());
         }
         final Object[] possibilities = aliases.toArray();
@@ -287,7 +398,7 @@ public final class ConnectionEditor extends TopComponentFinderPanel {
                 selection);
         if (res != null) {
             if (res instanceof DriverDescription) {
-                final DriverDescription dd = (DriverDescription) res;
+                final DriverDescription dd = (DriverDescription)res;
                 txtTargetDriver.setText(dd.getName());
                 if (txtTargetUrl.getText().length() == 0) {
                     txtTargetUrl.setText(dd.getUrlFormat());
@@ -298,20 +409,29 @@ public final class ConnectionEditor extends TopComponentFinderPanel {
                 lastChosenDD = null;
             }
         }
+    } //GEN-LAST:event_jButton1ActionPerformed
 
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-    if (lastChosenDD != null && lastChosenDD.getUrlFormat() != null) {
-        txtTargetUrl.setText(lastChosenDD.getUrlFormat());
-    } else {
-        final String defURL = DefaultURLProvider.getDefaultURL(txtTargetDriver.getText());
-        if (defURL != null) {
-            txtTargetUrl.setText(defURL);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
+        if ((lastChosenDD != null) && (lastChosenDD.getUrlFormat() != null)) {
+            txtTargetUrl.setText(lastChosenDD.getUrlFormat());
+        } else {
+            final String defURL = DefaultURLProvider.getDefaultURL(txtTargetDriver.getText());
+            if (defURL != null) {
+                txtTargetUrl.setText(defURL);
+            }
         }
-    }
-}//GEN-LAST:event_jButton2ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton2ActionPerformed
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  checkOnly  DOCUMENT ME!
+     */
     public void checkTargetConnection(final boolean checkOnly) {
         final ConnectionWorker cw = new ConnectionWorker(checkOnly);
         final AbstractJPTopComponent tc = findTopComponent();
@@ -320,57 +440,88 @@ private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         }
         ExecutorProvider.execute(cw);
     }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel pnlMain;
-    private javax.swing.JScrollPane scpTargetParam;
-    private javax.swing.JTextField txtTargetDriver;
-    private javax.swing.JTextArea txtTargetParam;
-    private javax.swing.JTextField txtTargetUrl;
-    // End of variables declaration//GEN-END:variables
+    /**
+     * End of variables declaration//GEN-END:variables.
+     *
+     * @return  DOCUMENT ME!
+     */
     public DatabaseConnection getTgt() {
         return tgt;
     }
 
-    public void setTgt(DatabaseConnection tgt) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  tgt  DOCUMENT ME!
+     */
+    public void setTgt(final DatabaseConnection tgt) {
         this.tgt = tgt;
     }
-    
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Document getDriverDocument() {
         return this.txtTargetDriver.getDocument();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Document getParamDocument() {
         return this.txtTargetParam.getDocument();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Document getURLDocument() {
         return this.txtTargetUrl.getDocument();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Document[] getDocuments() {
-        return new Document[]{getDriverDocument(), getParamDocument(), getURLDocument()};
+        return new Document[] { getDriverDocument(), getParamDocument(), getURLDocument() };
     }
 
+    //~ Inner Classes ----------------------------------------------------------
+
     /**
-     * Worker that creates an Connection
+     * Worker that creates an Connection.
+     *
+     * @version  $Revision$, $Date$
      */
     class ConnectionWorker extends SwingWorker<Connection, Void> {
 
-        public ConnectionWorker(boolean checkOnly) {
-            this.checkOnly = checkOnly;
-            this.tc = findTopComponent();
-        }
+        //~ Instance fields ----------------------------------------------------
+
         private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
         private boolean checkOnly;
         private final AbstractJPTopComponent tc;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new ConnectionWorker object.
+         *
+         * @param  checkOnly  DOCUMENT ME!
+         */
+        public ConnectionWorker(final boolean checkOnly) {
+            this.checkOnly = checkOnly;
+            this.tc = findTopComponent();
+        }
+
+        //~ Methods ------------------------------------------------------------
 
         @Override
         protected Connection doInBackground() throws Exception {
@@ -404,11 +555,16 @@ private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                         }
                     } else {
                         final String msg = "Connection to database succesfully established.";
-                        JOptionPane.showMessageDialog(ConnectionEditor.this, msg, "Check successful", JOptionPane.INFORMATION_MESSAGE);
-                        log.debug(msg);
+                        JOptionPane.showMessageDialog(
+                            ConnectionEditor.this,
+                            msg,
+                            "Check successful",
+                            JOptionPane.INFORMATION_MESSAGE);
+                        if (log.isDebugEnabled()) {
+                            log.debug(msg);
+                        }
                     }
                 }
-
             } catch (InterruptedException ex) {
                 Exceptions.printStackTrace(ex);
             } catch (ExecutionException ex) {
@@ -417,9 +573,8 @@ private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                 JOptionPane.showMessageDialog(ConnectionEditor.this, msg, "Fehler", JOptionPane.ERROR_MESSAGE);
                 log.error(msg, e);
             } finally {
-                
                 try {
-                    if (conn != null && !conn.isClosed()) {
+                    if ((conn != null) && !conn.isClosed()) {
                         log.info("Target " + conn + " CLOSED");
                         conn.close();
                     }

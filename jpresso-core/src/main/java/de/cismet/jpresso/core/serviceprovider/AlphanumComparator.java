@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package de.cismet.jpresso.core.serviceprovider;
 
 /*
@@ -24,24 +31,57 @@ package de.cismet.jpresso.core.serviceprovider;
  *
  */
 import java.util.Comparator;
-//TODO make it generic!
+/**
+ * TODO make it generic!
+ *
+ * @version  $Revision$, $Date$
+ */
 public final class AlphanumComparator implements Comparator<String> {
+
+    //~ Static fields/initializers ---------------------------------------------
 
     private static final Comparator<String> INSTANCE = new AlphanumComparator();
 
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new AlphanumComparator object.
+     */
     private AlphanumComparator() {
     }
 
-    public static final Comparator<String> getInstance() {
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static Comparator<String> getInstance() {
         return INSTANCE;
     }
 
-    private final boolean isDigit(final char ch) {
-        return ch > 47 && ch < 58;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   ch  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean isDigit(final char ch) {
+        return (ch > 47) && (ch < 58);
     }
 
-    /** Length of string is passed in for improved efficiency (only need to calculate it once) **/
-    private final String getChunk(final String s, final int slength, int marker) {
+    /**
+     * Length of string is passed in for improved efficiency (only need to calculate it once).*
+     *
+     * @param   s        DOCUMENT ME!
+     * @param   slength  DOCUMENT ME!
+     * @param   marker   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private String getChunk(final String s, final int slength, int marker) {
         final StringBuilder chunk = new StringBuilder();
         char c = s.charAt(marker);
         chunk.append(c);
@@ -68,6 +108,7 @@ public final class AlphanumComparator implements Comparator<String> {
         return chunk.toString();
     }
 
+    @Override
     public int compare(final String o1, final String o2) {
 //        if (!(o1 instanceof String) || !(o2 instanceof String)) {
 //            return o1.compareTo(o2);
@@ -81,7 +122,7 @@ public final class AlphanumComparator implements Comparator<String> {
         final int s1Length = o1.length();
         final int s2Length = o2.length();
 
-        while (thisMarker < s1Length && thatMarker < s2Length) {
+        while ((thisMarker < s1Length) && (thatMarker < s2Length)) {
             final String thisChunk = getChunk(o1, s1Length, thisMarker);
             thisMarker = thisMarker + thisChunk.length();
 
@@ -92,7 +133,7 @@ public final class AlphanumComparator implements Comparator<String> {
             int result = 0;
             if (isDigit(thisChunk.charAt(0)) && isDigit(thatChunk.charAt(0))) {
                 // Simple chunk comparison by length.
-                int thisChunkLength = thisChunk.length();
+                final int thisChunkLength = thisChunk.length();
                 result = thisChunkLength - thatChunk.length();
                 // If equal, the first different number counts
                 if (result == 0) {

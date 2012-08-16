@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * TargetTableProblemException.java
  *
@@ -5,18 +12,25 @@
  */
 package de.cismet.jpresso.core.exceptions;
 
-import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
 import de.cismet.jpresso.core.kernel.*;
+import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
 
-/** Wird geworfen wenn im Zielsystem eine Tabelle nicht uebereinstimmt
- * @author hell
+/**
+ * Wird geworfen wenn im Zielsystem eine Tabelle nicht uebereinstimmt.
+ *
+ * @author   hell
+ * @version  $Revision$, $Date$
  */
 public class TargetTableProblemException extends JPressoException {
 
-    /** Creates a new instance of TargetTableProblemException
-     * @param s Beschreibung der Exception
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new instance of TargetTableProblemException.
+     *
+     * @param  s  Beschreibung der Exception
      */
-    public TargetTableProblemException(String s) {
+    public TargetTableProblemException(final String s) {
         super(s);
     }
 }

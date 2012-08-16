@@ -1,257 +1,279 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
- * This class was automatically generated with 
+ * This class was automatically generated with
  * <a href="http://www.castor.org">Castor 0.9.4.3</a>, using an XML
  * Schema.
  * $Id: Code.java,v 1.1 2003/11/04 09:59:00 Hell Exp $
  */
-
 package de.cismet.jpresso.core.deprecated.castorGenerated;
 
-  //---------------------------------/
- //- Imported classes and packages -/
-//---------------------------------/
+// ---------------------------------/
+// - Imported classes and packages -/
+// ---------------------------------/
 
-import java.util.Vector;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 
+import java.util.Vector;
+
 /**
  * Class Code.
- * 
- * @version $Revision: 1.1 $ $Date: 2003/11/04 09:59:00 $
+ *
+ * @version  $Revision: 1.1 $ $Date: 2003/11/04 09:59:00 $
  */
 public class Code implements java.io.Serializable {
 
+    //~ Instance fields --------------------------------------------------------
 
-      //--------------------------/
-     //- Class/Member Variables -/
-    //--------------------------/
+    // --------------------------/
+    // - Class/Member Variables -/
+    // --------------------------/
 
-    /**
-     * Field _import
-     */
+    /** Field _import. */
     private java.lang.String _import;
 
-    /**
-     * Field _functionList
-     */
+    /** Field _functionList. */
     private java.util.Vector _functionList;
 
+    //~ Constructors -----------------------------------------------------------
 
-      //----------------/
-     //- Constructors -/
-    //----------------/
-
+    /**
+     * ----------------/ - Constructors -/ ----------------/
+     */
     public Code() {
         super();
         _functionList = new Vector();
-    } //-- de.cismet.cids.admin.importAnt.castorGenerated.Code()
+    } // -- de.cismet.cids.admin.importAnt.castorGenerated.Code()
 
+    //~ Methods ----------------------------------------------------------------
 
-      //-----------/
-     //- Methods -/
-    //-----------/
+    // -----------/
+    // - Methods -/
+    // -----------/
 
     /**
-     * Method addFunction
-     * 
-     * @param vFunction
+     * Method addFunction.
+     *
+     * @param   vFunction  DOCUMENT ME!
+     *
+     * @throws  java.lang.IndexOutOfBoundsException  DOCUMENT ME!
      */
-    
-    public void addFunction(de.cismet.jpresso.core.deprecated.castorGenerated.Function vFunction)
-        throws java.lang.IndexOutOfBoundsException
-    {
+
+    public void addFunction(final de.cismet.jpresso.core.deprecated.castorGenerated.Function vFunction)
+            throws java.lang.IndexOutOfBoundsException {
         _functionList.addElement(vFunction);
-    } //-- void addFunction(de.cismet.cids.admin.importAnt.castorGenerated.Function) 
+    } // -- void addFunction(de.cismet.cids.admin.importAnt.castorGenerated.Function)
 
     /**
-     * Method addFunction
-     * 
-     * @param index
-     * @param vFunction
+     * Method addFunction.
+     *
+     * @param   index      DOCUMENT ME!
+     * @param   vFunction  DOCUMENT ME!
+     *
+     * @throws  java.lang.IndexOutOfBoundsException  DOCUMENT ME!
      */
-    
-    public void addFunction(int index, de.cismet.jpresso.core.deprecated.castorGenerated.Function vFunction)
-        throws java.lang.IndexOutOfBoundsException
-    {
+
+    public void addFunction(final int index, final de.cismet.jpresso.core.deprecated.castorGenerated.Function vFunction)
+            throws java.lang.IndexOutOfBoundsException {
         _functionList.insertElementAt(vFunction, index);
-    } //-- void addFunction(int, de.cismet.cids.admin.importAnt.castorGenerated.Function) 
+    } // -- void addFunction(int, de.cismet.cids.admin.importAnt.castorGenerated.Function)
 
     /**
-     * Method enumerateFunction
+     * Method enumerateFunction.
+     *
+     * @return  DOCUMENT ME!
      */
-    public java.util.Enumeration enumerateFunction()
-    {
+    public java.util.Enumeration enumerateFunction() {
         return _functionList.elements();
-    } //-- java.util.Enumeration enumerateFunction() 
+    } // -- java.util.Enumeration enumerateFunction()
 
     /**
-     * Method getFunction
-     * 
-     * @param index
+     * Method getFunction.
+     *
+     * @param   index  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  java.lang.IndexOutOfBoundsException  DOCUMENT ME!
+     * @throws  IndexOutOfBoundsException            DOCUMENT ME!
      */
-    public de.cismet.jpresso.core.deprecated.castorGenerated.Function getFunction(int index)
-        throws java.lang.IndexOutOfBoundsException
-    {
-        //-- check bounds for index
+    public de.cismet.jpresso.core.deprecated.castorGenerated.Function getFunction(final int index)
+            throws java.lang.IndexOutOfBoundsException {
+        // -- check bounds for index
         if ((index < 0) || (index > _functionList.size())) {
             throw new IndexOutOfBoundsException();
         }
-        
-        return (de.cismet.jpresso.core.deprecated.castorGenerated.Function) _functionList.elementAt(index);
-    } //-- de.cismet.cids.admin.importAnt.castorGenerated.Function getFunction(int) 
+
+        return (de.cismet.jpresso.core.deprecated.castorGenerated.Function)_functionList.elementAt(index);
+    } // -- de.cismet.cids.admin.importAnt.castorGenerated.Function getFunction(int)
 
     /**
-     * Method getFunction
+     * Method getFunction.
+     *
+     * @return  DOCUMENT ME!
      */
-    public de.cismet.jpresso.core.deprecated.castorGenerated.Function[] getFunction()
-    {
-        int size = _functionList.size();
-        de.cismet.jpresso.core.deprecated.castorGenerated.Function[] mArray = new de.cismet.jpresso.core.deprecated.castorGenerated.Function[size];
+    public de.cismet.jpresso.core.deprecated.castorGenerated.Function[] getFunction() {
+        final int size = _functionList.size();
+        final de.cismet.jpresso.core.deprecated.castorGenerated.Function[] mArray =
+            new de.cismet.jpresso.core.deprecated.castorGenerated.Function[size];
         for (int index = 0; index < size; index++) {
-            mArray[index] = (de.cismet.jpresso.core.deprecated.castorGenerated.Function) _functionList.elementAt(index);
+            mArray[index] = (de.cismet.jpresso.core.deprecated.castorGenerated.Function)_functionList.elementAt(index);
         }
         return mArray;
-    } //-- de.cismet.cids.admin.importAnt.castorGenerated.Function[] getFunction() 
+    } // -- de.cismet.cids.admin.importAnt.castorGenerated.Function[] getFunction()
 
     /**
-     * Method getFunctionCount
+     * Method getFunctionCount.
+     *
+     * @return  DOCUMENT ME!
      */
-    public int getFunctionCount()
-    {
+    public int getFunctionCount() {
         return _functionList.size();
-    } //-- int getFunctionCount() 
+    } // -- int getFunctionCount()
 
     /**
      * Returns the value of field 'import'.
-     * 
-     * @return the value of field 'import'.
+     *
+     * @return  the value of field 'import'.
      */
-    public java.lang.String getImport()
-    {
+    public java.lang.String getImport() {
         return this._import;
-    } //-- java.lang.String getImport() 
+    } // -- java.lang.String getImport()
 
     /**
-     * Method isValid
+     * Method isValid.
+     *
+     * @return  DOCUMENT ME!
      */
-    public boolean isValid()
-    {
+    public boolean isValid() {
         try {
             validate();
-        }
-        catch (org.exolab.castor.xml.ValidationException vex) {
+        } catch (org.exolab.castor.xml.ValidationException vex) {
             return false;
         }
         return true;
-    } //-- boolean isValid() 
+    } // -- boolean isValid()
 
     /**
-     * Method marshal
-     * 
-     * @param out
+     * Method marshal.
+     *
+     * @param   out  DOCUMENT ME!
+     *
+     * @throws  org.exolab.castor.xml.MarshalException     DOCUMENT ME!
+     * @throws  org.exolab.castor.xml.ValidationException  DOCUMENT ME!
      */
-    public void marshal(java.io.Writer out)
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
-    {
-        
+    public void marshal(final java.io.Writer out) throws org.exolab.castor.xml.MarshalException,
+        org.exolab.castor.xml.ValidationException {
         Marshaller.marshal(this, out);
-    } //-- void marshal(java.io.Writer) 
+    } // -- void marshal(java.io.Writer)
 
     /**
-     * Method marshal
-     * 
-     * @param handler
+     * Method marshal.
+     *
+     * @param   handler  DOCUMENT ME!
+     *
+     * @throws  java.io.IOException                        DOCUMENT ME!
+     * @throws  org.exolab.castor.xml.MarshalException     DOCUMENT ME!
+     * @throws  org.exolab.castor.xml.ValidationException  DOCUMENT ME!
      */
-    public void marshal(org.xml.sax.ContentHandler handler)
-        throws java.io.IOException, org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
-    {
-        
+    public void marshal(final org.xml.sax.ContentHandler handler) throws java.io.IOException,
+        org.exolab.castor.xml.MarshalException,
+        org.exolab.castor.xml.ValidationException {
         Marshaller.marshal(this, handler);
-    } //-- void marshal(org.xml.sax.ContentHandler) 
+    } // -- void marshal(org.xml.sax.ContentHandler)
 
     /**
-     * Method removeAllFunction
+     * Method removeAllFunction.
      */
-    public void removeAllFunction()
-    {
+    public void removeAllFunction() {
         _functionList.removeAllElements();
-    } //-- void removeAllFunction() 
+    } // -- void removeAllFunction()
 
     /**
-     * Method removeFunction
-     * 
-     * @param index
+     * Method removeFunction.
+     *
+     * @param   index  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    public de.cismet.jpresso.core.deprecated.castorGenerated.Function removeFunction(int index)
-    {
-        java.lang.Object obj = _functionList.elementAt(index);
+    public de.cismet.jpresso.core.deprecated.castorGenerated.Function removeFunction(final int index) {
+        final java.lang.Object obj = _functionList.elementAt(index);
         _functionList.removeElementAt(index);
-        return (de.cismet.jpresso.core.deprecated.castorGenerated.Function) obj;
-    } //-- de.cismet.cids.admin.importAnt.castorGenerated.Function removeFunction(int) 
+        return (de.cismet.jpresso.core.deprecated.castorGenerated.Function)obj;
+    } // -- de.cismet.cids.admin.importAnt.castorGenerated.Function removeFunction(int)
 
     /**
-     * Method setFunction
-     * 
-     * @param index
-     * @param vFunction
+     * Method setFunction.
+     *
+     * @param   index      DOCUMENT ME!
+     * @param   vFunction  DOCUMENT ME!
+     *
+     * @throws  java.lang.IndexOutOfBoundsException  DOCUMENT ME!
+     * @throws  IndexOutOfBoundsException            DOCUMENT ME!
      */
-    
-    public void setFunction(int index, de.cismet.jpresso.core.deprecated.castorGenerated.Function vFunction)
-        throws java.lang.IndexOutOfBoundsException
-    {
-        //-- check bounds for index
+
+    public void setFunction(final int index, final de.cismet.jpresso.core.deprecated.castorGenerated.Function vFunction)
+            throws java.lang.IndexOutOfBoundsException {
+        // -- check bounds for index
         if ((index < 0) || (index > _functionList.size())) {
             throw new IndexOutOfBoundsException();
         }
         _functionList.setElementAt(vFunction, index);
-    } //-- void setFunction(int, de.cismet.cids.admin.importAnt.castorGenerated.Function) 
+    } // -- void setFunction(int, de.cismet.cids.admin.importAnt.castorGenerated.Function)
 
     /**
-     * Method setFunction
-     * 
-     * @param functionArray
+     * Method setFunction.
+     *
+     * @param  functionArray  DOCUMENT ME!
      */
-    
-    public void setFunction(de.cismet.jpresso.core.deprecated.castorGenerated.Function[] functionArray)
-    {
-        //-- copy array
+
+    public void setFunction(final de.cismet.jpresso.core.deprecated.castorGenerated.Function[] functionArray) {
+        // -- copy array
         _functionList.removeAllElements();
         for (int i = 0; i < functionArray.length; i++) {
             _functionList.addElement(functionArray[i]);
         }
-    } //-- void setFunction(de.cismet.cids.admin.importAnt.castorGenerated.Function) 
+    } // -- void setFunction(de.cismet.cids.admin.importAnt.castorGenerated.Function)
 
     /**
      * Sets the value of field 'import'.
-     * 
-     * @param _import
-     * @param import the value of field 'import'.
+     *
+     * @param  _import  DOCUMENT ME!
      */
-    public void setImport(java.lang.String _import)
-    {
+    public void setImport(final java.lang.String _import) {
         this._import = _import;
-    } //-- void setImport(java.lang.String) 
+    } // -- void setImport(java.lang.String)
 
     /**
-     * Method unmarshal
-     * 
-     * @param reader
+     * Method unmarshal.
+     *
+     * @param   reader  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  org.exolab.castor.xml.MarshalException     DOCUMENT ME!
+     * @throws  org.exolab.castor.xml.ValidationException  DOCUMENT ME!
      */
-    public static de.cismet.jpresso.core.deprecated.castorGenerated.Code unmarshal(java.io.Reader reader)
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
-    {
-        return (de.cismet.jpresso.core.deprecated.castorGenerated.Code) Unmarshaller.unmarshal(de.cismet.jpresso.core.deprecated.castorGenerated.Code.class, reader);
-    } //-- de.cismet.cids.admin.importAnt.castorGenerated.Code unmarshal(java.io.Reader) 
+    public static de.cismet.jpresso.core.deprecated.castorGenerated.Code unmarshal(final java.io.Reader reader)
+            throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException {
+        return (de.cismet.jpresso.core.deprecated.castorGenerated.Code)Unmarshaller.unmarshal(
+                de.cismet.jpresso.core.deprecated.castorGenerated.Code.class,
+                reader);
+    } // -- de.cismet.cids.admin.importAnt.castorGenerated.Code unmarshal(java.io.Reader)
 
     /**
-     * Method validate
+     * Method validate.
+     *
+     * @throws  org.exolab.castor.xml.ValidationException  DOCUMENT ME!
      */
-    public void validate()
-        throws org.exolab.castor.xml.ValidationException
-    {
-        org.exolab.castor.xml.Validator validator = new org.exolab.castor.xml.Validator();
+    public void validate() throws org.exolab.castor.xml.ValidationException {
+        final org.exolab.castor.xml.Validator validator = new org.exolab.castor.xml.Validator();
         validator.validate(this);
-    } //-- void validate() 
-
+    } // -- void validate()
 }

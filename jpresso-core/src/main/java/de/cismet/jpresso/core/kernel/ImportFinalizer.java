@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * ImportFinalizer.java
  *
@@ -5,59 +12,94 @@
  */
 package de.cismet.jpresso.core.kernel;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import java.util.Enumeration;
+import java.util.Properties;
+
+import javax.swing.table.TableModel;
+
 import de.cismet.jpresso.core.finalizer.StandardFinalizer;
 import de.cismet.jpresso.core.serviceacceptor.ProgressListener;
 import de.cismet.jpresso.core.serviceprovider.FinalizerController;
 import de.cismet.jpresso.core.serviceprovider.exceptions.FinalizerException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Properties;
-import java.util.Enumeration;
-import javax.swing.table.TableModel;
 
 /**
- * @author  srichter
- * @author  hell
+ * DOCUMENT ME!
+ *
+ * @author   srichter
+ * @author   hell
+ * @version  $Revision$, $Date$
  */
 public class ImportFinalizer implements FinalizerController {
 
-    /** Logger */
-    //private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+    //~ Static fields/initializers ---------------------------------------------
+
+    /** Logger. */
+    // private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private static final org.apache.log4j.Logger sLog = org.apache.log4j.Logger.getLogger(ImportFinalizer.class);
+    private static final String FINALIZER_PACKAGE = StandardFinalizer.class.getPackage().getName();
+    private static final String SET = "set";
+
+    //~ Instance fields --------------------------------------------------------
+
     private final Class<?> finalizerClass;
     private final Object finalizerObject;
     private final Finalizer finalizer;
     private final ProgressListener progressListener;
     private String fullMethodName;
 //    private static final String FINALIZER_PACKAGE = "de.cismet.jpresso.core.finalizer.";
-    private static final String FINALIZER_PACKAGE = StandardFinalizer.class.getPackage().getName();
-    private static final String SET = "set";
 
-    //IntermedTablesContainer intermedTables;
-    /** Creates a new instance of ImportFinalizer */
-    public ImportFinalizer(String finalizerClassName, IntermedTablesContainer intermedTables, Properties props) throws FinalizerException {
+    //~ Constructors -----------------------------------------------------------
+
+    // IntermedTablesContainer intermedTables;
+    /**
+     * Creates a new instance of ImportFinalizer.
+     *
+     * @param   finalizerClassName  DOCUMENT ME!
+     * @param   intermedTables      DOCUMENT ME!
+     * @param   props               DOCUMENT ME!
+     *
+     * @throws  FinalizerException  DOCUMENT ME!
+     */
+    public ImportFinalizer(final String finalizerClassName,
+            final IntermedTablesContainer intermedTables,
+            final Properties props) throws FinalizerException {
         this(finalizerClassName, intermedTables, props, null);
     }
 
-    public ImportFinalizer(final String finalizerClassName, final IntermedTablesContainer intermedTables, final Properties props, final ProgressListener progressListener) throws FinalizerException {
-
-        //Abspeichern der intermediate Tables
-        //this.intermedTables = intermedTables;
+    /**
+     * Creates a new ImportFinalizer object.
+     *
+     * @param   finalizerClassName  DOCUMENT ME!
+     * @param   intermedTables      DOCUMENT ME!
+     * @param   props               DOCUMENT ME!
+     * @param   progressListener    DOCUMENT ME!
+     *
+     * @throws  FinalizerException  DOCUMENT ME!
+     */
+    public ImportFinalizer(final String finalizerClassName,
+            final IntermedTablesContainer intermedTables,
+            final Properties props,
+            final ProgressListener progressListener) throws FinalizerException {
+        // Abspeichern der intermediate Tables
+        // this.intermedTables = intermedTables;
         this.progressListener = progressListener;
-        String canonicalFinalizer = FINALIZER_PACKAGE + "." + finalizerClassName;
+        final String canonicalFinalizer = FINALIZER_PACKAGE + "." + finalizerClassName;
 
         try {
-            //Suchen der Finisher Klasse
+            // Suchen der Finisher Klasse
             finalizerClass = Class.forName(canonicalFinalizer);
 
-            //Erzeugen eines Objektes des Finalizers
+            // Erzeugen eines Objektes des Finalizers
             finalizerObject = finalizerClass.newInstance();
-            if (finalizerObject != null && finalizerObject instanceof Finalizer) {
-                finalizer = (Finalizer) finalizerObject;
+            if ((finalizerObject != null) && (finalizerObject instanceof Finalizer)) {
+                finalizer = (Finalizer)finalizerObject;
             } else {
                 throw new FinalizerException("Finalizer Object is not an instance of Finalizer!");
             }
-            //Suchen und Aufruf der Property-Methoden
+            // Suchen und Aufruf der Property-Methoden
             if (props != null) {
                 final Enumeration<?> propsEnum = props.propertyNames();
                 while (propsEnum.hasMoreElements()) {
@@ -71,10 +113,10 @@ public class ImportFinalizer implements FinalizerController {
                     }
                     fullMethodName = SET + methodName;
                     try {
-                        final Method m = finalizerClass.getMethod(fullMethodName, new Class[]{String.class});
-                        m.invoke(finalizerObject, new Object[]{props.getProperty(name)});
+                        final Method m = finalizerClass.getMethod(fullMethodName, new Class[] { String.class });
+                        m.invoke(finalizerObject, new Object[] { props.getProperty(name) });
                     } catch (NoSuchMethodException nsme) {
-                        //find allowed methods via reflection to present them to the user as a hint
+                        // find allowed methods via reflection to present them to the user as a hint
                         final StringBuilder allowedMethods = new StringBuilder();
                         final Method[] methods = finalizerClass.getDeclaredMethods();
                         for (final Method method : methods) {
@@ -98,7 +140,9 @@ public class ImportFinalizer implements FinalizerController {
                         if (allowedMethods.length() > 0) {
                             allowedMethods.deleteCharAt(allowedMethods.length() - 1);
                         }
-                        throw new FinalizerException("Illegal Finalizer Parameter: Method " + fullMethodName + "(String arg) does not exist!\nPossible parameters:\n" + allowedMethods, nsme);
+                        throw new FinalizerException("Illegal Finalizer Parameter: Method " + fullMethodName
+                                    + "(String arg) does not exist!\nPossible parameters:\n" + allowedMethods,
+                            nsme);
                     }
                 }
             }
@@ -111,10 +155,11 @@ public class ImportFinalizer implements FinalizerController {
         } catch (Exception e) {
             throw new FinalizerException("Error in Finalizer!", e);
         }
-        //Setzen der IntermedTables
+        // Setzen der IntermedTables
         finalizer.setIntermedTables(intermedTables, progressListener);
-
     }
+
+    //~ Methods ----------------------------------------------------------------
 
     @Override
     public TableModel getFinalizerOutputTable() {
@@ -122,9 +167,11 @@ public class ImportFinalizer implements FinalizerController {
     }
 
     /**
-     * 
-     * @return
-     * @throws de.cismet.jpressocore.serviceprovider.exceptions.FinalizerException
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  FinalizerException  de.cismet.jpressocore.serviceprovider.exceptions.FinalizerException
      */
     @Override
     public long finalise() throws FinalizerException {

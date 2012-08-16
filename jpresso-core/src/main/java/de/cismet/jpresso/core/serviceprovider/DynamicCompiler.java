@@ -1,35 +1,45 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package de.cismet.jpresso.core.serviceprovider;
 
-import de.cismet.jpresso.core.data.JavaClassDefinition;
 import javax.tools.JavaCompiler;
+
+import de.cismet.jpresso.core.data.JavaClassDefinition;
 
 /**
  * Interface for a DynamicCompiler.
- * 
- * @author srichter
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public interface DynamicCompiler {
 
+    //~ Methods ----------------------------------------------------------------
+
     /**
      * Compiles JavaClassDefinitions using the given compiler-classpath.
-     * 
-     * @param compileClassPath
-     * @param sources
-     * @return the CompilerResult, containing the compiled classes and/or error diagnostics,
+     *
+     * @param   compileClassPath  DOCUMENT ME!
+     * @param   sources           DOCUMENT ME!
+     *
+     * @return  the CompilerResult, containing the compiled classes and/or error diagnostics,
      */
     @SuppressWarnings(value = "unchecked")
-    public CompilerResult compile(final String compileClassPath, final JavaClassDefinition... sources);
-    
+    CompilerResult compile(final String compileClassPath, final JavaClassDefinition... sources);
+
     /**
      * Sets the compiler to delegate to.
-     * 
-     * @param compiler
+     *
+     * @param  compiler  DOCUMENT ME!
      */
-    public void setCompiler(JavaCompiler compiler);
-
+    void setCompiler(JavaCompiler compiler);
 }

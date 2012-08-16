@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * ConnectionEditor.java
  *
@@ -5,72 +12,125 @@
  */
 package de.cismet.jpresso.project.gui.editors;
 
-import de.cismet.jpresso.project.gui.AbstractJPTopComponent;
-import de.cismet.jpresso.project.gui.ProgressHandler;
-import de.cismet.jpresso.project.gui.output.OutputQuery;
-import de.cismet.jpresso.project.gui.run.RunTopComponent;
-import de.cismet.jpresso.core.serviceprovider.ClassResourceProvider;
-import de.cismet.jpresso.core.data.Query;
-import de.cismet.jpresso.core.data.DatabaseConnection;
-import de.cismet.jpresso.project.serviceprovider.ExecutorProvider;
+import org.openide.util.Cancellable;
+import org.openide.util.Exceptions;
+
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
 import java.text.ParseException;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
+
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingWorker;
 import javax.swing.text.Document;
-import org.openide.util.Cancellable;
-import org.openide.util.Exceptions;
+
+import de.cismet.jpresso.core.data.DatabaseConnection;
+import de.cismet.jpresso.core.data.Query;
+import de.cismet.jpresso.core.serviceprovider.ClassResourceProvider;
+
+import de.cismet.jpresso.project.gui.AbstractJPTopComponent;
+import de.cismet.jpresso.project.gui.ProgressHandler;
+import de.cismet.jpresso.project.gui.output.OutputQuery;
+import de.cismet.jpresso.project.gui.run.RunTopComponent;
+import de.cismet.jpresso.project.serviceprovider.ExecutorProvider;
 
 /**
- * @author  srichter
- * @author  hell
+ * DOCUMENT ME!
+ *
+ * @author   srichter
+ * @author   hell
+ * @version  $Revision$, $Date$
  */
 public final class QueryEditor extends TopComponentFinderPanel {
+
+    //~ Static fields/initializers ---------------------------------------------
 
     private static final String BACKSLASH_N = "\n";
     private static final String SPACEBACKSLASH_N = " " + BACKSLASH_N;
     private static final String DOUBLE_SPACE = "  ";
     private static final String DEFINED_AS = ":=";
+
+    //~ Instance fields --------------------------------------------------------
+
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private Query qry;
     private String[] sourceFieldsForClipboard = null;
-    //TODO private AbstractJPTopComponent tc .... ein einziges findTopComponent..oder besser noch das ding gleich mitgeben...
+    // TODO private AbstractJPTopComponent tc .... ein einziges findTopComponent..oder besser noch das ding gleich
+    // mitgeben...
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnColumnNamesToClip;
+    private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSpinner jSpinner1;
+    private javax.swing.JPanel pnlMain;
+    private javax.swing.JScrollPane scpSourceParam;
+    private javax.swing.JTextField txtSourceDriver;
+    private javax.swing.JTextArea txtSourceParam;
+    private javax.swing.JEditorPane txtSourceStatement;
+    private javax.swing.JTextField txtSourceUrl;
+    // End of variables declaration//GEN-END:variables
 
-    /** Creates new form ConnectionEditor */
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates new form ConnectionEditor.
+     */
     public QueryEditor() {
         this(null);
     }
 
-    public QueryEditor(Query s) {
+    /**
+     * Creates a new QueryEditor object.
+     *
+     * @param  s  DOCUMENT ME!
+     */
+    public QueryEditor(final Query s) {
         this.qry = s;
         initComponents();
         myInit();
         jSpinner1.setModel(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
         setContent(s);
-
     }
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     */
     public void myInit() {
         txtSourceParam.setEditable(false);
         txtSourceParam.setEnabled(false);
         txtSourceDriver.setEditable(false);
         txtSourceUrl.setEditable(false);
-
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Query getContent() {
         final Query query = new Query();
         query.setDriverClass(txtSourceDriver.getText().trim());
@@ -93,14 +153,15 @@ public final class QueryEditor extends TopComponentFinderPanel {
             p.put(keyValue[0], keyValue[1]);
         }
         query.setProps(p);
-        query.setPreviewMaxRows((Integer) jSpinner1.getValue());
+        query.setPreviewMaxRows((Integer)jSpinner1.getValue());
         query.setLabelCase(jComboBox1.getSelectedItem().toString());
         return query;
     }
-
-//    public void setContent(ConnectionInfo ci) {
-//        setContent(ci.getSourceJdbcConnectionInfo());
-//    }
+    /**
+     * public void setContent(ConnectionInfo ci) { setContent(ci.getSourceJdbcConnectionInfo()); }.
+     *
+     * @param  s  DOCUMENT ME!
+     */
     public void setContent(final Query s) {
         if (s == null) {
             setSrc(new Query());
@@ -116,11 +177,13 @@ public final class QueryEditor extends TopComponentFinderPanel {
                 stmnt = stmnt.replaceAll(DOUBLE_SPACE, SPACEBACKSLASH_N);
             }
             txtSourceStatement.setText(stmnt);
-            //Fehlerquelle?
+            // Fehlerquelle?
             String sParams = "";
             final Properties p = source.getProps();
             for (final String txt : p.stringPropertyNames()) {
-                sParams = new StringBuffer(sParams).append(txt).append(DEFINED_AS).append(p.getProperty(txt)).append(BACKSLASH_N).toString();
+                sParams = new StringBuffer(sParams).append(txt).append(DEFINED_AS).append(p.getProperty(txt))
+                            .append(BACKSLASH_N)
+                            .toString();
             }
 //            while (sProp.hasMoreElements()) {
 //                Prop p = (Prop) sProp.nextElement();
@@ -143,17 +206,21 @@ public final class QueryEditor extends TopComponentFinderPanel {
             jSpinner1.setValue(0);
             jComboBox1.setSelectedIndex(0);
         }
-        //}
+        // }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getStatement() {
         return txtSourceStatement.getText();
     }
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
+     * content of this method is always regenerated by the Form Editor.
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -173,7 +240,7 @@ public final class QueryEditor extends TopComponentFinderPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         txtSourceStatement = new javax.swing.JEditorPane();
         txtSourceStatement.setContentType("text/x-sql");
-        //UndoRedoSupport.decorate(txtSourceStatement);
+        // UndoRedoSupport.decorate(txtSourceStatement);
         jPanel6 = new javax.swing.JPanel();
         jSpinner1 = new javax.swing.JSpinner();
         jLabel3 = new javax.swing.JLabel();
@@ -183,14 +250,31 @@ public final class QueryEditor extends TopComponentFinderPanel {
         setOpaque(false);
         setLayout(new java.awt.BorderLayout());
 
-        pnlMain.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(null, "Query Editor", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
+        pnlMain.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createTitledBorder(
+                    null,
+                    "Query Editor",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                    new java.awt.Font("Dialog", 0, 12),
+                    javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")),
+                javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
         pnlMain.setLayout(new java.awt.GridBagLayout());
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(null, "Adjust Labelname Case", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
+        jPanel1.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createTitledBorder(
+                    null,
+                    "Adjust Labelname Case",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                    new java.awt.Font("Dialog", 0, 12),
+                    javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")),
+                javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
         jPanel1.setOpaque(false);
         jPanel1.setLayout(new java.awt.BorderLayout());
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "-", Query.LOWER_CASE, Query.UPPER_CASE }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(
+                new String[] { "-", Query.LOWER_CASE, Query.UPPER_CASE }));
         jPanel1.add(jComboBox1, java.awt.BorderLayout.PAGE_END);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -201,7 +285,15 @@ public final class QueryEditor extends TopComponentFinderPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         pnlMain.add(jPanel1, gridBagConstraints);
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(null, "Driver", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
+        jPanel2.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createTitledBorder(
+                    null,
+                    "Driver",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                    new java.awt.Font("Dialog", 0, 12),
+                    javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")),
+                javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
         jPanel2.setLayout(new java.awt.BorderLayout());
 
         txtSourceDriver.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -214,7 +306,15 @@ public final class QueryEditor extends TopComponentFinderPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         pnlMain.add(jPanel2, gridBagConstraints);
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(null, "URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), javax.swing.UIManager.getDefaults().getColor("ComboBox.selectionBackground")), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
+        jPanel3.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createTitledBorder(
+                    null,
+                    "URL",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                    new java.awt.Font("Dialog", 0, 12),
+                    javax.swing.UIManager.getDefaults().getColor("ComboBox.selectionBackground")),
+                javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
         jPanel3.setLayout(new java.awt.BorderLayout());
 
         txtSourceUrl.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -228,7 +328,15 @@ public final class QueryEditor extends TopComponentFinderPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         pnlMain.add(jPanel3, gridBagConstraints);
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(null, "Additional Parameters", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
+        jPanel4.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createTitledBorder(
+                    null,
+                    "Additional Parameters",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                    new java.awt.Font("Dialog", 0, 12),
+                    javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")),
+                javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
         jPanel4.setMinimumSize(new java.awt.Dimension(200, 64));
         jPanel4.setPreferredSize(new java.awt.Dimension(200, 64));
         jPanel4.setLayout(new java.awt.BorderLayout());
@@ -247,7 +355,15 @@ public final class QueryEditor extends TopComponentFinderPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         pnlMain.add(jPanel4, gridBagConstraints);
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(null, "Statement", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
+        jPanel5.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createTitledBorder(
+                    null,
+                    "Statement",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                    new java.awt.Font("Dialog", 0, 12),
+                    javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")),
+                javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
         jPanel5.setMinimumSize(new java.awt.Dimension(132, 63));
         jPanel5.setLayout(new java.awt.BorderLayout());
 
@@ -266,7 +382,15 @@ public final class QueryEditor extends TopComponentFinderPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         pnlMain.add(jPanel5, gridBagConstraints);
 
-        jPanel6.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(null, "Max.Preview Rows", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
+        jPanel6.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createTitledBorder(
+                    null,
+                    "Max.Preview Rows",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                    new java.awt.Font("Dialog", 0, 12),
+                    javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")),
+                javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
         jPanel6.setOpaque(false);
         jPanel6.setLayout(new java.awt.BorderLayout());
 
@@ -287,15 +411,25 @@ public final class QueryEditor extends TopComponentFinderPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         pnlMain.add(jPanel6, gridBagConstraints);
 
-        jPanel7.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(null, "Copy Columnlabels To Clipboard", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")), null)); // NOI18N
+        jPanel7.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createTitledBorder(
+                    null,
+                    "Copy Columnlabels To Clipboard",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                    new java.awt.Font("Dialog", 0, 12),
+                    javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")),
+                null)); // NOI18N
 
         btnColumnNamesToClip.setText("Copy");
         btnColumnNamesToClip.setEnabled(false);
         btnColumnNamesToClip.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnColumnNamesToClipActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnColumnNamesToClipActionPerformed(evt);
+                }
+            });
         jPanel7.add(btnColumnNamesToClip);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -306,78 +440,105 @@ public final class QueryEditor extends TopComponentFinderPanel {
         pnlMain.add(jPanel7, gridBagConstraints);
 
         add(pnlMain, java.awt.BorderLayout.CENTER);
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
-    private void btnColumnNamesToClipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnColumnNamesToClipActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void btnColumnNamesToClipActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnColumnNamesToClipActionPerformed
         final String[] cols = sourceFieldsForClipboard;
         if (cols != null) {
-            StringSelection transferable = new StringSelection(Arrays.deepToString(cols));
+            final StringSelection transferable = new StringSelection(Arrays.deepToString(cols));
             final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             clipboard.setContents(transferable, transferable);
         }
+    }                                                                                        //GEN-LAST:event_btnColumnNamesToClipActionPerformed
 
-    }//GEN-LAST:event_btnColumnNamesToClipActionPerformed
-
-    public final void checkSourceConnection() {
+    /**
+     * DOCUMENT ME!
+     */
+    public void checkSourceConnection() {
         try {
             jSpinner1.commitEdit();
         } catch (ParseException ex) {
-            //ignore
+            // ignore
         }
-        checkSourceConnection(((Integer) jSpinner1.getValue()) + 1);
+        checkSourceConnection(((Integer)jSpinner1.getValue()) + 1);
     }
 
-    public final void checkSourceConnection(final int maxRows) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  maxRows  DOCUMENT ME!
+     */
+    public void checkSourceConnection(final int maxRows) {
         btnColumnNamesToClip.setEnabled(false);
         final QueryWorker qw = new QueryWorker(maxRows);
         ExecutorProvider.execute(qw);
 //        qw.execute();
     }
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnColumnNamesToClip;
-    private javax.swing.JComboBox jComboBox1;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JPanel pnlMain;
-    private javax.swing.JScrollPane scpSourceParam;
-    private javax.swing.JTextField txtSourceDriver;
-    private javax.swing.JTextArea txtSourceParam;
-    private javax.swing.JEditorPane txtSourceStatement;
-    private javax.swing.JTextField txtSourceUrl;
-    // End of variables declaration//GEN-END:variables
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Query getSrc() {
         return qry;
     }
 
-    public void setSrc(Query src) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  src  DOCUMENT ME!
+     */
+    public void setSrc(final Query src) {
         this.qry = src;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public int getPreviewMaxRows() {
-        return (Integer) jSpinner1.getValue();
+        return (Integer)jSpinner1.getValue();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Document getStatementDocument() {
         return txtSourceStatement.getDocument();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public JSpinner getMaxRowSpinner() {
         return jSpinner1;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public JComboBox getLabelCaseComboBox() {
         return jComboBox1;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  dc  DOCUMENT ME!
+     */
     public void setDatabaseConnection(final DatabaseConnection dc) {
         DatabaseConnection con = dc;
         if (con == null) {
@@ -388,18 +549,26 @@ public final class QueryEditor extends TopComponentFinderPanel {
         final Properties p = con.getProps();
         String sParams = "";
         for (final String txt : p.stringPropertyNames()) {
-            sParams = new StringBuffer(sParams).append(txt).append(DEFINED_AS).append(p.getProperty(txt)).append(BACKSLASH_N).toString();
+            sParams = new StringBuffer(sParams).append(txt).append(DEFINED_AS).append(p.getProperty(txt))
+                        .append(BACKSLASH_N)
+                        .toString();
         }
         txtSourceParam.setText(sParams);
     }
 
-    public void setEditable(boolean editable) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  editable  DOCUMENT ME!
+     */
+    public void setEditable(final boolean editable) {
         txtSourceStatement.setEditable(editable);
         jComboBox1.setEnabled(editable);
-        //txtSourceStatement.setEnabled(editable);
+        // txtSourceStatement.setEnabled(editable);
         jSpinner1.setEnabled(editable);
     }
 
+    //J-
     class QueryWorker extends SwingWorker<String[], Void> implements Cancellable {
 
         public QueryWorker(final int maxRows) {
@@ -532,4 +701,5 @@ public final class QueryEditor extends TopComponentFinderPanel {
             return true;
         }
     }
+    //J+
 }

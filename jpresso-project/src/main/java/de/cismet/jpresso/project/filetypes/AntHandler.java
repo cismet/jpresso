@@ -1,25 +1,19 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.project.filetypes;
 
-import de.cismet.jpresso.core.serviceprovider.ClassResourceProvider;
-import de.cismet.jpresso.core.serviceprovider.ClassResourceProviderFactory;
-import de.cismet.jpresso.core.utils.URLTools;
-import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Properties;
-import java.util.Set;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.tools.ant.module.api.support.ActionUtils;
+
 import org.openide.DialogDisplayer;
 import org.openide.ErrorManager;
 import org.openide.NotifyDescriptor;
@@ -29,17 +23,36 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import java.util.Collection;
+import java.util.Properties;
+import java.util.Set;
+
+import de.cismet.jpresso.core.serviceprovider.ClassResourceProvider;
+import de.cismet.jpresso.core.serviceprovider.ClassResourceProviderFactory;
+import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
+import de.cismet.jpresso.core.utils.URLTools;
+
 /**
- * This class provides static methods to execute all possible Ant tasks from
- * Netbeans. It collects all information about classpaths, project directory, 
- * etc. and passes them as arguments to the Ánt script.
- * 
- * @author srichter
+ * This class provides static methods to execute all possible Ant tasks from Netbeans. It collects all information about
+ * classpaths, project directory, etc. and passes them as arguments to the Ánt script.
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public abstract class AntHandler {
 
+    //~ Static fields/initializers ---------------------------------------------
+
     private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AntHandler.class);
-    //Target Names
+    // Target Names
     private static final String ANT_TARGET_SINGLE_RUN = "runSingle";
     private static final String ANT_TARGET_CONVERT = "runConvert";
     private static final String ANT_TARGET_EXPORT = "runExport";
@@ -47,7 +60,7 @@ public abstract class AntHandler {
     private static final String ANT_TARGET_PROJECT = "runProject";
     private static final String ANT_TARGET_COMPILE = "runCompile";
     private static final String ANT_TARGET_RUN_JAVA = "runJava";
-    //Script Variable Names
+    // Script Variable Names
     private static final String JPCORE_JAR = "jpcore.jar";
     private static final String LIB_DIR = "lib.dir";
     private static final String RUN_SOURCE = "run.sourcefile";
@@ -61,44 +74,50 @@ public abstract class AntHandler {
     private static final String ADDITIONAL_CLASSPATH = "add.classpath";
     private static final String COMPILE_FILELIST = "compile.filelist";
     private static final String RUN_CLASS = "run.class";
-    //Memory settings
+    // Memory settings
     private static final String MAX_MEMORY = "memory.max";
     private static final String MAX_MEMORY_VALUE = "512M";
 
+    //~ Methods ----------------------------------------------------------------
+
     /**
-     * 
-     * @param buildXML
-     * @param source
+     * DOCUMENT ME!
+     *
+     * @param  buildXML  DOCUMENT ME!
+     * @param  jpRun     source
      */
     public static void startSingleRun(final FileObject buildXML, final DataObject jpRun) {
-        //todo ckeck dass es auch ein run ist!
+        // todo ckeck dass es auch ein run ist!
         if (jpRun != null) {
             final Properties p = createProjectAntProperties();
             final String file = jpRun.getPrimaryFile().getNameExt();
-            //String dest = FileUtil.toFile(source.getPrimaryFile()).getAbsolutePath();
+            // String dest = FileUtil.toFile(source.getPrimaryFile()).getAbsolutePath();
 
             p.put(RUN_SOURCE, file);
 //            p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
-            log.debug("Ant " + ANT_TARGET_SINGLE_RUN + " properties: " + RUN_SOURCE + " = " + file);
+            if (log.isDebugEnabled()) {
+                log.debug("Ant " + ANT_TARGET_SINGLE_RUN + " properties: " + RUN_SOURCE + " = " + file);
+            }
             if (canExecute(jpRun)) {
                 try {
-                    ActionUtils.runTarget(buildXML, new String[]{ANT_TARGET_SINGLE_RUN}, p);
+                    ActionUtils.runTarget(buildXML, new String[] { ANT_TARGET_SINGLE_RUN }, p);
                 } catch (IOException e) {
                     ErrorManager.getDefault().notify(e);
                 }
             }
         } else {
-            //TODO notify
+            // TODO notify
         }
     }
 
     /**
+     * DOCUMENT ME!
      *
-     * @param buildXML
-     * @param sources
+     * @param  buildXML  DOCUMENT ME!
+     * @param  sources   DOCUMENT ME!
      */
     public static void startCompile(final FileObject buildXML, final Collection<? extends DataObject> sources) {
-        //todo check dass es auch ein run ist!
+        // todo check dass es auch ein run ist!
         if (sources != null) {
             final Properties p = createProjectAntProperties();
             addAdditionalClassPathToProperties(p, buildXML);
@@ -111,125 +130,145 @@ public abstract class AntHandler {
             }
 //            p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
             p.put(COMPILE_FILELIST, sourcefiles.toString());
-            log.debug("Ant " + ANT_TARGET_COMPILE + " properties: " + COMPILE_FILELIST + " = " + sourcefiles.toString());
+            if (log.isDebugEnabled()) {
+                log.debug("Ant " + ANT_TARGET_COMPILE + " properties: " + COMPILE_FILELIST + " = "
+                            + sourcefiles.toString());
+            }
 
             try {
-                ActionUtils.runTarget(buildXML, new String[]{ANT_TARGET_COMPILE}, p);
+                ActionUtils.runTarget(buildXML, new String[] { ANT_TARGET_COMPILE }, p);
             } catch (IOException e) {
                 ErrorManager.getDefault().notify(e);
-
             }
         } else {
-            //TODO notify
+            // TODO notify
         }
     }
 
     /**
+     * DOCUMENT ME!
      *
-     * @param buildXML
-     * @param sources
+     * @param  buildXML  DOCUMENT ME!
+     * @param  runClass  sources
      */
     public static void startJava(final FileObject buildXML, final DataObject runClass) {
-        //todo ckeck dass es auch ein run ist!
+        // todo ckeck dass es auch ein run ist!
         if (runClass != null) {
             final Properties p = createProjectAntProperties();
             addAdditionalClassPathToProperties(p, buildXML);
 //            p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
             p.put(RUN_CLASS, JPressoFileManager.DIR_CDE + "." + runClass.getPrimaryFile().getName());
             p.put(COMPILE_FILELIST, JPressoFileManager.DIR_CDE + "/" + runClass.getPrimaryFile().getNameExt());
-            log.debug("Ant " + ANT_TARGET_RUN_JAVA + " properties: " + RUN_CLASS + " = " + runClass.getPrimaryFile().getPath());
+            if (log.isDebugEnabled()) {
+                log.debug("Ant " + ANT_TARGET_RUN_JAVA + " properties: " + RUN_CLASS + " = "
+                            + runClass.getPrimaryFile().getPath());
+            }
 
             try {
-                ActionUtils.runTarget(buildXML, new String[]{ANT_TARGET_RUN_JAVA}, p);
+                ActionUtils.runTarget(buildXML, new String[] { ANT_TARGET_RUN_JAVA }, p);
             } catch (IOException e) {
                 ErrorManager.getDefault().notify(e);
-
             }
         } else {
-            //TODO notify
+            // TODO notify
         }
     }
 
     /**
-     * 
-     * @param buildXML
-     * @param dest
-     * @param src
+     * DOCUMENT ME!
+     *
+     * @param  buildXML         DOCUMENT ME!
+     * @param  files            dest
+     * @param  dir              src
+     * @param  mergeProperties  DOCUMENT ME!
      */
-    public static void startConvert(final FileObject buildXML, final String files, String dir, String mergeProperties) {
+    public static void startConvert(final FileObject buildXML,
+            final String files,
+            final String dir,
+            final String mergeProperties) {
         final Properties p = createProjectAntProperties();
-        if (files != null && dir != null && mergeProperties != null) {
+        if ((files != null) && (dir != null) && (mergeProperties != null)) {
             p.put(CONVERT_SOURCE, files);
             p.put(CONVERT_DEST, dir);
             p.put(MERGE_PROPS, mergeProperties);
 //            p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
-            log.debug("Ant " + ANT_TARGET_CONVERT + " properties: " + CONVERT_SOURCE + " = " + files + ", " + CONVERT_DEST + " = " + dir);
+            if (log.isDebugEnabled()) {
+                log.debug("Ant " + ANT_TARGET_CONVERT + " properties: " + CONVERT_SOURCE + " = " + files + ", "
+                            + CONVERT_DEST + " = " + dir);
+            }
             try {
-                ActionUtils.runTarget(buildXML, new String[]{ANT_TARGET_CONVERT}, p);
+                ActionUtils.runTarget(buildXML, new String[] { ANT_TARGET_CONVERT }, p);
             } catch (IOException e) {
                 ErrorManager.getDefault().notify(e);
             }
         } else {
-            //TODO notify
+            // TODO notify
         }
     }
 
     /**
-     * 
-     * @param buildXML
-     * @param dest
-     * @param src
+     * DOCUMENT ME!
+     *
+     * @param  buildXML  DOCUMENT ME!
+     * @param  dest      DOCUMENT ME!
      */
     public static void startExport(final FileObject buildXML, final String dest) {
         if (dest != null) {
             final Properties p = createProjectAntProperties();
-            String source = FileUtil.toFile(buildXML.getParent()).getAbsolutePath();
+            final String source = FileUtil.toFile(buildXML.getParent()).getAbsolutePath();
             p.put(EXPORT_SOURCE, source);
             p.put(EXPORT_DEST, dest);
 //            p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
-            log.debug("Ant " + ANT_TARGET_EXPORT + " properties: " + EXPORT_DEST + " = " + dest + ", " + EXPORT_SOURCE + " = " + source);
+            if (log.isDebugEnabled()) {
+                log.debug("Ant " + ANT_TARGET_EXPORT + " properties: " + EXPORT_DEST + " = " + dest + ", "
+                            + EXPORT_SOURCE + " = " + source);
+            }
             try {
-                ActionUtils.runTarget(buildXML, new String[]{ANT_TARGET_EXPORT}, p);
+                ActionUtils.runTarget(buildXML, new String[] { ANT_TARGET_EXPORT }, p);
             } catch (IOException e) {
                 ErrorManager.getDefault().notify(e);
             }
         } else {
-            //TODO notify
+            // TODO notify
         }
     }
 
     /**
-     * 
-     * @param buildXML
-     * @param dest
-     * @param src
+     * DOCUMENT ME!
+     *
+     * @param  buildXML  DOCUMENT ME!
+     * @param  src       DOCUMENT ME!
      */
     @Deprecated
     public static void startImport(final FileObject buildXML, final String src) {
         if (src != null) {
             final Properties p = createProjectAntProperties();
-            String dest = FileUtil.toFile(buildXML.getParent()).getAbsolutePath();
+            final String dest = FileUtil.toFile(buildXML.getParent()).getAbsolutePath();
             p.put(IMPORT_DEST, dest);
             p.put(IMPORT_SOURCE, src);
 //            p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
-            log.debug("Ant " + ANT_TARGET_IMPORT + " properties: " + IMPORT_DEST + " = " + src + ", " + IMPORT_SOURCE + " = " + dest);
+            if (log.isDebugEnabled()) {
+                log.debug("Ant " + ANT_TARGET_IMPORT + " properties: " + IMPORT_DEST + " = " + src + ", "
+                            + IMPORT_SOURCE + " = " + dest);
+            }
             try {
-                ActionUtils.runTarget(buildXML, new String[]{ANT_TARGET_IMPORT}, p);
+                ActionUtils.runTarget(buildXML, new String[] { ANT_TARGET_IMPORT }, p);
             } catch (IOException e) {
                 ErrorManager.getDefault().notify(e);
             }
         } else {
-            //TODO notify
+            // TODO notify
         }
     }
 
     /**
-     * 
-     * @param buildXML
-     * @param dest
+     * DOCUMENT ME!
+     *
+     * @param  buildXML  DOCUMENT ME!
+     * @param  dest      DOCUMENT ME!
      */
     public static void saveAntProperties(final FileObject buildXML, final File dest) {
-        if (buildXML != null && buildXML.isValid() && dest != null) {
+        if ((buildXML != null) && buildXML.isValid() && (dest != null)) {
             dest.mkdirs();
             final Properties p = createProjectAntProperties();
             try {
@@ -242,31 +281,35 @@ public abstract class AntHandler {
     }
 
     /**
-     * 
-     * @param buildXML
+     * DOCUMENT ME!
+     *
+     * @param  buildXML  DOCUMENT ME!
      */
     public static void startProject(final FileObject buildXML) {
         final Properties p = createProjectAntProperties();
 //        p.put(MAX_MEMORY, MAX_MEMORY_VALUE);
         try {
-            ActionUtils.runTarget(buildXML, new String[]{ANT_TARGET_PROJECT}, p);
+            ActionUtils.runTarget(buildXML, new String[] { ANT_TARGET_PROJECT }, p);
         } catch (IOException e) {
             ErrorManager.getDefault().notify(e);
         }
     }
 
     /**
-     * 
-     * @param dob
-     * @return
+     * DOCUMENT ME!
+     *
+     * @param   dob  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
     private static boolean canExecute(final DataObject dob) {
         boolean start = true;
         if (dob.isModified()) {
             try {
-                final Confirmation msg = new NotifyDescriptor.Confirmation("You are trying to execute " + dob.getPrimaryFile().getNameExt() + ".\n" +
-                        "There are changes that have to be saved before.\n" +
-                        "Save file and continue?");
+                final Confirmation msg = new NotifyDescriptor.Confirmation("You are trying to execute "
+                                + dob.getPrimaryFile().getNameExt() + ".\n"
+                                + "There are changes that have to be saved before.\n"
+                                + "Save file and continue?");
                 final Object result = DialogDisplayer.getDefault().notify(msg);
                 if (result.equals(NotifyDescriptor.YES_OPTION)) {
                     start = true;
@@ -278,7 +321,7 @@ public abstract class AntHandler {
                     if (sc != null) {
                         sc.save();
                     } else {
-                        //TODO notify
+                        // TODO notify
                     }
                 }
             } catch (IOException ex) {
@@ -289,26 +332,30 @@ public abstract class AntHandler {
     }
 
     /**
-     * Creates properties to fill the ant script's variables.
-     * These are project directory, the jpressocore.jar, external
+     * Creates properties to fill the ant script's variables. These are project directory, the jpressocore.jar, external
      * library directory.
-     * 
-     * @param buildXML
-     * @return parameter to execute the build.xml with.
+     *
+     * @return  parameter to execute the build.xml with.
      */
     private static Properties createProjectAntProperties() {
-
         final Properties props = new Properties();
         Class c = JPressoFileManager.class;
         final String pathCore = URLTools.convertURLToFile(JPressoFileManager.locateJarForClass(c)).getAbsolutePath();
         props.put(JPCORE_JAR, pathCore);
-        log.debug("Ant properties: JPressoCore.jar -> jpcore.jar = " + pathCore);
+        if (log.isDebugEnabled()) {
+            log.debug("Ant properties: JPressoCore.jar -> jpcore.jar = " + pathCore);
+        }
         c = PropertyConfigurator.class;
         final String pathLib = URLTools.convertURLToFile(JPressoFileManager.locateJarForClass(c)).getParent();
         props.put(LIB_DIR, pathLib);
         return props;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @throws  IOException  DOCUMENT ME!
+     */
     public static void writeDefaultProperties() throws IOException {
 //        final File defProp = new File(FileUtil.toFile(buildXML.getParent()), JPressoFileManager.DEFAULT_PROPS);
         final File defProp = new File(System.getProperty("user.home"), File.separator + JPressoFileManager.ANT_PROPS);
@@ -317,10 +364,18 @@ public abstract class AntHandler {
         p.store(new BufferedOutputStream(new FileOutputStream(defProp)), "");
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  props     DOCUMENT ME!
+     * @param  buildXML  DOCUMENT ME!
+     */
     public static void addAdditionalClassPathToProperties(final Properties props, final FileObject buildXML) {
-        if (buildXML != null && buildXML.isValid()) {
+        if ((buildXML != null) && buildXML.isValid()) {
             final File projDir = FileUtil.toFile(buildXML.getParent());
-            log.debug("Ant properties: Project Directory -> project.dir = " + projDir);
+            if (log.isDebugEnabled()) {
+                log.debug("Ant properties: Project Directory -> project.dir = " + projDir);
+            }
             final ClassResourceProvider crp = ClassResourceProviderFactory.createClassRessourceProvider(projDir);
             final Set<File> addCP = crp.getProjectClasspath();
             final StringBuilder addCPString = new StringBuilder();
@@ -330,10 +385,15 @@ public abstract class AntHandler {
             props.put(ADDITIONAL_CLASSPATH, addCPString.toString());
         } else {
             log.error("Could not get Project Directory from BuildXML, returning null");
-        //TODO error message window & return!
+            // TODO error message window & return!
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public static boolean defaultPropertiesExist() {
         final String homeDir = System.getProperty("user.home");
         final File defaultProps = new File(homeDir, File.separator + JPressoFileManager.ANT_PROPS);
@@ -351,16 +411,17 @@ public abstract class AntHandler {
                 if (coreFile.isFile()) {
                     if (libPath != null) {
                         final File libDir = new File(libPath);
-                        if (libDir.isDirectory() && libDir.list().length > 0) {
-                            //alles ok
+                        if (libDir.isDirectory() && (libDir.list().length > 0)) {
+                            // alles ok
                             return true;
                         }
                     }
                 }
                 final File possibleLibDir = new File(coreFile.getParentFile(), File.separator + "ext");
-                if (possibleLibDir.isDirectory() && possibleLibDir.list().length > 0) {
-                    //koennte stimmen, also true aber warning:
-                    System.err.println("Warning: Could not locate given library directory " + libPath + "! Trying relative directory " + possibleLibDir);
+                if (possibleLibDir.isDirectory() && (possibleLibDir.list().length > 0)) {
+                    // koennte stimmen, also true aber warning:
+                    System.err.println("Warning: Could not locate given library directory " + libPath
+                                + "! Trying relative directory " + possibleLibDir);
                     return true;
                 }
             }

@@ -1,68 +1,85 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package de.cismet.jpresso.core.serviceprovider;
 
-import de.cismet.jpresso.core.serviceacceptor.ProgressListener;
 import java.sql.Connection;
 
+import de.cismet.jpresso.core.serviceacceptor.ProgressListener;
+
 /**
+ * DOCUMENT ME!
  *
- * @author srichter
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public interface SQLScriptExecutionController {
 
+    //~ Methods ----------------------------------------------------------------
+
     /**
+     * DOCUMENT ME!
      *
-     * @return
-     * @throws de.cismet.jpressocore.exceptions.InitializingException
+     * @return  DOCUMENT ME!
      */
     long execute();
 
     /**
+     * DOCUMENT ME!
      *
-     * @param progress
-     * @return
-     * @throws de.cismet.jpressocore.exceptions.InitializingException
+     * @param   progress  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
     long execute(final ProgressListener progress);
 
     /**
+     * DOCUMENT ME!
      *
-     * @return the logs
+     * @return  the logs
      */
     String getLogs();
 
     /**
+     * DOCUMENT ME!
      *
-     * @return
+     * @return  DOCUMENT ME!
      */
     Connection getTargetConn();
 
     /**
+     * DOCUMENT ME!
      *
-     * @return
+     * @return  DOCUMENT ME!
      */
     boolean isCanceled();
 
     /**
+     * DOCUMENT ME!
      *
-     * @param canceled
+     * @param  canceled  DOCUMENT ME!
      */
     void setCanceled(final boolean canceled);
 
     /**
+     * DOCUMENT ME!
      *
-     * @param targetConn
+     * @param  targetConn  DOCUMENT ME!
      */
     void setTargetConn(final Connection targetConn);
 
     /**
+     * DOCUMENT ME!
      *
-     * @param test
+     * @param  test  DOCUMENT ME!
      */
     void setTest(final boolean test);
-
 }

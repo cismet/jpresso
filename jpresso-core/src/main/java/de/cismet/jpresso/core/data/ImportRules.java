@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -5,26 +12,42 @@
 package de.cismet.jpresso.core.data;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import de.cismet.jpresso.core.serviceprovider.AntExecutableInterface;
-import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
 import java.util.Collections;
 import java.util.List;
 
+import de.cismet.jpresso.core.serviceprovider.AntExecutableInterface;
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
 /**
- *  Encapsulates all the import descrition datas
- * //TODO Zur Fasscade machen, so dass z.b. 
- * getConnectionInfo.getSourceJdbcConnection.getDriverClass()
- * zu getSourceJDBCConnectionDriverClass() wird. 
- * -> weniger Abhängigkeiten von den Einzelklassen dieses Pakets.
- * 
- * 
- * @author srichter
+ * Encapsulates all the import descrition datas //TODO Zur Fasscade machen, so dass z.b.
+ * getConnectionInfo.getSourceJdbcConnection.getDriverClass() zu getSourceJDBCConnectionDriverClass() wird. -> weniger
+ * Abhängigkeiten von den Einzelklassen dieses Pakets.
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 @XStreamAlias("ImportRules")
 public final class ImportRules implements AntExecutableInterface, JPLoadable {
 
-    // <editor-fold defaultstate="collapsed" desc="Constructors">
-    public ImportRules(final DatabaseConnection target, final Query source, final List<Mapping> mappings, final List<Reference> references, final RuntimeProperties runtimeProperties, final Options options) {
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * <editor-fold defaultstate="collapsed" desc="Constructors">.
+     *
+     * @param  target             DOCUMENT ME!
+     * @param  source             DOCUMENT ME!
+     * @param  mappings           DOCUMENT ME!
+     * @param  references         DOCUMENT ME!
+     * @param  runtimeProperties  DOCUMENT ME!
+     * @param  options            DOCUMENT ME!
+     */
+    public ImportRules(final DatabaseConnection target,
+            final Query source,
+            final List<Mapping> mappings,
+            final List<Reference> references,
+            final RuntimeProperties runtimeProperties,
+            final Options options) {
         if (mappings != null) {
             this.mappings = mappings;
         } else {
@@ -57,6 +80,9 @@ public final class ImportRules implements AntExecutableInterface, JPLoadable {
         }
     }
 
+    /**
+     * Creates a new ImportRules object.
+     */
     public ImportRules() {
         mappings = TypeSafeCollections.newArrayList();
         references = TypeSafeCollections.newArrayList();
@@ -64,9 +90,12 @@ public final class ImportRules implements AntExecutableInterface, JPLoadable {
         targetConnection = new DatabaseConnection();
     }
 // </editor-fold>
-    //private String name;
-//    @XStreamAlias("ConnectionInfo")
-//    private ConnectionInfo connectionInfo;
+
+    //~ Instance fields --------------------------------------------------------
+
+    // private String name;
+// @XStreamAlias("ConnectionInfo")
+// private ConnectionInfo connectionInfo;
     @XStreamAlias("TargetConnection")
     private DatabaseConnection targetConnection;
     @XStreamAlias("SourceQuery")
@@ -80,46 +109,98 @@ public final class ImportRules implements AntExecutableInterface, JPLoadable {
     @XStreamAlias("Options")
     private Options options;
     private transient String fileName = "";
-    //key = X-JDBCConnection.getName()
+    // key = X-JDBCConnection.getName()
     // <editor-fold defaultstate="collapsed" desc="Setters & Getters">
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public RuntimeProperties getRuntimeProperties() {
         return runtimeProperties;
     }
 
-    public void setRuntimeProperties(RuntimeProperties runtimeProperties) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  runtimeProperties  DOCUMENT ME!
+     */
+    public void setRuntimeProperties(final RuntimeProperties runtimeProperties) {
         this.runtimeProperties = runtimeProperties;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public List<Reference> getReferences() {
         return references;
     }
 
-    public void setReferences(List<Reference> references) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  references  DOCUMENT ME!
+     */
+    public void setReferences(final List<Reference> references) {
         this.references = references;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public List<Mapping> getMappings() {
         return mappings;
     }
 
-    public void setMappings(List<Mapping> mappings) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  mappings  DOCUMENT ME!
+     */
+    public void setMappings(final List<Mapping> mappings) {
         this.mappings = mappings;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Options getOptions() {
         return options;
     }
 
-    public void setOptions(Options options) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  options  DOCUMENT ME!
+     */
+    public void setOptions(final Options options) {
         this.options = options;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Query getSourceQuery() {
         return this.sourceQuery;
     }
 
-    public void setSourceQuery(Query sourceConnection) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  sourceConnection  DOCUMENT ME!
+     */
+    public void setSourceQuery(final Query sourceConnection) {
         if (sourceConnection != null) {
             this.sourceQuery = sourceConnection;
         } else {
@@ -127,12 +208,21 @@ public final class ImportRules implements AntExecutableInterface, JPLoadable {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public DatabaseConnection getTargetConnection() {
         return this.targetConnection;
-
     }
 
-    public void setTargetConnection(DatabaseConnection targetConnection) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  targetConnection  DOCUMENT ME!
+     */
+    public void setTargetConnection(final DatabaseConnection targetConnection) {
         if (targetConnection != null) {
             this.targetConnection = targetConnection;
         } else {
@@ -140,10 +230,20 @@ public final class ImportRules implements AntExecutableInterface, JPLoadable {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getFileName() {
         return fileName;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  fileName  DOCUMENT ME!
+     */
     public void setFileName(String fileName) {
         if (fileName != null) {
             this.fileName = fileName;

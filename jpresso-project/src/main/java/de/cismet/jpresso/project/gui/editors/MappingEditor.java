@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * MappingEditor.java
  *
@@ -5,23 +12,15 @@
  */
 package de.cismet.jpresso.project.gui.editors;
 
-import de.cismet.jpresso.project.gui.dnd.TableTransferHandler;
-import de.cismet.jpresso.project.serviceprovider.CodeFunctionProvider;
-import de.cismet.jpresso.project.gui.editors.autocomplete.SmartComboBox;
-import de.cismet.jpresso.project.gui.dnd.Mapable;
-import de.cismet.jpresso.project.gui.output.filtering.TableSortDecorator;
-import de.cismet.jpresso.core.data.Mapping;
-import de.cismet.jpresso.project.gui.dnd.JPDataFlavors;
-import de.cismet.jpresso.project.gui.dnd.MapableCollector;
-import de.cismet.jpresso.project.gui.editors.autocomplete.MultiClickComboBoxCellEditor;
-import de.cismet.jpresso.core.utils.TypeSafeCollections;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.InputMap;
@@ -35,59 +34,120 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
+import de.cismet.jpresso.core.data.Mapping;
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
+import de.cismet.jpresso.project.gui.dnd.JPDataFlavors;
+import de.cismet.jpresso.project.gui.dnd.Mapable;
+import de.cismet.jpresso.project.gui.dnd.MapableCollector;
+import de.cismet.jpresso.project.gui.dnd.TableTransferHandler;
+import de.cismet.jpresso.project.gui.editors.autocomplete.MultiClickComboBoxCellEditor;
+import de.cismet.jpresso.project.gui.editors.autocomplete.SmartComboBox;
+import de.cismet.jpresso.project.gui.output.filtering.TableSortDecorator;
+import de.cismet.jpresso.project.serviceprovider.CodeFunctionProvider;
+
 /**
- * @author  srichter
+ * DOCUMENT ME!
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public final class MappingEditor extends javax.swing.JPanel {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final String STRING_EMPTY = "";
+
+    //~ Instance fields --------------------------------------------------------
 
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private CodeFunctionProvider codeProvider;
     private TableModelListener topComponent;
     private String[] fldNames;
-    private static final String STRING_EMPTY = "";
 
-    /** Creates new form MappingEditor */
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton cmdAddRow;
+    private javax.swing.JButton cmdDeleteRow;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JScrollPane scpMappings;
+    private MappingTable tblMappings;
+    // End of variables declaration//GEN-END:variables
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates new form MappingEditor.
+     */
     public MappingEditor() {
         this(null);
     }
 
+    /**
+     * Creates a new MappingEditor object.
+     *
+     * @param  mappings  DOCUMENT ME!
+     */
     public MappingEditor(final List<Mapping> mappings) {
         fldNames = null;
         initComponents();
         setContent(mappings);
         tblMappings.setModel(new MappingModel(mappings));
-        //add alphanumeric sorting
+        // add alphanumeric sorting
         TableSortDecorator.decorate(tblMappings);
         scpMappings.setTransferHandler(tblMappings.getTransferHandler());
         this.tblMappings.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
-        TableColumn col = tblMappings.getColumnModel().getColumn(3);
+        final TableColumn col = tblMappings.getColumnModel().getColumn(3);
         col.getCellRenderer();
     }
 
+    /**
+     * Creates a new MappingEditor object.
+     *
+     * @param  mappings      DOCUMENT ME!
+     * @param  codeProvider  DOCUMENT ME!
+     */
     public MappingEditor(final List<Mapping> mappings, final CodeFunctionProvider codeProvider) {
         this(mappings);
         this.codeProvider = codeProvider;
     }
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  tml  DOCUMENT ME!
+     */
     public void setTableListener(final TableModelListener tml) {
         this.topComponent = tml;
-        if (tblMappings != null && tblMappings.getModel() != null) {
+        if ((tblMappings != null) && (tblMappings.getModel() != null)) {
             this.tblMappings.getModel().addTableModelListener(topComponent);
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public List<Mapping> getContent() {
         return this.getMappingModel().getRows();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  mappings  DOCUMENT ME!
+     */
     public void setContent(List<Mapping> mappings) {
         if (mappings == null) {
             mappings = TypeSafeCollections.newArrayList();
         }
-        //this.mappings = mappings;
-        //TableSorter ts = new TableSorter(new MappingModel(mappings));
-        //tblMappings.setModel(ts);
+        // this.mappings = mappings;
+        // TableSorter ts = new TableSorter(new MappingModel(mappings));
+        // tblMappings.setModel(ts);
         if (tblMappings.getModel() != null) {
             tblMappings.getModel().removeTableModelListener(topComponent);
         }
@@ -96,8 +156,9 @@ public final class MappingEditor extends javax.swing.JPanel {
     }
 
     /**
-     * 
-     * @param fieldNames
+     * DOCUMENT ME!
+     *
+     * @param  fieldNames  DOCUMENT ME!
      */
     public void prepareAutoComplete(final String[] fieldNames) {
         final List<String> tmp = TypeSafeCollections.newArrayList();
@@ -115,7 +176,7 @@ public final class MappingEditor extends javax.swing.JPanel {
         final TableColumn tc = tblMappings.getColumnModel().getColumn(1);
         Collections.sort(tmp);
 
-        final SmartComboBox combo = new SmartComboBox(tmp.toArray(new String[]{}));
+        final SmartComboBox combo = new SmartComboBox(tmp.toArray(new String[] {}));
         combo.setBorder(new javax.swing.border.EmptyBorder(0, 0, 0, 0));
         combo.setEditable(true);
         combo.setCaseSensitive(true);
@@ -125,8 +186,9 @@ public final class MappingEditor extends javax.swing.JPanel {
     }
 
     /**
-     * 
-     * @param maps
+     * DOCUMENT ME!
+     *
+     * @param  maps  DOCUMENT ME!
      */
     public void addMappings(final List<Mapping> maps) {
         for (final Mapping m : maps) {
@@ -135,15 +197,16 @@ public final class MappingEditor extends javax.swing.JPanel {
     }
 
     /**
-     * 
-     * @return the mapping model
+     * DOCUMENT ME!
+     *
+     * @return  the mapping model
      */
     private MappingModel getMappingModel() {
         return tblMappings.getModel();
     }
 
     /**
-     * stop cell editor
+     * stop cell editor.
      */
     public void stopEditing() {
         if (tblMappings.isEditing()) {
@@ -151,10 +214,9 @@ public final class MappingEditor extends javax.swing.JPanel {
         }
     }
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
+     * content of this method is always regenerated by the Form Editor.
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -167,22 +229,27 @@ public final class MappingEditor extends javax.swing.JPanel {
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
 
-        setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(null, "Mappings", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
+        setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createTitledBorder(
+                    null,
+                    "Mappings",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                    new java.awt.Font("Dialog", 0, 12),
+                    javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")),
+                javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5))); // NOI18N
         setLayout(new java.awt.GridBagLayout());
 
         scpMappings.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         tblMappings.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {},
-                {},
-                {},
-                {}
-            },
-            new String [] {
-
-            }
-        ));
+                new Object[][] {
+                    {},
+                    {},
+                    {},
+                    {}
+                },
+                new String[] {}));
         scpMappings.setViewportView(tblMappings);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -194,16 +261,19 @@ public final class MappingEditor extends javax.swing.JPanel {
         gridBagConstraints.weighty = 1.0;
         add(scpMappings, gridBagConstraints);
 
-        cmdAddRow.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/jpresso/project/res/edit-delete.png"))); // NOI18N
+        cmdAddRow.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/jpresso/project/res/edit-delete.png"))); // NOI18N
         cmdAddRow.setToolTipText("Remove selected Rows");
         cmdAddRow.setBorderPainted(false);
         cmdAddRow.setFocusPainted(false);
         cmdAddRow.setMargin(new java.awt.Insets(2, 5, 1, 5));
         cmdAddRow.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdAddRowActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdAddRowActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -211,16 +281,19 @@ public final class MappingEditor extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(1, 8, 1, 0);
         add(cmdAddRow, gridBagConstraints);
 
-        cmdDeleteRow.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/jpresso/project/res/edit-add.png"))); // NOI18N
+        cmdDeleteRow.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/jpresso/project/res/edit-add.png"))); // NOI18N
         cmdDeleteRow.setToolTipText("Add new Row");
         cmdDeleteRow.setBorderPainted(false);
         cmdDeleteRow.setFocusPainted(false);
         cmdDeleteRow.setMargin(new java.awt.Insets(2, 5, 1, 5));
         cmdDeleteRow.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmdDeleteRowActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    cmdDeleteRowActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -229,16 +302,19 @@ public final class MappingEditor extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(1, 8, 1, 0);
         add(cmdDeleteRow, gridBagConstraints);
 
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/jpresso/project/res/format-font-size-more.png"))); // NOI18N
+        jButton1.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/jpresso/project/res/format-font-size-more.png"))); // NOI18N
         jButton1.setToolTipText("To upper case");
         jButton1.setMaximumSize(new java.awt.Dimension(36, 29));
         jButton1.setMinimumSize(new java.awt.Dimension(36, 29));
         jButton1.setPreferredSize(new java.awt.Dimension(36, 29));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -246,55 +322,83 @@ public final class MappingEditor extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(1, 8, 1, 0);
         add(jButton1, gridBagConstraints);
 
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/jpresso/project/res/format-font-size-less.png"))); // NOI18N
+        jButton2.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/jpresso/project/res/format-font-size-less.png"))); // NOI18N
         jButton2.setToolTipText("To lower case");
         jButton2.setMaximumSize(new java.awt.Dimension(36, 29));
         jButton2.setMinimumSize(new java.awt.Dimension(36, 29));
         jButton2.setPreferredSize(new java.awt.Dimension(36, 29));
         jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton2ActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(1, 8, 1, 0);
         add(jButton2, gridBagConstraints);
-    }// </editor-fold>//GEN-END:initComponents
-    private void cmdDeleteRowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdDeleteRowActionPerformed
-        if (tblMappings.isEditing()) {//GEN-LAST:event_cmdDeleteRowActionPerformed
+    } // </editor-fold>//GEN-END:initComponents
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdDeleteRowActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdDeleteRowActionPerformed
+        if (tblMappings.isEditing()) {                                               //GEN-LAST:event_cmdDeleteRowActionPerformed
             tblMappings.getCellEditor().stopCellEditing();
         }
         getMappingModel().addRow(new Mapping());
     }
 
-    private void cmdAddRowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAddRowActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void cmdAddRowActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAddRowActionPerformed
         tblMappings.deleteCurrentSelection();
-    }//GEN-LAST:event_cmdAddRowActionPerformed
+    }                                                                             //GEN-LAST:event_cmdAddRowActionPerformed
 
-private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-    swichCase(true);
-}//GEN-LAST:event_jButton1ActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+        swichCase(true);
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
-private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-    swichCase(false);
-}//GEN-LAST:event_jButton2ActionPerformed
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
+        swichCase(false);
+    }                                                                            //GEN-LAST:event_jButton2ActionPerformed
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  toUpper  DOCUMENT ME!
+     */
     private void swichCase(final boolean toUpper) {
         if (tblMappings != null) {
             final int[] x = tblMappings.getSelectedColumns();
             final int[] y = tblMappings.getSelectedRows();
             if (toUpper) {
-                for (int i : y) {
-                    for (int j : x) {
+                for (final int i : y) {
+                    for (final int j : x) {
                         tblMappings.setValueAt(tblMappings.getValueAt(i, j).toString().toUpperCase(), i, j);
                     }
                 }
             } else {
-                for (int i : y) {
-                    for (int j : x) {
+                for (final int i : y) {
+                    for (final int j : x) {
                         tblMappings.setValueAt(tblMappings.getValueAt(i, j).toString().toLowerCase(), i, j);
                     }
                 }
@@ -303,8 +407,9 @@ private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     }
 
     /**
-     * 
-     * @return
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
     public boolean allMappingsComplete() {
         tblMappings.clearColors();
@@ -319,33 +424,40 @@ private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
     /**
      * Marks potential error fields red in the table.
-     * @param s
+     *
+     * @param  errors  s
+     * @param  column  DOCUMENT ME!
      */
-    public void markPotentialErrors(List<String> errors, int column) {
+    public void markPotentialErrors(final List<String> errors, final int column) {
         tblMappings.markPotentialErrors(errors, column);
     }
-    
-    public void markPotentialError(int row, int column) {    
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  row     DOCUMENT ME!
+     * @param  column  DOCUMENT ME!
+     */
+    public void markPotentialError(final int row, final int column) {
         tblMappings.setColor(tblMappings.convertRowIndexToView(row), column, Color.RED);
     }
-    
+
+    /**
+     * DOCUMENT ME!
+     */
     public void clearErrors() {
         tblMappings.clearColors();
     }
-    
-   
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton cmdAddRow;
-    private javax.swing.JButton cmdDeleteRow;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JScrollPane scpMappings;
-    private MappingTable tblMappings;
-    // End of variables declaration//GEN-END:variables
 }
 
-
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
 class MappingModel extends ListTableModel<Mapping> {
+
+    //~ Static fields/initializers ---------------------------------------------
 
     public static final int COLUMN_TAGRET = 0;
     public static final int COLUMN_SOURCE = 1;
@@ -356,86 +468,141 @@ class MappingModel extends ListTableModel<Mapping> {
     public static final String ENCLOSING_CHARACTER = "'";
     public static final String PATH_SEPARATOR = "/";
     private static final String SPLITT_DOT = "\\.";
-    public static final String[] COLUMN_NAMES = new String[]{"Target", "Source", "Relationpath", "Counter", "Compare", "String/Date"};
+    public static final String[] COLUMN_NAMES = new String[] {
+            "Target",
+            "Source",
+            "Relationpath",
+            "Counter",
+            "Compare",
+            "String/Date"
+        };
 
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new MappingModel object.
+     *
+     * @param  mappings  DOCUMENT ME!
+     */
     public MappingModel(final List<Mapping> mappings) {
         super(mappings);
     }
 
-    /** 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
      * Liefert das allgemeinste Klassenobjekt, welches die Spalte beschreiben kann.
+     *
+     * @param   columnIndex  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
     @Override
     public Class getColumnClass(final int columnIndex) {
         switch (columnIndex) {
-            case COLUMN_TAGRET:
+            case COLUMN_TAGRET: {
                 return java.lang.String.class;
-            case COLUMN_SOURCE:
+            }
+            case COLUMN_SOURCE: {
                 return java.lang.String.class;
-            case COLUMN_RELATIONPATH:
+            }
+            case COLUMN_RELATIONPATH: {
                 return java.lang.String.class;
-            case COLUMN_COUNTER:
+            }
+            case COLUMN_COUNTER: {
                 return java.lang.Boolean.class;
-            case COLUMN_COMPARE:
+            }
+            case COLUMN_COMPARE: {
                 return java.lang.Boolean.class;
-            case COLUMN_STRINGDATE:
+            }
+            case COLUMN_STRINGDATE: {
                 return java.lang.Boolean.class;
+            }
         }
         return null;
     }
 
-    /** Liefert die Anzahl Spalten.*/
+    /**
+     * Liefert die Anzahl Spalten.
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public int getColumnCount() {
         return 6;
     }
 
-    /** Gibt den Namen der Spalte columnIndex zurueck. */
+    /**
+     * Gibt den Namen der Spalte columnIndex zurueck.
+     *
+     * @param   columnIndex  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public String getColumnName(final int columnIndex) {
         return COLUMN_NAMES[columnIndex];
     }
 
-    /** Gibt den Eintrag an der Stelle columnIndex und rowIndex zurueck.*/
+    /**
+     * Gibt den Eintrag an der Stelle columnIndex und rowIndex zurueck.
+     *
+     * @param   rowIndex     DOCUMENT ME!
+     * @param   columnIndex  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public Object getValueAt(final int rowIndex, final int columnIndex) {
         final Mapping m = getRows().get(rowIndex);
         switch (columnIndex) {
-            case COLUMN_TAGRET:
+            case COLUMN_TAGRET: {
                 return m.getCompleteTarget();
-            case COLUMN_SOURCE:
+            }
+            case COLUMN_SOURCE: {
                 return m.getContent();
-            case COLUMN_RELATIONPATH:
+            }
+            case COLUMN_RELATIONPATH: {
                 final String relNa = m.getPath();
                 if (relNa == null) {
                     return "";
                 } else {
                     return String.valueOf(relNa);
                 }
-            case COLUMN_COUNTER:
+            }
+            case COLUMN_COUNTER: {
                 return m.isAutoIncrement();
-            case COLUMN_COMPARE:
+            }
+            case COLUMN_COMPARE: {
                 return m.isComparing();
-            case COLUMN_STRINGDATE:
+            }
+            case COLUMN_STRINGDATE: {
                 final Boolean stringOrDate;
-                if (m.getEnclosingChar() == null || m.getEnclosingChar().length() == 0) {
+                if ((m.getEnclosingChar() == null) || (m.getEnclosingChar().length() == 0)) {
                     stringOrDate = false;
                 } else {
                     stringOrDate = true;
                 }
                 return stringOrDate;
+            }
         }
         return null;
     }
 
-    /** Setzt den Wert an die gegebene Stelle.*/
+    /**
+     * Setzt den Wert an die gegebene Stelle.
+     *
+     * @param  aValue       DOCUMENT ME!
+     * @param  rowIndex     DOCUMENT ME!
+     * @param  columnIndex  DOCUMENT ME!
+     */
     @Override
     public void setValueAt(final Object aValue, final int rowIndex, final int columnIndex) {
         final Mapping m = getRow(rowIndex);
         try {
             switch (columnIndex) {
-                case COLUMN_TAGRET:
-                    final String tableAndField = ((String) aValue);
+                case COLUMN_TAGRET: {
+                    final String tableAndField = ((String)aValue);
                     final String[] s = tableAndField.split(SPLITT_DOT);
                     if (s.length == 2) {
                         m.setTargetTable(s[0]);
@@ -471,135 +638,67 @@ class MappingModel extends ListTableModel<Mapping> {
 //                    }
 //                    //--------------
                     break;
-                case COLUMN_SOURCE:
-                    final String source = ((String) aValue);
+                }
+                case COLUMN_SOURCE: {
+                    final String source = ((String)aValue);
                     m.setContent(source);
 //                    //TODO wenns aerger macht -> raus, aber increment un content zusammen = sinnlos
                     m.setAutoIncrement(false);
                     break;
-                case COLUMN_RELATIONPATH:
-                    if (aValue != null && aValue instanceof String) {
-                        m.setPath((String) aValue);
+                }
+                case COLUMN_RELATIONPATH: {
+                    if ((aValue != null) && (aValue instanceof String)) {
+                        m.setPath((String)aValue);
                     }
                     break;
-                case COLUMN_COUNTER:
-                    final Boolean autoInc = ((Boolean) aValue);
+                }
+                case COLUMN_COUNTER: {
+                    final Boolean autoInc = ((Boolean)aValue);
                     m.setAutoIncrement(autoInc.booleanValue());
 //                    //TODO wenns aerger macht -> raus, aber increment un content zusammen = sinnlos
                     m.setContent("");
                     break;
-                case COLUMN_COMPARE:
-                    final Boolean comp = ((Boolean) aValue);
+                }
+                case COLUMN_COMPARE: {
+                    final Boolean comp = ((Boolean)aValue);
                     m.setComparing(comp.booleanValue());
                     break;
-                case COLUMN_STRINGDATE:
-                    final Boolean enclChar = ((Boolean) aValue);
+                }
+                case COLUMN_STRINGDATE: {
+                    final Boolean enclChar = ((Boolean)aValue);
                     if (enclChar.booleanValue()) {
                         m.setEnclosingChar(ENCLOSING_CHARACTER);
                     } else {
                         m.setEnclosingChar(null);
                     }
                     break;
+                }
             }
         } catch (Exception e) {
-            //keine Veraenderung vornehmen;
+            // keine Veraenderung vornehmen;
         }
         setRow(m, rowIndex);
         fireTableRowsUpdated(rowIndex, rowIndex);
     }
 }
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
 final class MappingTable extends ColorfulJTable {
+
+    //~ Static fields/initializers ---------------------------------------------
 
     public static final String STRING_EMPTY = "";
     public static final String STRING_FALSE = "false";
 
-    public MappingTable() {
-        this(new MappingModel(new ArrayList<Mapping>()));
-    }
+    //~ Instance fields --------------------------------------------------------
 
-    public MappingTable(final MappingModel model) {
-        super(model);
-        this.mappingModel = model;
-        final Action deleteAction = new AbstractAction() {
-
-            public void actionPerformed(ActionEvent e) {
-                deleteCurrentSelection();
-            }
-        };
-        final InputMap im = getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        final KeyStroke delete = KeyStroke.getKeyStroke("DELETE");
-        im.put(delete, "delete");
-        getActionMap().put("delete", deleteAction);
-        final TransferHandler th = new TableTransferHandler<MappingTable, Mapable>(this, new DataFlavor[]{JPDataFlavors.MAP_FLAVOR}) {
-
-            @Override
-            public void deleteCurrentSelectionFromTable() {
-                getTable().deleteCurrentSelection();
-            }
-
-            @Override
-            public boolean insertImportDataListIntoTable(Mapable data, TransferSupport s) {
-                int rowIndex;
-                if (s.isDrop()) {
-                    final Point p = s.getDropLocation().getDropPoint();
-                    rowIndex = rowAtPoint(p);
-                } else {
-                    rowIndex = getSelectedRow();
-                }
-                if (rowIndex > -1) {
-                    rowIndex = convertRowIndexToModel(rowIndex);
-                }
-                getTable().getSelectionModel().setSelectionInterval(rowIndex, rowIndex);
-                if (rowIndex < 0) {
-                    rowIndex = getTable().getRowCount() - 1;
-                    if(rowIndex < 0) {
-                        rowIndex = -1;
-                    }
-                }
-                if (data.getMappings() == null) {
-                    return false;
-                }
-//                if (s.getComponent() == getTable()) {
-//                    for (final Mapping map : data.getMappings()) {
-//                        mappingModel.addMapping(map.copy(), rowIndex++);
-//                        mappingModel.removeMapping(map);
-//                    }
-//                } else {
-                for (final Mapping map : data.getMappings()) {
-                    mappingModel.addRow(map.copy(), ++rowIndex);
-                }
-
-//                }
-                return true;
-            }
-
-            @Override
-            public Mapable createExportDataListFromTable(int[] selectedRows) {
-                final List<Mapping> mappings = TypeSafeCollections.newArrayList();
-                for (int selRow : selectedRows) {
-                    if (selRow != -1) {
-                        final Mapping m = mappingModel.getRow(selRow);
-                        if (m != null) {
-                            mappings.add(m);
-                        }
-                    }
-                }
-                return new MapableCollector(mappings);
-            }
-        };
-        setTransferHandler(th);
-        setDragEnabled(true);
-        getModel().addTableModelListener(new TableModelListener() {
-
-            public void tableChanged(TableModelEvent e) {
-                clearColors();
-            }
-        });
-    }
     private MappingModel mappingModel;
 //
 //    @Override
-//    
+//
 //    public TableCellRenderer getCellRenderer(int row, int column) {
 //        final TableCellRenderer tcr = super.getCellRenderer(row, column);
 //        final Object value = getValueAt(row, column);
@@ -615,14 +714,121 @@ final class MappingTable extends ColorfulJTable {
 //        ((JComponent) tcr).setBackground(color);
 //        return tcr;
 //    }
+
+    //~ Constructors -----------------------------------------------------------
+
     /**
-     * 
-     * @param dataModel only mappingmodels accepted
+     * Creates a new MappingTable object.
+     */
+    public MappingTable() {
+        this(new MappingModel(new ArrayList<Mapping>()));
+    }
+
+    /**
+     * Creates a new MappingTable object.
+     *
+     * @param  model  DOCUMENT ME!
+     */
+    public MappingTable(final MappingModel model) {
+        super(model);
+        this.mappingModel = model;
+        final Action deleteAction = new AbstractAction() {
+
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    deleteCurrentSelection();
+                }
+            };
+
+        final InputMap im = getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        final KeyStroke delete = KeyStroke.getKeyStroke("DELETE");
+        im.put(delete, "delete");
+        getActionMap().put("delete", deleteAction);
+        final TransferHandler th = new TableTransferHandler<MappingTable, Mapable>(
+                this,
+                new DataFlavor[] { JPDataFlavors.MAP_FLAVOR }) {
+
+                @Override
+                public void deleteCurrentSelectionFromTable() {
+                    getTable().deleteCurrentSelection();
+                }
+
+                @Override
+                public boolean insertImportDataListIntoTable(final Mapable data, final TransferSupport s) {
+                    int rowIndex;
+                    if (s.isDrop()) {
+                        final Point p = s.getDropLocation().getDropPoint();
+                        rowIndex = rowAtPoint(p);
+                    } else {
+                        rowIndex = getSelectedRow();
+                    }
+                    if (rowIndex > -1) {
+                        rowIndex = convertRowIndexToModel(rowIndex);
+                    }
+                    getTable().getSelectionModel().setSelectionInterval(rowIndex, rowIndex);
+                    if (rowIndex < 0) {
+                        rowIndex = getTable().getRowCount() - 1;
+                        if (rowIndex < 0) {
+                            rowIndex = -1;
+                        }
+                    }
+                    if (data.getMappings() == null) {
+                        return false;
+                    }
+//                if (s.getComponent() == getTable()) {
+//                    for (final Mapping map : data.getMappings()) {
+//                        mappingModel.addMapping(map.copy(), rowIndex++);
+//                        mappingModel.removeMapping(map);
+//                    }
+//                } else {
+                    for (final Mapping map : data.getMappings()) {
+                        mappingModel.addRow(map.copy(), ++rowIndex);
+                    }
+
+//                }
+                    return true;
+                }
+
+                @Override
+                public Mapable createExportDataListFromTable(final int[] selectedRows) {
+                    final List<Mapping> mappings = TypeSafeCollections.newArrayList();
+                    for (final int selRow : selectedRows) {
+                        if (selRow != -1) {
+                            final Mapping m = mappingModel.getRow(selRow);
+                            if (m != null) {
+                                mappings.add(m);
+                            }
+                        }
+                    }
+                    return new MapableCollector(mappings);
+                }
+            };
+        setTransferHandler(th);
+        setDragEnabled(true);
+
+        // jalopy doesn't like these inline listeners
+
+        //J-
+        getModel().addTableModelListener(new TableModelListener() {
+
+            public void tableChanged(TableModelEvent e) {
+                clearColors();
+            }
+        });
+        //J+
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  dataModel  only mappingmodels accepted
      */
     @Override
     public void setModel(final TableModel dataModel) {
-        if (dataModel != null && dataModel instanceof MappingModel) {
-            this.mappingModel = (MappingModel) dataModel;
+        if ((dataModel != null) && (dataModel instanceof MappingModel)) {
+            this.mappingModel = (MappingModel)dataModel;
             super.setModel(dataModel);
         }
     }
@@ -640,9 +846,11 @@ final class MappingTable extends ColorfulJTable {
 
     /**
      * Mark errors red in the table, until they are edited agin.
-     * @param errors
+     *
+     * @param  errors  DOCUMENT ME!
+     * @param  column  DOCUMENT ME!
      */
-    
+
     public void markPotentialErrors(final List<String> errors, final int column) {
         final int columnAtView = convertColumnIndexToView(column);
         if (errors != null) {
@@ -659,7 +867,7 @@ final class MappingTable extends ColorfulJTable {
     }
 
     /**
-     * delete the currently selected rows from the table
+     * delete the currently selected rows from the table.
      */
     public void deleteCurrentSelection() {
         if (isEditing()) {
@@ -668,7 +876,7 @@ final class MappingTable extends ColorfulJTable {
         clearColors();
         final int[] selRows = getSelectedRows();
         for (int i = selRows.length - 1; i >= 0; --i) {
-            int selRow = selRows[i];
+            final int selRow = selRows[i];
             if (selRow != -1) {
                 mappingModel.removeRow(convertRowIndexToModel(selRow));
                 if (mappingModel.getRowCount() > 0) {
@@ -682,5 +890,3 @@ final class MappingTable extends ColorfulJTable {
         }
     }
 }
-
-

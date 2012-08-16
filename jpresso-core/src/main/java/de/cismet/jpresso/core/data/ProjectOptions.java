@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -5,21 +12,29 @@
 package de.cismet.jpresso.core.data;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
 import java.io.File;
+
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
 /**
- *  Encapsulates all the project option data.
- * 
- * @author srichter
+ * Encapsulates all the project option data.
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 @XStreamAlias("ProjectOptions")
 public final class ProjectOptions implements JPLoadable {
 
-    // <editor-fold defaultstate="collapsed" desc="Constructors">
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * <editor-fold defaultstate="collapsed" desc="Constructors">.
+     */
     public ProjectOptions() {
         this.addClassPath = TypeSafeCollections.newHashSet();
         this.driver = TypeSafeCollections.newArrayList();
@@ -27,7 +42,18 @@ public final class ProjectOptions implements JPLoadable {
         this.defaultFinalizerProperties = new Properties();
     }
 
-    public ProjectOptions(Set<File> addClassPath, List<DriverDescription> driver, final String defFinClass, final Properties defFinProps) {
+    /**
+     * Creates a new ProjectOptions object.
+     *
+     * @param  addClassPath  DOCUMENT ME!
+     * @param  driver        DOCUMENT ME!
+     * @param  defFinClass   DOCUMENT ME!
+     * @param  defFinProps   DOCUMENT ME!
+     */
+    public ProjectOptions(final Set<File> addClassPath,
+            final List<DriverDescription> driver,
+            final String defFinClass,
+            final Properties defFinProps) {
         if (addClassPath != null) {
             this.addClassPath = addClassPath;
         } else {
@@ -50,21 +76,21 @@ public final class ProjectOptions implements JPLoadable {
         }
     }
 // </editor-fold>
-    //private String name;
-    @XStreamAlias("AdditionalClassPath")
-    private Set<File> addClassPath;
-    @XStreamAlias("Driver")
-    private List<DriverDescription> driver;
-    @XStreamAlias("DefaultFinalizerClass")
-    private String defaultFinalizerClass;
-    @XStreamAlias("DefaultFinalizerProperties")
-    private Properties defaultFinalizerProperties;
 
-    // <editor-fold defaultstate="collapsed" desc="Setters & Getters">
+    /**
+     * <editor-fold defaultstate="collapsed" desc="Setters & Getters">.
+     *
+     * @return  DOCUMENT ME!
+     */
     public Set<File> getAddClassPath() {
         return addClassPath;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  addClassPath  DOCUMENT ME!
+     */
     public void setAddClassPath(final Set<File> addClassPath) {
         if (addClassPath != null) {
             this.addClassPath = addClassPath;
@@ -73,10 +99,20 @@ public final class ProjectOptions implements JPLoadable {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public List<DriverDescription> getDriver() {
         return driver;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  driver  DOCUMENT ME!
+     */
     public void setDriver(final List<DriverDescription> driver) {
         if (driver != null) {
             this.driver = driver;
@@ -85,24 +121,56 @@ public final class ProjectOptions implements JPLoadable {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getDefaultFinalizerClass() {
         return defaultFinalizerClass;
     }
 
-    public void setDefaultFinalizerClass(String defaultFinalizerClass) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  defaultFinalizerClass  DOCUMENT ME!
+     */
+    public void setDefaultFinalizerClass(final String defaultFinalizerClass) {
         if (defaultFinalizerClass != null) {
             this.defaultFinalizerClass = defaultFinalizerClass;
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Properties getDefaultFinalizerProperties() {
         return defaultFinalizerProperties;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  defaultFinalizerProperties  DOCUMENT ME!
+     */
     public void setDefaultFinalizerProperties(final Properties defaultFinalizerProperties) {
         if (defaultFinalizerProperties != null) {
             this.defaultFinalizerProperties = defaultFinalizerProperties;
         }
     }
 // </editor-fold>
+
+    //~ Instance fields --------------------------------------------------------
+
+    // private String name;
+    @XStreamAlias("AdditionalClassPath")
+    private Set<File> addClassPath;
+    @XStreamAlias("Driver")
+    private List<DriverDescription> driver;
+    @XStreamAlias("DefaultFinalizerClass")
+    private String defaultFinalizerClass;
+    @XStreamAlias("DefaultFinalizerProperties")
+    private Properties defaultFinalizerProperties;
 }

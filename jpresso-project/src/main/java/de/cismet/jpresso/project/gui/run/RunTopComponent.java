@@ -1,44 +1,24 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.project.gui.run;
 
-import de.cismet.jpresso.core.data.ImportRules;
-import de.cismet.jpresso.core.data.Mapping;
-import de.cismet.jpresso.core.data.Options;
-import de.cismet.jpresso.core.data.Reference;
-import de.cismet.jpresso.project.gui.editors.ConnectionEditor;
-import de.cismet.jpresso.project.gui.editors.MappingEditor;
-import de.cismet.jpresso.project.gui.editors.OptionsEditor;
-import de.cismet.jpresso.project.gui.editors.ReferenceEditor;
-import de.cismet.jpresso.project.gui.output.OutputFinalizer;
-import de.cismet.jpresso.project.gui.output.OutputInitializing;
-import de.cismet.jpresso.project.gui.output.OutputIntermedTable;
-import de.cismet.jpresso.project.gui.editors.QueryEditor;
-import de.cismet.jpresso.project.gui.AbstractJPTopComponent;
-import de.cismet.jpresso.project.gui.ProgressHandler;
-import de.cismet.jpresso.project.gui.dnd.JPDataFlavors;
-import de.cismet.jpresso.project.serviceprovider.CodeFunctionProvider;
-import de.cismet.jpresso.project.gui.output.OutputTabbedPaneFactory;
-import de.cismet.jpresso.core.serviceprovider.exceptions.DynamicCompilingException;
-import de.cismet.jpresso.core.data.DatabaseConnection;
-import de.cismet.jpresso.core.data.Query;
-import de.cismet.jpresso.core.serviceprovider.ClassResourceProvider;
-import de.cismet.jpresso.core.serviceprovider.ExtractAndTransformController;
-import de.cismet.jpresso.core.serviceprovider.ControllerFactory;
-import de.cismet.jpresso.core.serviceprovider.FinalizerController;
-import de.cismet.jpresso.core.serviceprovider.FinalizerCreator;
-import de.cismet.jpresso.core.serviceprovider.exceptions.InitializingException;
-import de.cismet.jpresso.core.utils.TypeSafeCollections;
-import de.cismet.jpresso.project.filetypes.connection.ConnectionDataNode;
-import de.cismet.jpresso.project.filetypes.connection.ConnectionDataObject;
-import de.cismet.jpresso.project.filetypes.cookies.ConnectionListModelProvider;
-import de.cismet.jpresso.project.filetypes.cookies.QueryListModelProvider;
-import de.cismet.jpresso.project.filetypes.query.QueryDataNode;
-import de.cismet.jpresso.project.filetypes.query.QueryDataObject;
-import de.cismet.jpresso.project.filetypes.run.RunDataObject;
-import de.cismet.jpresso.project.serviceprovider.ExecutorProvider;
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
+import org.openide.cookies.OpenCookie;
+import org.openide.explorer.view.NodeListModel;
+import org.openide.loaders.DataNode;
+import org.openide.util.Cancellable;
+import org.openide.util.NbBundle;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Point;
@@ -47,9 +27,13 @@ import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+
 import java.beans.PropertyChangeEvent;
+
 import java.io.Serializable;
+
 import java.text.DateFormat;
+
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
@@ -58,6 +42,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -68,17 +53,49 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
-import org.openide.cookies.OpenCookie;
-import org.openide.explorer.view.NodeListModel;
-import org.openide.loaders.DataNode;
-import org.openide.util.Cancellable;
-import org.openide.util.NbBundle;
+
+import de.cismet.jpresso.core.data.DatabaseConnection;
+import de.cismet.jpresso.core.data.ImportRules;
+import de.cismet.jpresso.core.data.Mapping;
+import de.cismet.jpresso.core.data.Options;
+import de.cismet.jpresso.core.data.Query;
+import de.cismet.jpresso.core.data.Reference;
+import de.cismet.jpresso.core.serviceprovider.ClassResourceProvider;
+import de.cismet.jpresso.core.serviceprovider.ControllerFactory;
+import de.cismet.jpresso.core.serviceprovider.ExtractAndTransformController;
+import de.cismet.jpresso.core.serviceprovider.FinalizerController;
+import de.cismet.jpresso.core.serviceprovider.FinalizerCreator;
+import de.cismet.jpresso.core.serviceprovider.exceptions.DynamicCompilingException;
+import de.cismet.jpresso.core.serviceprovider.exceptions.InitializingException;
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
+import de.cismet.jpresso.project.filetypes.connection.ConnectionDataNode;
+import de.cismet.jpresso.project.filetypes.connection.ConnectionDataObject;
+import de.cismet.jpresso.project.filetypes.cookies.ConnectionListModelProvider;
+import de.cismet.jpresso.project.filetypes.cookies.QueryListModelProvider;
+import de.cismet.jpresso.project.filetypes.query.QueryDataNode;
+import de.cismet.jpresso.project.filetypes.query.QueryDataObject;
+import de.cismet.jpresso.project.filetypes.run.RunDataObject;
+import de.cismet.jpresso.project.gui.AbstractJPTopComponent;
+import de.cismet.jpresso.project.gui.ProgressHandler;
+import de.cismet.jpresso.project.gui.dnd.JPDataFlavors;
+import de.cismet.jpresso.project.gui.editors.ConnectionEditor;
+import de.cismet.jpresso.project.gui.editors.MappingEditor;
+import de.cismet.jpresso.project.gui.editors.OptionsEditor;
+import de.cismet.jpresso.project.gui.editors.QueryEditor;
+import de.cismet.jpresso.project.gui.editors.ReferenceEditor;
+import de.cismet.jpresso.project.gui.output.OutputFinalizer;
+import de.cismet.jpresso.project.gui.output.OutputInitializing;
+import de.cismet.jpresso.project.gui.output.OutputIntermedTable;
+import de.cismet.jpresso.project.gui.output.OutputTabbedPaneFactory;
+import de.cismet.jpresso.project.serviceprovider.CodeFunctionProvider;
+import de.cismet.jpresso.project.serviceprovider.ExecutorProvider;
 
 /**
  * Top component which visualizes a run.
  */
+// Jalopy doesn't like this class :/
+//J-
 public final class RunTopComponent extends AbstractJPTopComponent<RunDataObject> implements TableModelListener, ItemListener, ListDataListener {
 
     private static final String PREFERRED_ID = "RunTopComponent";
@@ -688,14 +705,14 @@ private void jPanel13MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:ev
         mappings.prepareAutoComplete(null);
     }
 
-// </editor-fold>    
+// </editor-fold>
     // <editor-fold defaultstate="collapsed" desc="Getter & Setter">
     public ConnectionDataObject getCurrentConnection() {
         return currentConnection;
     }
 
     /**
-     * 
+     *
      * @param currentConnection
      */
     private void setCurrentConnection(ConnectionDataObject currentConnection) {
@@ -716,7 +733,7 @@ private void jPanel13MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:ev
     }
 
     /**
-     * 
+     *
      * @param currentQuery
      */
     private void setCurrentQuery(QueryDataObject currentQuery) {
@@ -952,7 +969,7 @@ private void jPanel13MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:ev
 
     /**
      * TODO remove duplicated code! @ NullpointerException handling
-     * 
+     *
      * @param data
      */
     private void initComboBoxes(final RunDataObject data) {
@@ -1039,7 +1056,7 @@ private void jPanel13MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:ev
 
     /**
      * called when mapping or relation table changes
-     * 
+     *
      * @param e
      */
     public void tableChanged(TableModelEvent e) {
@@ -1383,7 +1400,4 @@ private void jPanel13MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:ev
     }
 // </editor-fold>
 
-
-
-
-
+//J+

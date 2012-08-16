@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -8,14 +15,19 @@ import org.openide.explorer.view.NodeListModel;
 import org.openide.nodes.Node;
 
 /**
+ * DOCUMENT ME!
  *
- * @author srichter
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public interface NodeListModelProviderCookie extends Node.Cookie {
 
+    //~ Methods ----------------------------------------------------------------
+
     /**
-     * 
-     * @return usually a NodeListModel with the children of the implementing Node
+     * DOCUMENT ME!
+     *
+     * @return  usually a NodeListModel with the children of the implementing Node
      */
-    public NodeListModel createNodeListModel();
+    NodeListModel createNodeListModel();
 }

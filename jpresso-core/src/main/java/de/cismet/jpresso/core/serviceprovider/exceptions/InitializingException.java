@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * WrongNameException.java
  *
@@ -5,34 +12,66 @@
  */
 package de.cismet.jpresso.core.serviceprovider.exceptions;
 
-import de.cismet.jpresso.core.utils.TypeSafeCollections;
 import java.awt.Point;
+
 import java.util.List;
 
-/** 
- * Wird geworfen wenn beim Initialisieren was schief geht
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
+/**
+ * Wird geworfen wenn beim Initialisieren was schief geht.
  *
- * @author hell
+ * @author   hell
+ * @version  $Revision$, $Date$
  */
 public class InitializingException extends JPressoException {
+
+    //~ Instance fields --------------------------------------------------------
 
     private String initializeLog = "";
     private List<Point> mappingErrors = TypeSafeCollections.newArrayList();
     private List<Point> referenceErrors = TypeSafeCollections.newArrayList();
 
-    /** Creates a new instance of InitializingException */
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new instance of InitializingException.
+     */
     public InitializingException() {
     }
 
-    /** Creates a new instance of InitializingException
-     * @param s Beschreibung der Exception
+    /**
+     * Creates a new instance of InitializingException.
+     *
+     * @param  s    Beschreibung der Exception
+     * @param  log  DOCUMENT ME!
      */
-    public InitializingException(String s, String log) {
+    public InitializingException(final String s, final String log) {
         super(s);
         initializeLog = log;
     }
 
-    public InitializingException(String s, String log, final List<Point> mapErr, final List<Point> refErr) {
+    /**
+     * Creates a new InitializingException object.
+     *
+     * @param  s    DOCUMENT ME!
+     * @param  log  DOCUMENT ME!
+     * @param  e    DOCUMENT ME!
+     */
+    public InitializingException(final String s, final String log, final Throwable e) {
+        super(s, e);
+        initializeLog = log;
+    }
+
+    /**
+     * Creates a new InitializingException object.
+     *
+     * @param  s       DOCUMENT ME!
+     * @param  log     DOCUMENT ME!
+     * @param  mapErr  DOCUMENT ME!
+     * @param  refErr  DOCUMENT ME!
+     */
+    public InitializingException(final String s, final String log, final List<Point> mapErr, final List<Point> refErr) {
         super(s);
         initializeLog = log;
         if (mapErr != null) {
@@ -43,23 +82,31 @@ public class InitializingException extends JPressoException {
         }
     }
 
-    public InitializingException(String s, String log, Throwable e) {
-        super(s, e);
-        initializeLog = log;
-    }
+    //~ Methods ----------------------------------------------------------------
 
-    /** Getter for property initializeLog.
-     * @return Value of property initializeLog.
+    /**
+     * Getter for property initializeLog.
      *
+     * @return  Value of property initializeLog.
      */
     public java.lang.String getInitializeLog() {
         return initializeLog;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public List<Point> getMappingErrorFields() {
         return mappingErrors;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public List<Point> getReferenceErrorFields() {
         return referenceErrors;
     }

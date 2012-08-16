@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * ImportMetaInfo.java
  *
@@ -6,20 +13,12 @@
 package de.cismet.jpresso.core.kernel;
 
 import code.AssignerBase;
-import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
-import de.cismet.jpresso.core.exceptions.WrongNameException;
-import de.cismet.jpresso.core.exceptions.ImportMetaInfoException;
-import de.cismet.jpresso.core.data.ImportRules;
-import de.cismet.jpresso.core.data.Mapping;
-import de.cismet.jpresso.core.data.Reference;
-import de.cismet.jpresso.core.kernel.TableMetaInfo.Builder;
-import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
-import de.cismet.jpresso.core.utils.EscapeUtil;
-import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -29,17 +28,30 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** 
- * ImportMetaInfo haelt die notwendigen Metainformationen zu einem Import.
- * Dazu gehoeren neben dem Zugriffsobjekt der Importdate auch noch weitere
- * Convenience Funktionen.
- * 
- * @author srichter
- * @author hell
+import de.cismet.jpresso.core.data.ImportRules;
+import de.cismet.jpresso.core.data.Mapping;
+import de.cismet.jpresso.core.data.Reference;
+import de.cismet.jpresso.core.exceptions.ImportMetaInfoException;
+import de.cismet.jpresso.core.exceptions.WrongNameException;
+import de.cismet.jpresso.core.kernel.TableMetaInfo.Builder;
+import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
+import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
+import de.cismet.jpresso.core.utils.EscapeUtil;
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
+/**
+ * ImportMetaInfo haelt die notwendigen Metainformationen zu einem Import. Dazu gehoeren neben dem Zugriffsobjekt der
+ * Importdate auch noch weitere Convenience Funktionen.
+ *
+ * @author   srichter
+ * @author   hell
+ * @version  $Revision$, $Date$
  */
 public final class ImportMetaInfo {
 
-    //prevents naming mappingErrors if tablename == a field name
+    //~ Static fields/initializers ---------------------------------------------
+
+    // prevents naming mappingErrors if tablename == a field name
     private static final String FILTER_ERROR_FINDER = "by-cids-filter-error-finder:";
     private static final String OPENING_BRACKET = "[";
     private static final String COUNT_STMNT = "SELECT count(*) FROM ";
@@ -54,69 +66,89 @@ public final class ImportMetaInfo {
     public static final String ERROR_FINDER = "by-cids-error-finder:";
     public static final String NORMALIZE_MEM_ONLY = "#";
     public static final String NORMALIZE_WITH_DB = "!";
-    //regex describing a valid java variable name
-    public static final Pattern VALID_JAVA_VARIABLE_NAME = Pattern.compile("^[_\\$A-Za-zÄäÜüÖöß][_\\$\\p{Alnum}ÄäÜüÖöß]*$");
-    /** Logger */
+    // regex describing a valid java variable name
+    public static final Pattern VALID_JAVA_VARIABLE_NAME = Pattern.compile(
+            "^[_\\$A-Za-zÄäÜüÖöß][_\\$\\p{Alnum}ÄäÜüÖöß]*$");
+
+    //~ Instance fields --------------------------------------------------------
+
+    /** Logger. */
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
-    /** Spaltennamen der Datenquelle z.B um zu pruefen ob ein Label doppelt vorhanden ist*/
+    /** Spaltennamen der Datenquelle z.B um zu pruefen ob ein Label doppelt vorhanden ist. */
     private final List<String> sourceFields = TypeSafeCollections.newArrayList();
-    /** Die realen Zieltabellen(Strukturen) (ohne Beziehungspfad) : Tabellenname -> Liste Feldnamen*/
+    /** Die realen Zieltabellen(Strukturen) (ohne Beziehungspfad) : Tabellenname -> Liste Feldnamen */
     private final Map<String, List<String>> targetTables = TypeSafeCollections.newLinkedHashMap();
-    /** Enclosing Character der einzelnen Felder der Zieltabellen: Zieltabelle -> Feldname -> Umschliessende Characters*/
+    /**
+     * Enclosing Character der einzelnen Felder der Zieltabellen: Zieltabelle -> Feldname -> Umschliessende Characters
+     */
     private final Map<String, Map<String, String>> enclosingChars = TypeSafeCollections.newLinkedHashMap();
     /** Normalisierungscontainer: Enthaelt die Namen der zu normalisierenden Tabellen */
     private final Map<String, String> normalizeHM = TypeSafeCollections.newLinkedHashMap();
-    /** Welche Felder sind fuer einen Vergleich (Normalisierung) relevant ? : Tabellenname -> Liste vergleichsrelevanter Felder */
+    /**
+     * Welche Felder sind fuer einen Vergleich (Normalisierung) relevant ? : Tabellenname -> Liste vergleichsrelevanter
+     * Felder
+     */
     private final Map<String, List<String>> compareRelevant = TypeSafeCollections.newLinkedHashMap();
-    /** RelationenContainer : String(DetailTabelle.Feld) -> List: String(MasterTabelle.Feld)*/
-    private final Map<FieldDescription, List<FieldDescription>> referencesHashMap = TypeSafeCollections.newLinkedHashMap();
-    /** Mastertabellen, mit Pfaden */
+    /** RelationenContainer : String(DetailTabelle.Feld) -> List: String(MasterTabelle.Feld) */
+    private final Map<FieldDescription, List<FieldDescription>> referencesHashMap = TypeSafeCollections
+                .newLinkedHashMap();
+    /** Mastertabellen, mit Pfaden. */
     private final Map<String, String> tableIsMaster = TypeSafeCollections.newLinkedHashMap();
-    /** Detailtabellen (Tabellen die irgendwo referenziert werden, mit Pfaden): Tabellenname -> Referenziertes Feld*/
+    /** Detailtabellen (Tabellen die irgendwo referenziert werden, mit Pfaden): Tabellenname -> Referenziertes Feld */
     private final Map<String, List<String>> tableIsDetail = TypeSafeCollections.newLinkedHashMap();
-    /** Topologisch sortierte Reihenfolge der Zieltabellen zur Abarbeitung, ohne Pfade */
+    /** Topologisch sortierte Reihenfolge der Zieltabellen zur Abarbeitung, ohne Pfade. */
     private final Set<String> topologicalTableSequence = TypeSafeCollections.newLinkedHashSet();
-    /** Topologisch sortierte Reihenfolge der Zieltabellen zur Abarbeitung, mit Pfaden */
+    /** Topologisch sortierte Reihenfolge der Zieltabellen zur Abarbeitung, mit Pfaden. */
     private final Set<String> topologicalTableSequenceWithPath = TypeSafeCollections.newLinkedHashSet();
-    /** Sammlung aller Tabellen mit Pfad zu einem Tabellenname ohne Pfad: Tabellenname ohne Pfad -> Liste zugehoeriger Tabellennamen mit Pfad **/
+    /**
+     * Sammlung aller Tabellen mit Pfad zu einem Tabellenname ohne Pfad: Tabellenname ohne Pfad -> Liste zugehoeriger
+     * Tabellennamen mit Pfad *
+     */
     private final Map<String, List<String>> tableToAppropriateTablesWithPaths = TypeSafeCollections.newLinkedHashMap();
-    /** Umgekehrt mappt dieser Hash alle Tabellennamen mit Pfad auf ihren jeweilen Tabellenname ohne Pfad. Dies dient nur der Performancesteigerung **/
+    /**
+     * Umgekehrt mappt dieser Hash alle Tabellennamen mit Pfad auf ihren jeweilen Tabellenname ohne Pfad. Dies dient nur
+     * der Performancesteigerung *
+     */
     private final Map<String, String> pureTableNameHash = TypeSafeCollections.newHashMap();
-    /** Ein Hash der einer FieldDescription einen eine Map zuordnet, die fue eine MasterTable einen zirkularen Felditerator liefert **/
-    private final Map<FieldDescription, Map<String, ListCirculator<String>>> referencingFields = TypeSafeCollections.newHashMap();
-    /** Cache der Anzeigt ob zwischen 2 Tabellen ueber ein gegebenes Feld eine Master-Detail-Beziehung ebsteht **/
-    private final Map<String, Map<String, Map<String, Boolean>>> rightMasterTableCache = TypeSafeCollections.newHashMap();
-    /** Tabellenname -> Nummern der referenzierten Felder **/
+    /**
+     * Ein Hash der einer FieldDescription einen eine Map zuordnet, die fue eine MasterTable einen zirkularen
+     * Felditerator liefert.*
+     */
+    private final Map<FieldDescription, Map<String, ListCirculator<String>>> referencingFields = TypeSafeCollections
+                .newHashMap();
+    /** Cache der Anzeigt ob zwischen 2 Tabellen ueber ein gegebenes Feld eine Master-Detail-Beziehung ebsteht.* */
+    private final Map<String, Map<String, Map<String, Boolean>>> rightMasterTableCache = TypeSafeCollections
+                .newHashMap();
+    /** Tabellenname -> Nummern der referenzierten Felder.* */
     private final Map<String, int[]> detailKeyFields = TypeSafeCollections.newHashMap();
-    /** Tabellenname -> Nummern der referenzierten Felder **/
+    /** Tabellenname -> Nummern der referenzierten Felder.* */
     private final Map<String, List<Integer>> autoIncFieldNos = TypeSafeCollections.newHashMap();
-    /** ImportKonfiguration */
+    /** ImportKonfiguration. */
     private final ImportRules rules;
-    /** Tabellenname -> gueltiger Java Variablenname der die Tablle im Assigner als String[] repräsentiert**/
+    /** Tabellenname -> gueltiger Java Variablenname der die Tablle im Assigner als String[] repräsentiert.* */
     private final Map<String, String> tableVariableNames = TypeSafeCollections.newHashMap();
-    /** **/
+    /** .*DOCUMENT ME! */
     private final Iterable<Reference> sortedReferences;
     private final List<TableMetaInfo> tableInfo;
 
-    public final List<TableMetaInfo> getTableInfo() {
-        return tableInfo;
-    }
+    //~ Constructors -----------------------------------------------------------
 
-    /** 
-     * Konstruiert die Metainformationen aus der entsprechenden Konfigurationsdatei
-     * 
-     * @param rules ImportRules
-     * @throws JPressoException wird geworfen wenn ein schwerer Fehler auftritt ;-)
+    /**
+     * Konstruiert die Metainformationen aus der entsprechenden Konfigurationsdatei.
+     *
+     * @param   rules  ImportRules
+     *
+     * @throws  ImportMetaInfoException  JPressoException wird geworfen wenn ein schwerer Fehler auftritt ;-)
      */
     public ImportMetaInfo(final ImportRules rules) throws ImportMetaInfoException {
         this.rules = rules;
         try {
             processMappings();
             if (rules.getReferences() != null) {
-                //Sortieren der References, so dass Beziehungen innerhalb einer Tabelle vor Fremdschlüsselbeziehungen stehen
-                //-> Felder die z.B. Kopie eines AutoInc-Feldes sind können sicher referenziert werden
+                // Sortieren der References, so dass Beziehungen innerhalb einer Tabelle vor Fremdschlüsselbeziehungen
+                // stehen -> Felder die z.B. Kopie eines AutoInc-Feldes sind können sicher referenziert werden
                 final List<Reference> references = TypeSafeCollections.newArrayList(rules.getReferences());
-                //topologisches Sortieren der Tabellen und Referenzen (~Felder)
+                // topologisches Sortieren der Tabellen und Referenzen (~Felder)
                 final ImportTopology importTopology = new ImportTopology(references);
                 sortedReferences = importTopology.getTopologicalSortedReferences();
                 for (final String tabN : importTopology.getTopologicalSortedTables()) {
@@ -133,8 +165,24 @@ public final class ImportMetaInfo {
         }
     }
 
-    private final void processNormalization() throws WrongNameException {
-        //Zu normalisierende Tabellen merken
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public List<TableMetaInfo> getTableInfo() {
+        return tableInfo;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @throws  WrongNameException  DOCUMENT ME!
+     */
+    private void processNormalization() throws WrongNameException {
+        // Zu normalisierende Tabellen merken
         if (rules.getOptions() != null) {
             for (final String tableToNormalizeName : rules.getOptions().getNormalize()) {
                 normalizeHM.put(tableToNormalizeName, NORMALIZE_WITH_DB);
@@ -154,11 +202,17 @@ public final class ImportMetaInfo {
         }
         log.info("Table ordering sequence is " + topologicalTableSequence);
         for (final String tab : topologicalTableSequence) {
-            log.info("Table " + tab + " := " + getTargetFields(tab) + " with enclosing characters " + enclosingChars.get(getPureTabName(tab)));
+            log.info("Table " + tab + " := " + getTargetFields(tab) + " with enclosing characters "
+                        + enclosingChars.get(getPureTabName(tab)));
         }
     }
 
-    private final void processReferences() throws ImportMetaInfoException {
+    /**
+     * DOCUMENT ME!
+     *
+     * @throws  ImportMetaInfoException  DOCUMENT ME!
+     */
+    private void processReferences() throws ImportMetaInfoException {
         for (final Reference ref : sortedReferences) {
             String pureReferencingTabName = getPureTabName(ref.getReferencingTable());
             final String referencingTable = ref.getReferencingTable().trim();
@@ -166,21 +220,23 @@ public final class ImportMetaInfo {
             final String referencingField = ref.getReferencingField().trim();
             final String referencedField = ref.getReferencedField().trim();
             final String eChar = ref.getEnclosingChar().trim();
-            //Hinzufuegen der Foreign Keys Fields zu den einzelnen Tabellen
+            // Hinzufuegen der Foreign Keys Fields zu den einzelnen Tabellen
             if (!targetTables.containsKey(pureReferencingTabName)) {
                 if (pureReferencingTabName == null) {
                     pureReferencingTabName = referencingTable;
                 } else if (pureReferencingTabName.trim().length() < 1) {
                     pureReferencingTabName = "<Empty/only Whitspaces>";
                 }
-                throw new ImportMetaInfoException("Mastertable " + pureReferencingTabName + " does not exist!\nForeign-Key relies on a non existant Table (" + pureReferencingTabName + ")!!!");
+                throw new ImportMetaInfoException("Mastertable " + pureReferencingTabName
+                            + " does not exist!\nForeign-Key relies on a non existant Table (" + pureReferencingTabName
+                            + ")!!!");
             } else {
                 final List<String> targetTabsList = targetTables.get(pureReferencingTabName);
                 if (!targetTabsList.contains(referencingField)) {
                     targetTabsList.add(referencingField);
                 }
             }
-            //Fuellen der References-HashMap
+            // Fuellen der References-HashMap
             final FieldDescription detailField = new FieldDescription(referencedTable, referencedField);
             final FieldDescription masterField = new FieldDescription(referencingTable, referencingField);
             final List<FieldDescription> foreignFields;
@@ -195,7 +251,7 @@ public final class ImportMetaInfo {
                 }
             }
 
-            //Rollen der Tabellen abspeichern
+            // Rollen der Tabellen abspeichern
             tableIsMaster.put(referencingTable, "-");
             List<String> detailKeys = tableIsDetail.get(referencedTable);
             if (detailKeys == null) {
@@ -218,7 +274,7 @@ public final class ImportMetaInfo {
                 }
             }
 
-            //Enclosing-chars des foreign-Key Feldes rausfinden
+            // Enclosing-chars des foreign-Key Feldes rausfinden
             if (!enclosingChars.containsKey(pureReferencingTabName)) {
                 final Map<String, String> fields = TypeSafeCollections.newLinkedHashMap();
                 fields.put(ref.getReferencingField(), eChar);
@@ -236,7 +292,12 @@ public final class ImportMetaInfo {
         }
     }
 
-    private final void processMappings() throws WrongNameException {
+    /**
+     * DOCUMENT ME!
+     *
+     * @throws  WrongNameException  DOCUMENT ME!
+     */
+    private void processMappings() throws WrongNameException {
         for (final Mapping m : rules.getMappings()) {
             final String tableName = m.getTargetTable().trim();
             final String tableNameWithPath = m.getTargetTableWithPath().trim();
@@ -244,7 +305,7 @@ public final class ImportMetaInfo {
             final String targetField = m.getTargetField().trim();
 
             pureTableNameHash.put(tableName, tableName);
-            //Wenn die Tabelle noch nicht gemerkt ist...
+            // Wenn die Tabelle noch nicht gemerkt ist...
             List<String> fieldNames = targetTables.get(tableName);
             if (fieldNames == null) {
                 fieldNames = TypeSafeCollections.newArrayList();
@@ -260,7 +321,7 @@ public final class ImportMetaInfo {
                     fields = TypeSafeCollections.newArrayList();
                     autoIncFieldNos.put(tableName, fields);
                 }
-                int pos = getPositionInTable(tableName, targetField);
+                final int pos = getPositionInTable(tableName, targetField);
                 if (!fields.contains(pos)) {
                     fields.add(getPositionInTable(tableName, targetField));
                 }
@@ -289,7 +350,7 @@ public final class ImportMetaInfo {
                 lhm.put(m.getTargetField(), eChar);
             }
 
-            if (m.getPath() != null && m.getPath().length() > 0) {
+            if ((m.getPath() != null) && (m.getPath().length() > 0)) {
                 pureTableNameHash.put(tableNameWithPath, tableName);
                 if (!tableToAppropriateTablesWithPaths.containsKey(tableName)) {
                     final List<String> paths = TypeSafeCollections.newArrayList();
@@ -302,19 +363,26 @@ public final class ImportMetaInfo {
                     }
                 }
             } else {
-                //TODO abschliessender check ob sich eine Tabelle mit UND ohne path darin befindet -> fehler!
+                // TODO abschliessender check ob sich eine Tabelle mit UND ohne path darin befindet -> fehler!
                 final List<String> ownName = TypeSafeCollections.newArrayList();
                 ownName.add(tableName);
                 tableToAppropriateTablesWithPaths.put(tableName, ownName);
             }
-        }//Ende Mapping Verarbeitung
+        } // Ende Mapping Verarbeitung
         if (log.isDebugEnabled()) {
             log.debug("Mappings created");
             log.debug("Paths:\n" + tableToAppropriateTablesWithPaths);
         }
     }
 
-    private final List<TableMetaInfo> createTableInfos() throws WrongNameException {
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  WrongNameException  DOCUMENT ME!
+     */
+    private List<TableMetaInfo> createTableInfos() throws WrongNameException {
 //        final Map<String, TableMetaInfo> tableMetaInfoMap = TypeSafeCollections.newHashMap(topologicalTableSequenceWithPath.size());
         final List<TableMetaInfo> result = TypeSafeCollections.newArrayList();
         final Map<String, Integer> posMap = TypeSafeCollections.newHashMap(topologicalTableSequenceWithPath.size());
@@ -348,7 +416,8 @@ public final class ImportMetaInfo {
                     try {
                         final int masterTableIndex = posMap.get(ref.getReferencingTable());
                         final int detailFieldPos = getPositionInTable(tabNameWithPath, ref.getReferencedField());
-                        final int masterFieldPos = getPositionInTable(ref.getReferencingTable(), ref.getReferencingField());
+                        final int masterFieldPos = getPositionInTable(ref.getReferencingTable(),
+                                ref.getReferencingField());
                         builder.addStoreOffsets(masterTableIndex, masterFieldPos, detailFieldPos);
                     } catch (WrongNameException ex) {
                         log.warn(ex, ex);
@@ -579,24 +648,25 @@ public final class ImportMetaInfo {
 //            throw new ImportMetaInfoException("Error creating import meta information: " + ex.getMessage(), ex);
 //        }
 //    }
-    /** 
-     * Liefert die Felder der Datenquelle
-     * @return List: Felder der Datenquelle
+    /**
+     * Liefert die Felder der Datenquelle.
+     *
+     * @return  List: Felder der Datenquelle
      */
-    public final Iterable<String> getSourceFields() {
+    public Iterable<String> getSourceFields() {
         return sourceFields;
     }
 
-    /** 
-     * Setzt die Felder der Datenquelle. Analysiert das Source ResultSet und setzt dann
-     * die entsprechenden Spaltennamen
-     * 
-     * @param rs ResultSet das analysiert wird
-     * @throws JPressoException wird geworfen, wenn ein SQL Fehler auftritt
+    /**
+     * Setzt die Felder der Datenquelle. Analysiert das Source ResultSet und setzt dann die entsprechenden Spaltennamen
+     *
+     * @param   dataSource  rs ResultSet das analysiert wird
+     *
+     * @throws  ImportMetaInfoException  JPressoException wird geworfen, wenn ein SQL Fehler auftritt
      */
-    public final void setSourceFields(final DataSource dataSource) throws ImportMetaInfoException {
-        boolean lower = rules.getSourceQuery().labelsToLowerCase();
-        boolean upper = rules.getSourceQuery().labelsToUpperCase();
+    public void setSourceFields(final DataSource dataSource) throws ImportMetaInfoException {
+        final boolean lower = rules.getSourceQuery().labelsToLowerCase();
+        final boolean upper = rules.getSourceQuery().labelsToUpperCase();
         for (int i = 0; i < dataSource.getColumnCount(); ++i) {
             String sField = dataSource.getColumnLabel(i);
             if (sField != null) {
@@ -613,10 +683,12 @@ public final class ImportMetaInfo {
         for (final String cur : sourceFields) {
             final Matcher javaVarNameValidator = VALID_JAVA_VARIABLE_NAME.matcher(cur);
             if (!javaVarNameValidator.matches()) {
-                throw new ImportMetaInfoException("Columnlabel " + cur + " is not a valid Java-variable name!\n Please rename the column/label (with: SELECT invalidName AS validName).");
+                throw new ImportMetaInfoException("Columnlabel " + cur
+                            + " is not a valid Java-variable name!\n Please rename the column/label (with: SELECT invalidName AS validName).");
             }
             if (!findDuplicates.add(cur)) {
-                throw new ImportMetaInfoException("Query creates duplicated source fieldnames!\nPlease use UNIQUE labels for the fields to assure well-defined mapping!");
+                throw new ImportMetaInfoException(
+                    "Query creates duplicated source fieldnames!\nPlease use UNIQUE labels for the fields to assure well-defined mapping!");
             }
         }
 
@@ -625,24 +697,25 @@ public final class ImportMetaInfo {
         }
     }
 
-    /** 
-     * Liefert einen Iterator der ueber die Ziehltabellennamen laeuft
-     * 
-     * @return Iterator der ueber die Ziehltabellennamen laeuft
+    /**
+     * Liefert einen Iterator der ueber die Ziehltabellennamen laeuft.
+     *
+     * @return  Iterator der ueber die Ziehltabellennamen laeuft
      */
-    public final Iterable<String> getTargetTableNames() {
+    public Iterable<String> getTargetTableNames() {
         return targetTables.keySet();
     }
 
-    /** 
-     * Liefert die Spaltennamen der uebergebenen Zieltabelle
-     * 
-     * @return Spaltennamen der uebergebenen Zieltabelle als List
-     * @param pureReferencingTabName Zieltabelle
-     * @throws WrongNameException wird geworfen, wenn der Tabellenname nicht stimmt
+    /**
+     * Liefert die Spaltennamen der uebergebenen Zieltabelle.
      *
+     * @param   tableName  pureReferencingTabName Zieltabelle
+     *
+     * @return  Spaltennamen der uebergebenen Zieltabelle als List
+     *
+     * @throws  WrongNameException  wird geworfen, wenn der Tabellenname nicht stimmt
      */
-    private final List<String> getTargetFields(String tableName) throws WrongNameException {
+    private List<String> getTargetFields(String tableName) throws WrongNameException {
         tableName = getPureTabName(tableName);
         final List<String> ret = (targetTables.get(tableName));
         if (ret == null) {
@@ -651,15 +724,16 @@ public final class ImportMetaInfo {
         return ret;
     }
 
-    /** 
-     * Liefert alle im Konfigurationsfile angegebenen Enclosing Characters fuer eine
-     * bestimmte Tabelle
-     * 
-     * @param tabN Tabellennamen
-     * @throws WrongNameException wird geworfen, wenn der Tabellenname nicht stimmt
-     * @return String[]: Kopie des der enclosing Characters fuer eine bestimmte Tabelle
+    /**
+     * Liefert alle im Konfigurationsfile angegebenen Enclosing Characters fuer eine bestimmte Tabelle.
+     *
+     * @param   tabName  Tabellennamen
+     *
+     * @return  String[]: Kopie des der enclosing Characters fuer eine bestimmte Tabelle
+     *
+     * @throws  WrongNameException  wird geworfen, wenn der Tabellenname nicht stimmt
      */
-    public final String[] getTargetEnclosingCharsAsStringArray(String tabName) throws WrongNameException {
+    public String[] getTargetEnclosingCharsAsStringArray(String tabName) throws WrongNameException {
         tabName = getPureTabName(tabName);
         final Map<String, String> lhm = enclosingChars.get(tabName);
         if (lhm == null) {
@@ -672,14 +746,16 @@ public final class ImportMetaInfo {
         return v.toArray(new String[v.size()]);
     }
 
-    /** 
-     * Liefert die Spaltennamen der uebergebenen Zieltabelle
-     * @return Spaltennamen der uebergebenen Zieltabelle als String[]
-     * 
-     * @param pureReferencingTabName Zieltabelle
-     * @throws WrongNameException wird geworfen, wenn der Tabellenname nicht stimmt
+    /**
+     * Liefert die Spaltennamen der uebergebenen Zieltabelle.
+     *
+     * @param   tableName  pureReferencingTabName Zieltabelle
+     *
+     * @return  Spaltennamen der uebergebenen Zieltabelle als String[]
+     *
+     * @throws  WrongNameException  wird geworfen, wenn der Tabellenname nicht stimmt
      */
-    public final String[] getTargetFieldsAsStringArray(String tableName) throws WrongNameException {
+    public String[] getTargetFieldsAsStringArray(final String tableName) throws WrongNameException {
         final List<String> v = getTargetFields(tableName);
         return v.toArray(new String[v.size()]);
 //        final String[] s = ;
@@ -689,23 +765,24 @@ public final class ImportMetaInfo {
 //        return s;
     }
 
-    /** 
-     * Erzeugt aus einem Zieltabellenname ein SQL-Statement. Wenn dieses SQL-Statement
-     * (Select .... ) ohne Fehler ausgefuehrt werden kann, existiert die Tablle im
-     * Zielsystem und der Import kann durchgefuehrt werden.
-     * 
-     * @return String: SQL-Statement
-     * @param pureReferencingTabName Zieltabellenname
-     * @throws WrongNameException wird geworfen, wenn der Tabellenname nicht stimmt
+    /**
+     * Erzeugt aus einem Zieltabellenname ein SQL-Statement. Wenn dieses SQL-Statement (Select .... ) ohne Fehler
+     * ausgefuehrt werden kann, existiert die Tablle im Zielsystem und der Import kann durchgefuehrt werden.
+     *
+     * @param   tableName  pureReferencingTabName Zieltabellenname
+     *
+     * @return  String: SQL-Statement
+     *
+     * @throws  WrongNameException  wird geworfen, wenn der Tabellenname nicht stimmt
      */
-    public final String getControlStatement(String tableName) throws WrongNameException {
+    public String getControlStatement(String tableName) throws WrongNameException {
         tableName = getPureTabName(tableName);
         final StringBuilder stmnt = new StringBuilder(SELECT);
         final List<String> fields = (targetTables.get(tableName));
         if (fields != null) {
             final Iterator<String> it = fields.iterator();
             while (it.hasNext()) {
-                String field = it.next();
+                final String field = it.next();
                 stmnt.append(field);
                 if (it.hasNext()) {
                     stmnt.append(KOMMA);
@@ -719,30 +796,32 @@ public final class ImportMetaInfo {
         }
     }
 
-    /** 
-     * Liefert eine Stringrepraesentation des Objektes
-     * 
-     * @return Stringrepraesentation des Objektes
+    /**
+     * Liefert eine Stringrepraesentation des Objektes.
+     *
+     * @return  Stringrepraesentation des Objektes
      */
     @Override
-    public final String toString() {
+    public String toString() {
         return targetTables.toString() + "\n\n" + sourceFields.toString();
     }
 
-    /** 
-     * Erzeugt aus den Metadaten der import-Konfiguration eine Java-Klasse. Diese
-     * Klasse wird dazu verwendet den entsprechenden Felder zuzuweisen und einfache
-     * Datenkonvertierungsaufgaben zu uebernehmen. Spaeter im Workflow wird diese Klasse
-     * waehrend der Laufzeit kompiliert und aufgerufen.
+    /**
+     * Erzeugt aus den Metadaten der import-Konfiguration eine Java-Klasse. Diese Klasse wird dazu verwendet den
+     * entsprechenden Felder zuzuweisen und einfache Datenkonvertierungsaufgaben zu uebernehmen. Spaeter im Workflow
+     * wird diese Klasse waehrend der Laufzeit kompiliert und aufgerufen.
      *
-     * @param canonicalAssignerName Dateiname der Zukuenftigen Java-Klasse
-     * @throws JPressoException wird bei einem Fehler geworfen
-     * @return String: Java-Quelltext der Klasse
+     * @param   canonicalAssignerName  Dateiname der Zukuenftigen Java-Klasse
+     *
+     * @return  String: Java-Quelltext der Klasse
+     *
+     * @throws  JPressoException  wird bei einem Fehler geworfen
      */
-    public final String generateAssignerJavaClassCode(final String canonicalAssignerName) throws JPressoException {
-        int splitPoint = canonicalAssignerName.lastIndexOf(".");
-        final String packageName = splitPoint > 0 ? canonicalAssignerName.substring(0, splitPoint) : null;
-        final String className = splitPoint > 0 ? canonicalAssignerName.substring(splitPoint + 1) : canonicalAssignerName;
+    public String generateAssignerJavaClassCode(final String canonicalAssignerName) throws JPressoException {
+        final int splitPoint = canonicalAssignerName.lastIndexOf(".");
+        final String packageName = (splitPoint > 0) ? canonicalAssignerName.substring(0, splitPoint) : null;
+        final String className = (splitPoint > 0) ? canonicalAssignerName.substring(splitPoint + 1)
+                                                  : canonicalAssignerName;
         final Map<String, String> topologicalTablesWithPathSequenceEscaped = TypeSafeCollections.newLinkedHashMap();
         for (final String tabName : topologicalTableSequenceWithPath) {
             topologicalTablesWithPathSequenceEscaped.put(tabName, EscapeUtil.escapeJava(tabName));
@@ -757,21 +836,29 @@ public final class ImportMetaInfo {
         buf.append("import java.util.HashMap;\n");
         buf.append("import de.cismet.jpresso.core.serviceprovider.DynamicDriverManager;\n");
         buf.append("import de.cismet.jpresso.core.kernel.UniversalContainer;\n\n");
-        //buf.append("import java.util.LinkedHashMap;\n");
-        buf.append(" public final class " + className + " extends " + AssignerBase.class.getCanonicalName() + " implements " + Assigner.class.getCanonicalName() + " {\n\n");
+        // buf.append("import java.util.LinkedHashMap;\n");
+        buf.append(" public final class " + className + " extends " + AssignerBase.class.getCanonicalName()
+                    + " implements " + Assigner.class.getCanonicalName() + " {\n\n");
         buf.append("    private final Map<String, int[]> lookupMap;\n");
         buf.append("    private String[][] currentRows;\n\n");
         buf.append("    public " + className + "() {\n");
         buf.append("        lookupMap = new HashMap<String, int[]>();\n");
 //        buf.append("        //currentRows = new LinkedHashMap<String, String[]>();\n\n");
         int i = -1;
-        for (final Map.Entry<String, String> tabUnescapedToEscaped : topologicalTablesWithPathSequenceEscaped.entrySet()) {
+        for (final Map.Entry<String, String> tabUnescapedToEscaped
+                    : topologicalTablesWithPathSequenceEscaped.entrySet()) {
             ++i;
             final List<String> fields = targetTables.get(getPureTabName(tabUnescapedToEscaped.getKey()));
             if (fields != null) {
                 for (int j = 0; j < fields.size(); ++j) {
                     buf.append("        lookupMap.put(\"").append(tabUnescapedToEscaped.getValue());
-                    buf.append(".").append(EscapeUtil.escapeJava(fields.get(j))).append("\", new int[]{").append(i).append(", ").append(j).append("});\n");
+                    buf.append(".")
+                            .append(EscapeUtil.escapeJava(fields.get(j)))
+                            .append("\", new int[]{")
+                            .append(i)
+                            .append(", ")
+                            .append(j)
+                            .append("});\n");
                 }
             } else {
                 log.error("Can not find field entries for table " + tabUnescapedToEscaped.getKey());
@@ -789,7 +876,8 @@ public final class ImportMetaInfo {
 //            }
 //        }
         buf.append("    }\n\n");
-        buf.append("    public final String[][] assign(final java.sql.Connection $tc, final String[] $args, " + UniversalContainer.class.getCanonicalName() + " $universalC) {\n");
+        buf.append("    public final String[][] assign(final java.sql.Connection $tc, final String[] $args, "
+                    + UniversalContainer.class.getCanonicalName() + " $universalC) {\n");
         buf.append("        // init\n");
         buf.append("        " + FIELD_TAG + "TargetConnection = $tc;\n");
         buf.append("        " + FIELD_TAG + "UniversalContainer = $universalC;\n");
@@ -800,16 +888,21 @@ public final class ImportMetaInfo {
         }
         buf.append("\n");
         for (final String tabName : getTopologicalTableSequenceWithPath()) {
-            log.debug("getClass: TargetTables: ->" + tabName);
-            buf.append("        final String[] " + (getScriptVariableName(tabName)) + " = new String[" + getFieldCount(tabName) + "];\n");
+            if (log.isDebugEnabled()) {
+                log.debug("getClass: TargetTables: ->" + tabName);
+            }
+            buf.append("        final String[] " + (getScriptVariableName(tabName)) + " = new String["
+                        + getFieldCount(tabName) + "];\n");
         }
         buf.append("\n        // Assigning Section\n");
         for (final Mapping m : rules.getMappings()) {
             if (!m.isAutoIncrement()) {
-                buf.append("        " + getScriptVariableNameWithIndex(m.getTargetTable(), m.getTargetField(), m.getPath()) + " = " + m.getContent() + ";" + "//" + ERROR_FINDER + m.getContent() + "\n");
+                buf.append("        "
+                            + getScriptVariableNameWithIndex(m.getTargetTable(), m.getTargetField(), m.getPath())
+                            + " = " + m.getContent() + ";" + "//" + ERROR_FINDER + m.getContent() + "\n");
             }
         }
-        //preparing the return value
+        // preparing the return value
         buf.append("\n        // Preparing the return value");
         buf.append("\n        currentRows = new String[" + topologicalTableSequenceWithPath.size() + "][];\n");
         final Properties filters = rules.getOptions().getFilter();
@@ -824,7 +917,7 @@ public final class ImportMetaInfo {
         for (final String tabName : topologicalTableSequenceWithPath) {
             ++i;
             final String filterString = filters.getProperty(tabName);
-            boolean isFilterSet = filterString != null && filterString.length() > 0;
+            final boolean isFilterSet = (filterString != null) && (filterString.length() > 0);
             if (isFilterSet) {
                 log.info("Filter for " + tabName + " is set as \"" + filterString + "\".");
                 buf.append("    if(!(" + filterString + ")) { //" + FILTER_ERROR_FINDER + filterString + "\n        ");
@@ -834,7 +927,7 @@ public final class ImportMetaInfo {
         }
         buf.append("        return currentRows;\n");
         buf.append("    }\n");
-        //inhereted Methods
+        // inhereted Methods
         buf.append("    // Predefined Methods");
         buf.append("\n    public final java.sql.Connection getTargetConnection() {");
         buf.append("\n        return " + FIELD_TAG + "TargetConnection;");
@@ -878,26 +971,43 @@ public final class ImportMetaInfo {
         buf.append("\n");
         // break if Funktion
         buf.append("    public final String cidsBreakIf(boolean breakIt, final String defaultValue) {\n");
-        buf.append("        if (breakIt) { return \"" + ImportMetaInfo.BREAK_IDENTIFIER + "\";} else { return defaultValue; }\n");
+        buf.append("        if (breakIt) { return \"" + ImportMetaInfo.BREAK_IDENTIFIER
+                    + "\";} else { return defaultValue; }\n");
         buf.append("    }\n");
         buf.append("\n}\n");
         return buf.toString();
     }
 
-    /** 
-     * Methode zur Erzeugung des Java-Codes zum Zugriff auf eine Spalte einer
-     * Zieltabelle.
-     * 
-     * @param targetTable Zieltabelle
-     * @param targetField Zielspalte
-     * @throws WrongNameException wird geworfen, wenn der Tabellenname oder der Spaltenname nicht stimmt
-     * @return Java-Code zum Zugriff auf eine Spalte einer Zieltabelle
+    /**
+     * Methode zur Erzeugung des Java-Codes zum Zugriff auf eine Spalte einer Zieltabelle.
+     *
+     * @param   targetTable  Zieltabelle
+     * @param   targetField  Zielspalte
+     * @param   path         DOCUMENT ME!
+     *
+     * @return  Java-Code zum Zugriff auf eine Spalte einer Zieltabelle
+     *
+     * @throws  WrongNameException  wird geworfen, wenn der Tabellenname oder der Spaltenname nicht stimmt
      */
-    private final String getScriptVariableNameWithIndex(final String targetTable, final String targetField, String path) throws WrongNameException {
-        return new StringBuffer(getScriptVariableName(targetTable, path)).append("[").append(getPositionInTable(targetTable, targetField)).append("]").toString();
+    private String getScriptVariableNameWithIndex(final String targetTable, final String targetField, final String path)
+            throws WrongNameException {
+        return new StringBuffer(getScriptVariableName(targetTable, path)).append("[")
+                    .append(getPositionInTable(targetTable, targetField))
+                    .append("]")
+                    .toString();
     }
 
-    private final String getScriptVariableName(final String targetTable, String path) throws WrongNameException {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   targetTable  DOCUMENT ME!
+     * @param   path         DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  WrongNameException  DOCUMENT ME!
+     */
+    private String getScriptVariableName(final String targetTable, String path) throws WrongNameException {
         if (path == null) {
             path = EMPTY;
         }
@@ -905,25 +1015,38 @@ public final class ImportMetaInfo {
         return getScriptVariableName(new StringBuffer(targetTable).append(path).toString());
     }
 
-    private final String getScriptVariableName(final String targetTableWithPath) throws WrongNameException {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   targetTableWithPath  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  WrongNameException  DOCUMENT ME!
+     */
+    private String getScriptVariableName(final String targetTableWithPath) throws WrongNameException {
         String ret = tableVariableNames.get(targetTableWithPath);
         if (ret == null) {
-            ret = EscapeUtil.escapeJavaVariableName(
-                    new StringBuffer(TABLE_TAG).append(tableVariableNames.size()).append("$").append(EscapeUtil.escapeJavaVariableName(targetTableWithPath.replace('[', '$').replace(']', '$'))).toString());
+            ret = EscapeUtil.escapeJavaVariableName(new StringBuffer(TABLE_TAG).append(tableVariableNames.size())
+                            .append("$").append(
+                        EscapeUtil.escapeJavaVariableName(targetTableWithPath.replace('[', '$').replace(']', '$')))
+                            .toString());
             tableVariableNames.put(targetTableWithPath, ret);
         }
         return ret;
     }
 
-    /** 
+    /**
      * Liefert den Spaltenindex der Spalte einer Zieltabelle.
-     * 
-     * @param pureReferencingTabName Zieltabelle
-     * @param fieldName Zielspalte
-     * @throws WrongNameException wird geworfen, wenn der Tabellenname oder der Spaltenname nicht stimmt
-     * @return Spaltenindex
+     *
+     * @param   tableName  pureReferencingTabName Zieltabelle
+     * @param   fieldName  Zielspalte
+     *
+     * @return  Spaltenindex
+     *
+     * @throws  WrongNameException  wird geworfen, wenn der Tabellenname oder der Spaltenname nicht stimmt
      */
-    public final int getPositionInTable(String tableName, final String fieldName) throws WrongNameException {
+    public int getPositionInTable(String tableName, final String fieldName) throws WrongNameException {
         tableName = getPureTabName(tableName);
         final List<String> fields = targetTables.get(tableName);
         if (fields == null) {
@@ -936,12 +1059,14 @@ public final class ImportMetaInfo {
         return index;
     }
 
-    /** 
-     * Gibt die Anzahl der Felder einer Zieltabelle aus
-     * 
-     * @param pureReferencingTabName Zieltabellenname
-     * @throws WrongNameException wird geworfen, wenn der Tabellenname nicht stimmt
-     * @return Anzahl der Felder der Zieltabelle
+    /**
+     * Gibt die Anzahl der Felder einer Zieltabelle aus.
+     *
+     * @param   tableName  pureReferencingTabName Zieltabellenname
+     *
+     * @return  Anzahl der Felder der Zieltabelle
+     *
+     * @throws  WrongNameException  wird geworfen, wenn der Tabellenname nicht stimmt
      */
     private int getFieldCount(final String tableName) throws WrongNameException {
         final String pureTabName = getPureTabName(tableName);
@@ -953,53 +1078,49 @@ public final class ImportMetaInfo {
     }
 
     // Methoden die fuers ReferenceManagement benoetigt werden
-    /** 
-     * Gibt eine List aus, in der die Reihenfolge der Zieltabellen mit den Beziehungspfaden abgelegt ist.
-     * Die Reihenfolge der Zieltabellen ist nicht frei waehlbar, da es Beziehungen
-     * zwischen den einzelnen Zieltabellen gibt.
+    /**
+     * Gibt eine List aus, in der die Reihenfolge der Zieltabellen mit den Beziehungspfaden abgelegt ist. Die
+     * Reihenfolge der Zieltabellen ist nicht frei waehlbar, da es Beziehungen zwischen den einzelnen Zieltabellen gibt.
      * Unterschied zu getTopologicalTableSequence(): Beziehungspfade explizit einzeln enthalten.
-     * 
-     * Wird in addCurrentRow benoetigt um in der richtigen Reihenfolge ueber alle
-     * Tabellenpfade zu iterieren.
-     * 
-     * @return List mit den Namen der Zieltabellen (Strings) in der richtigen Reihenfolge.
+     *
+     * <p>Wird in addCurrentRow benoetigt um in der richtigen Reihenfolge ueber alle Tabellenpfade zu iterieren.</p>
+     *
+     * @return  List mit den Namen der Zieltabellen (Strings) in der richtigen Reihenfolge.
      */
     public Iterable<String> getTopologicalTableSequenceWithPath() {
         return topologicalTableSequenceWithPath;
     }
 
-    /** 
-     * Gibt eine List aus, in dem die Reihenfolge der Zieltabellen abgelegt ist.
-     * Die Reihenfolge der Zieltabellen ist nicht frei waehlbar, da es Beziehungen
-     * zwischen den einzelnen Zieltabellen gibt.
-     * 
-     * Unterschied zu getTopologicalTableSequenceWithPath(): Beziehungspfade zusammengefasst,
-     * nur die eigentlichen Tabellen enthalten.
-     * 
-     * Wird im Finalizer benoetigt um zu wissen, welche Tabellen zuerst geschrieben 
-     * werden muessen (weil es z.B. constraints gibt, die verlangen, dass gewisse 
-     * Werte bereits in der datenbank existieren.)
-     * 
-     * @return List mit den Namen der Zieltabellen (Strings) in der richtigen Reihenfolge.
+    /**
+     * Gibt eine List aus, in dem die Reihenfolge der Zieltabellen abgelegt ist. Die Reihenfolge der Zieltabellen ist
+     * nicht frei waehlbar, da es Beziehungen zwischen den einzelnen Zieltabellen gibt.
+     *
+     * <p>Unterschied zu getTopologicalTableSequenceWithPath(): Beziehungspfade zusammengefasst, nur die eigentlichen
+     * Tabellen enthalten.</p>
+     *
+     * <p>Wird im Finalizer benoetigt um zu wissen, welche Tabellen zuerst geschrieben werden muessen (weil es z.B.
+     * constraints gibt, die verlangen, dass gewisse Werte bereits in der datenbank existieren.)</p>
+     *
+     * @return  List mit den Namen der Zieltabellen (Strings) in der richtigen Reihenfolge.
      */
     public Iterable<String> getTopologicalTableSequence() {
         return topologicalTableSequence;
     }
 
-    /** 
-     * Liefert alle Tabellennamen, die das uebergebene Feld der uebergebenen Tabelle als
-     * Fremdschluessel referenzieren.
+    /**
+     * Liefert alle Tabellennamen, die das uebergebene Feld der uebergebenen Tabelle als Fremdschluessel referenzieren.
      * <br>
      * Bsp.:<br>
-     * ein <CODE>getMasterTables("Url","UrlID")</CODE> koennte als Ergebniss liefern:
-     * <br>
-     * <CODE>"Altlast",""Fluss"</CODE> weil beide Tabellen auf die Tabelle Url
-     * verweisen und dort ihre Beschreibung ablegen
-     * @return alle Tabellennamen, die das uebergebene Feld der uebergebenen Tabelle als
-     * Fremdschluessel referenzieren
-     * @param pureReferencingTabName Tabellenname
-     * @param fieldName Feldname
-     * @throws WrongNameException wird geworfen, wenn der Tabellenname oder Spaltenname nicht stimmt
+     * ein <CODE>getMasterTables("Url","UrlID")</CODE> koennte als Ergebniss liefern:<br>
+     * <CODE>"Altlast",""Fluss"</CODE> weil beide Tabellen auf die Tabelle Url verweisen und dort ihre Beschreibung
+     * ablegen
+     *
+     * @param   tableName  pureReferencingTabName Tabellenname
+     * @param   fieldName  Feldname
+     *
+     * @return  alle Tabellennamen, die das uebergebene Feld der uebergebenen Tabelle als Fremdschluessel referenzieren
+     *
+     * @throws  WrongNameException  wird geworfen, wenn der Tabellenname oder Spaltenname nicht stimmt
      */
     public String[] getMasterTables(final String tableName, final String fieldName) throws WrongNameException {
         final List<FieldDescription> masterTabList = referencesHashMap.get(new FieldDescription(tableName, fieldName));
@@ -1013,33 +1134,29 @@ public final class ImportMetaInfo {
         return arr;
     }
 
-    /** 
-     * Liefert den Feldnamen des Feldes, das auf das
-     * uebergebene Feld der uebergebenen Tabelle referenziert (<B>Fremdschluessel</B>). Zusaetzlich muss noch die
-     * Tabelle angegeben werden. 
-     * Es ist zu beachten, dass ein Feld mehrfach referenziert werden kann. Darum wird mittels eines zirkularen Iterators
-     * immer wieder ueber die alle gefundenen Master-Felder iteriert.
+    /**
+     * Liefert den Feldnamen des Feldes, das auf das uebergebene Feld der uebergebenen Tabelle referenziert
+     * (<B>Fremdschluessel</B>). Zusaetzlich muss noch die Tabelle angegeben werden. Es ist zu beachten, dass ein Feld
+     * mehrfach referenziert werden kann. Darum wird mittels eines zirkularen Iterators immer wieder ueber die alle
+     * gefundenen Master-Felder iteriert.<br>
+     * Bsp.:<br>
+     * erster Schritt:<br>
+     * ein <CODE>getMasterTables("Url","UrlID")</CODE> koennte als Ergebniss liefern:<br>
+     * <CODE>"Altlast",""Fluss"</CODE> weil beide Tabellen auf die Tabelle Url verweisen und dort ihre Beschreibung
+     * ablegen<br>
+     * wenn man nun <CODE>getReferencingField("Url","UrlID","Altlast")</CODE> aufruft, koennte die Methode folgendes
+     * Ergebniss liefern: <CODE>DescrId</CODE>
      *
-     * <br>
-     * Bsp.:
-     * <br>
-     * erster Schritt:
-     * <br>
-     * ein <CODE>getMasterTables("Url","UrlID")</CODE> koennte als Ergebniss liefern:
-     * <br>
-     * <CODE>"Altlast",""Fluss"</CODE> weil beide Tabellen auf die Tabelle Url
-     * verweisen und dort ihre Beschreibung ablegen
-     * <br>
-     * wenn man nun <CODE>getReferencingField("Url","UrlID","Altlast")</CODE> aufruft,
-     * koennte die Methode folgendes Ergebniss liefern:
-     *    <CODE>DescrId</CODE>
-     * @return Fremdschluesselfeldnamen
-     * @param pureReferencingTabName Tabellenname der Detailtabelle
-     * @param fieldName Feldname des Detailschluessels (Primaerschluessel der Detailtabelle)
-     * @param masterTable Tabellenname der Tabelle die auf die Detailtabelle referenziert
-     * @throws WrongNameException wird geworfen, wenn der Tabellenname oder Spaletnname nicht stimmt
+     * @param   tableName    pureReferencingTabName Tabellenname der Detailtabelle
+     * @param   fieldName    Feldname des Detailschluessels (Primaerschluessel der Detailtabelle)
+     * @param   masterTable  Tabellenname der Tabelle die auf die Detailtabelle referenziert
+     *
+     * @return  Fremdschluesselfeldnamen
+     *
+     * @throws  WrongNameException  wird geworfen, wenn der Tabellenname oder Spaletnname nicht stimmt
      */
-    public final String getReferencingField(final String tableName, final String fieldName, final String masterTable) throws WrongNameException {
+    public String getReferencingField(final String tableName, final String fieldName, final String masterTable)
+            throws WrongNameException {
         final FieldDescription detailFieldDescription = new FieldDescription(tableName, fieldName);
         Map<String, ListCirculator<String>> masterTableFieldIterators = referencingFields.get(detailFieldDescription);
         if (masterTableFieldIterators == null) {
@@ -1048,14 +1165,14 @@ public final class ImportMetaInfo {
         }
         ListCirculator<String> circ = masterTableFieldIterators.get(masterTable);
         if (circ != null) {
-            //Zirkularer Iterator gefunden, liefere naechstes Element
+            // Zirkularer Iterator gefunden, liefere naechstes Element
             return circ.next();
         } else {
             final List<FieldDescription> refFields = referencesHashMap.get(detailFieldDescription);
             if (refFields == null) {
                 throw new WrongNameException("Wrong TableName.FieldName: " + tableName + "." + fieldName);
             }
-            //Liste der richtigen Master-Tabellen Felder erstellen
+            // Liste der richtigen Master-Tabellen Felder erstellen
             final List<String> fields = TypeSafeCollections.newArrayList();
             for (int i = 0; i < refFields.size(); ++i) {
                 if (refFields.get(i).getTableName().equals(masterTable)) {
@@ -1065,62 +1182,60 @@ public final class ImportMetaInfo {
             if (fields.isEmpty()) {
                 throw new WrongNameException("Wrong ForeignTableName:" + masterTable);
             }
-            //Neuen zirkularen Iterator für diese Liste anlegen und abspeichern
+            // Neuen zirkularen Iterator für diese Liste anlegen und abspeichern
             circ = new ListCirculator<String>(fields);
             masterTableFieldIterators.put(masterTable, circ);
             return circ.next();
         }
     }
 
-    /** 
-     * Liefert die Nummer des Feldes, das auf das
-     * uebergebene Feld der uebergebenen Tabelle referenziert (<B>Fremdschluessel</B>). Zusaetzlich muss noch die
-     * Tabelle angegeben werden.
+    /**
+     * Liefert die Nummer des Feldes, das auf das uebergebene Feld der uebergebenen Tabelle referenziert
+     * (<B>Fremdschluessel</B>). Zusaetzlich muss noch die Tabelle angegeben werden.<br>
+     * Bsp.:<br>
+     * erster Schritt:<br>
+     * ein <CODE>getForeignTables("Url","UrlID")</CODE> koennte als Ergebniss liefern:<br>
+     * <CODE>"Altlast",""Fluss"</CODE> weil beide Tabellen auf die Tabelle Url verweisen und dort ihre Beschreibung
+     * ablegen<br>
+     * wenn man nun <CODE>getReferencingField("Url","UrlID","Altlast")</CODE> aufruft, koennte die Methode folgendes
+     * Ergebniss liefern: <CODE>DescrId</CODE>
      *
-     *<br>
-     * Bsp.:
-     *<br>
-     * erster Schritt:
-     *<br>
-     * ein <CODE>getForeignTables("Url","UrlID")</CODE> koennte als Ergebniss liefern:
-     *<br>
-     * <CODE>"Altlast",""Fluss"</CODE> weil beide Tabellen auf die Tabelle Url
-     * verweisen und dort ihre Beschreibung ablegen
-     *<br>
-     * wenn man nun <CODE>getReferencingField("Url","UrlID","Altlast")</CODE> aufruft,
-     * koennte die Methode folgendes Ergebniss liefern:
-     *    <CODE>DescrId</CODE>
-     * @return Fremdschluesselfeldnummer
-     * @param pureReferencingTabName Tabellenname der Detailtabelle
-     * @param fieldName Feldname des Detailschluessels (Primaerschlurssel der Detailtabelle)
-     * @param masterTable Tabellenname der Tabelle die auf die Detailtabelle referenziert
-     * @throws WrongNameException wird geworfen, wenn der Tabellenname oder der Spaltenname nicht stimmt
+     * @param   tableName    pureReferencingTabName Tabellenname der Detailtabelle
+     * @param   fieldName    Feldname des Detailschluessels (Primaerschlurssel der Detailtabelle)
+     * @param   masterTable  Tabellenname der Tabelle die auf die Detailtabelle referenziert
+     *
+     * @return  Fremdschluesselfeldnummer
+     *
+     * @throws  WrongNameException  wird geworfen, wenn der Tabellenname oder der Spaltenname nicht stimmt
      */
-    public final int getReferencingFieldNo(final String tableName, final String fieldName, final String masterTable) throws WrongNameException {
+    public int getReferencingFieldNo(final String tableName, final String fieldName, final String masterTable)
+            throws WrongNameException {
         return getPositionInTable(masterTable, getReferencingField(tableName, fieldName, masterTable));
     }
 
-    /** 
-     * Gibt an ob das angegebene Feld der angegebenen Tabelle in einer Reference
-     * verwendet wird.
-     * 
-     * @param pureReferencingTabName Tabellenname
-     * @param fieldName Feldname
-     * @return boolean: <CODE>true</CODE> wenn in Reference vorhanden, <CODE>false</CODE> sonst
+    /**
+     * Gibt an ob das angegebene Feld der angegebenen Tabelle in einer Reference verwendet wird.
+     *
+     * @param   tableName  pureReferencingTabName Tabellenname
+     * @param   fieldName  Feldname
+     *
+     * @return  boolean: <CODE>true</CODE> wenn in Reference vorhanden, <CODE>false</CODE> sonst
      */
-    public final boolean isInRelation(final String tableName, final String fieldName) {
+    public boolean isInRelation(final String tableName, final String fieldName) {
         return referencesHashMap.containsKey(new FieldDescription(tableName, fieldName));
     }
 
     /**
-     * Schaut nach ob wir gemaess Beziehungspfad beim Einfügen der 
-     * DetailTable-Referenzen in die MasterTable an der richtigen Tabelle werkeln
-     * 
-     * @param detailTable
-     * @param foreignTable
-     * @return
+     * Schaut nach ob wir gemaess Beziehungspfad beim Einfügen der DetailTable-Referenzen in die MasterTable an der
+     * richtigen Tabelle werkeln.
+     *
+     * @param   detailTable  DOCUMENT ME!
+     * @param   masterTable  foreignTable
+     * @param   refField     DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    public final boolean isTheRightMasterTable(final String detailTable, final String masterTable, final String refField) {
+    public boolean isTheRightMasterTable(final String detailTable, final String masterTable, final String refField) {
         Map<String, Map<String, Boolean>> masterField = rightMasterTableCache.get(detailTable);
         Map<String, Boolean> fieldBoolean;
         Boolean result;
@@ -1140,7 +1255,6 @@ public final class ImportMetaInfo {
             fieldBoolean = TypeSafeCollections.newHashMap();
             masterField.put(masterTable, fieldBoolean);
             rightMasterTableCache.put(detailTable, masterField);
-
         }
         final int ftIndex = masterTable.lastIndexOf(OPENING_BRACKET);
         if (ftIndex == -1) {
@@ -1153,15 +1267,16 @@ public final class ImportMetaInfo {
     }
 
     /**
-     * Checkt die Reference um festzustellen ob wir gemaess Beziehungspfad beim Einfügen der 
-     * DetailTable-Referenzen in die MasterTable an der richtigen Tabelle werkeln.
-     * 
-     * @param dTab
-     * @param mTab
-     * @param refField
-     * @return
+     * Checkt die Reference um festzustellen ob wir gemaess Beziehungspfad beim Einfügen der DetailTable-Referenzen in
+     * die MasterTable an der richtigen Tabelle werkeln.
+     *
+     * @param   dTab      DOCUMENT ME!
+     * @param   mTab      DOCUMENT ME!
+     * @param   refField  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    private final boolean testDetailMasterRelationship(final String dTab, final String mTab, final String refField) {
+    private boolean testDetailMasterRelationship(final String dTab, final String mTab, final String refField) {
         for (final Reference r : rules.getReferences()) {
             if (r.getReferencedTable().equals(dTab)) {
                 if (r.getReferencedField().equals(refField)) {
@@ -1174,29 +1289,29 @@ public final class ImportMetaInfo {
         return false;
     }
 
-    /** 
-     * Liefert die Feldnummern einer Tabelle,  bei denen in der Importkonfiguration
-     * festgelegt wurde, dass sie AutoInkrement sind.
-     * 
-     * @param pureReferencingTabName Tabellenname
-     * @throws WrongNameException wird geworfen, wenn der Tabellenname nicht stimmt
-     * @return List mit den Feldnummern der AutoInkrementfelder
+    /**
+     * Liefert die Feldnummern einer Tabelle, bei denen in der Importkonfiguration festgelegt wurde, dass sie
+     * AutoInkrement sind.
+     *
+     * @param   tableName  pureReferencingTabName Tabellenname
+     *
+     * @return  List mit den Feldnummern der AutoInkrementfelder
+     *
+     * @throws  WrongNameException  wird geworfen, wenn der Tabellenname nicht stimmt
      */
-    public final List<Integer> getAutoIncFieldNos(String tableName) throws WrongNameException {
+    public List<Integer> getAutoIncFieldNos(String tableName) throws WrongNameException {
         tableName = getPureTabName(tableName);
         return autoIncFieldNos.get(tableName);
     }
 
-    /** 
-     * Gibt die Feldnamen an, die fuer das Vergleichen beim Normalisieren notwendig
-     * sind
-     * 
-     * @param pureReferencingTabName Tabellenname
-     * @throws WrongNameException wird geworfen, wenn der Tabellenname nicht stimmt
-     * @return List mit den Feldnamen, die fuer das Vergleichen beim Normalisieren noptwendig
-     * sind
+    /**
+     * Gibt die Feldnamen an, die fuer das Vergleichen beim Normalisieren notwendig sind.
+     *
+     * @param   tableName  pureReferencingTabName Tabellenname
+     *
+     * @return  List mit den Feldnamen, die fuer das Vergleichen beim Normalisieren noptwendig sind
      */
-    private final String[] getRelevantFieldNamesForComparing(String tableName) {
+    private String[] getRelevantFieldNamesForComparing(String tableName) {
         tableName = getPureTabName(tableName);
         final List<String> compFieldNamesList = compareRelevant.get(tableName);
         if (compFieldNamesList == null) {
@@ -1209,21 +1324,22 @@ public final class ImportMetaInfo {
         return arr;
     }
 
-    /** 
-     * Gibt die Feldnummern an, die fuer das Vergleichen beim Normalisieren notwendig
-     * sind
-     * 
-     * @param pureReferencingTabName Tabellenname
-     * @throws WrongNameException wird geworfen, wenn der Tabellenname nicht stimmt
-     * @return int[] mit den Feldnummern, die fuer das Vergleichen beim Normalisieren noptwendig
-     * sind
+    /**
+     * Gibt die Feldnummern an, die fuer das Vergleichen beim Normalisieren notwendig sind.
+     *
+     * @param   tableName  pureReferencingTabName Tabellenname
+     *
+     * @return  int[] mit den Feldnummern, die fuer das Vergleichen beim Normalisieren noptwendig sind
+     *
+     * @throws  WrongNameException  wird geworfen, wenn der Tabellenname nicht stimmt
      */
-    public final int[] getRelevantFieldNosForComparing(String tableName) throws WrongNameException {
+    public int[] getRelevantFieldNosForComparing(String tableName) throws WrongNameException {
         tableName = getPureTabName(tableName);
         if (normalizeHM.get(tableName) != null) {
             final List<String> compareFieldNamesList = compareRelevant.get(tableName);
             if (compareFieldNamesList == null) {
-                throw new WrongNameException("Activated normalization, but no field(s) for comparison declared:\n" + tableName);
+                throw new WrongNameException("Activated normalization, but no field(s) for comparison declared:\n"
+                            + tableName);
             }
             final int[] arr = new int[compareFieldNamesList.size()];
             for (int i = 0; i < compareFieldNamesList.size(); ++i) {
@@ -1231,31 +1347,31 @@ public final class ImportMetaInfo {
             }
             return arr;
         } else {
-            return new int[]{};
+            return new int[] {};
         }
     }
 
-    /** 
-     * Gibt an ob eine Tabelle normalisiert werden soll, oder nicht. Beim normalisieren
-     * werden doppelte Datensaetze identifiziert und durch Verwendung der
-     * entsprechenden vorhandenen Datensaetze wird Speicherplatz gespart.
-     * <br>
+    /**
+     * Gibt an ob eine Tabelle normalisiert werden soll, oder nicht. Beim normalisieren werden doppelte Datensaetze
+     * identifiziert und durch Verwendung der entsprechenden vorhandenen Datensaetze wird Speicherplatz gespart.<br>
      * (Erklaerung fuer Laien)
-     * @param pureReferencingTabName Tabellenname
-     * @return <CODE>true</CODE> wenn Tabelle normalisiert werden soll, <CODE>false</CODE> sonst
+     *
+     * @param   tableName  pureReferencingTabName Tabellenname
+     *
+     * @return  <CODE>true</CODE> wenn Tabelle normalisiert werden soll, <CODE>false</CODE> sonst
      */
-    public final String getNormalizationType(String tableName) {
+    public String getNormalizationType(String tableName) {
         tableName = getPureTabName(tableName);
         return normalizeHM.get(tableName);
     }
 
     /**
-     * Optimizes normalization by checking if the according tables are ampty first,
-     * switching to memory-only normalization otherwise.
-     * 
-     * @param tc - the target connection
+     * Optimizes normalization by checking if the according tables are ampty first, switching to memory-only
+     * normalization otherwise.
+     *
+     * @param  tc  - the target connection
      */
-    public final void optimizeNormalization(final Connection tc) {
+    public void optimizeNormalization(final Connection tc) {
         try {
             final Statement stmnt = tc.createStatement();
             final List<String> items = TypeSafeCollections.newArrayList(normalizeHM.keySet().size());
@@ -1283,46 +1399,48 @@ public final class ImportMetaInfo {
     }
 
     /**
-     * Returns all Table.Fields as FieldDescriptions, that reference the given Table
+     * Returns all Table.Fields as FieldDescriptions, that reference the given Table.
      *
-     * @param detailTabName
-     * @return
+     * @param   detailFD  detailTabName
+     *
+     * @return  DOCUMENT ME!
      */
-    public final Iterable<FieldDescription> getAllMasterFields(final FieldDescription detailFD) {
+    public Iterable<FieldDescription> getAllMasterFields(final FieldDescription detailFD) {
         final Set<FieldDescription> result = TypeSafeCollections.newHashSet();
         for (final FieldDescription fd : referencesHashMap.keySet()) {
-            if (fd.getTableName().equals(detailFD.getTableName()) || fd.getTableName().startsWith(detailFD.getTableName() + "[")) {
+            if (fd.getTableName().equals(detailFD.getTableName())
+                        || fd.getTableName().startsWith(detailFD.getTableName() + "[")) {
                 result.addAll(referencesHashMap.get(fd));
             }
         }
         return result;
     }
 
-    /** 
-     * Liefert die Schluesselfelder in einer Detail-Tabelle.
-     * <br>
-     * :-( maybe buggy
-     * <br>
-     * z.B.:
-     * <CODE>Url_ID</CODE> in der Tabelle <CODE>Url</CODE>
-     * @return Schluesselfeld in einer Detail-Tabelle
-     * @param detailTable Tabellenname
-     * @throws WrongNameException wird geworfen, wenn der Tabellenname nicht stimmt
+    /**
+     * Liefert die Schluesselfelder in einer Detail-Tabelle.<br>
+     * :-( maybe buggy<br>
+     * z.B.: <CODE>Url_ID</CODE> in der Tabelle <CODE>Url</CODE>
+     *
+     * @param   detailTable  Tabellenname
+     *
+     * @return  Schluesselfeld in einer Detail-Tabelle
      */
-    public final List<String> getDetailKeyFields(final String detailTable) {
+    public List<String> getDetailKeyFields(final String detailTable) {
         return tableIsDetail.get(detailTable);
     }
 
-    /** Liefert die Nummer des Schluesselfeldes in einer Detail-Tabelle.
-     * <br>
+    /**
+     * Liefert die Nummer des Schluesselfeldes in einer Detail-Tabelle.<br>
      * :-( maybe buggy<br>
-     * z.B.:
-     * <CODE>Url_ID</CODE> in der Tabelle <CODE>Url</CODE>
-     * @param detailTable Tabellenname
-     * @throws WrongNameException wird geworfen, wenn der Tabellenname nicht stimmt
-     * @return Schluesselfeldnummer in einer Detail-Tabelle
+     * z.B.: <CODE>Url_ID</CODE> in der Tabelle <CODE>Url</CODE>
+     *
+     * @param   detailTable  Tabellenname
+     *
+     * @return  Schluesselfeldnummer in einer Detail-Tabelle
+     *
+     * @throws  WrongNameException  wird geworfen, wenn der Tabellenname nicht stimmt
      */
-    public final int[] getDetailedKeyFieldNos(final String detailTable) throws WrongNameException {
+    public int[] getDetailedKeyFieldNos(final String detailTable) throws WrongNameException {
         int[] ret = detailKeyFields.get(detailTable);
         if (ret == null) {
             final List<String> fields = getDetailKeyFields(detailTable);
@@ -1338,17 +1456,24 @@ public final class ImportMetaInfo {
     }
 
     /**
-     * Entfernt das []-relationPath aus dem Tabellennamen
+     * Entfernt das []-relationPath aus dem Tabellennamen.
+     *
+     * @param   tabName  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    public final String getPureTabName(final String tabName) {
+    public String getPureTabName(final String tabName) {
         return pureTableNameHash.get(tabName);
     }
 
     /**
-     *Erzeugt aus dem Beziehungspfad das $FROM$-Format zur Verwendung in Variablennamen
+     * Erzeugt aus dem Beziehungspfad das $FROM$-Format zur Verwendung in Variablennamen.
      *
-     **/
-    private final String getBracketAppenderFromPath(String path) {
+     * @param   path  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private String getBracketAppenderFromPath(String path) {
         if (path != null) {
             path = path.trim();
             if (path.length() > 0) {
@@ -1359,11 +1484,13 @@ public final class ImportMetaInfo {
     }
 
     /**
-     * 
-     * @param pureReferencingTabName
-     * @return
+     * DOCUMENT ME!
+     *
+     * @param   tableName  pureReferencingTabName
+     *
+     * @return  DOCUMENT ME!
      */
-    private final List<String> getTablesWithPathFromPureTableName(String tableName) {
+    private List<String> getTablesWithPathFromPureTableName(String tableName) {
         tableName = getPureTabName(tableName);
         return Collections.unmodifiableList(tableToAppropriateTablesWithPaths.get(tableName));
     }

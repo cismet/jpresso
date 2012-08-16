@@ -1,26 +1,42 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.core.kernel;
 
-import de.cismet.jpresso.core.serviceprovider.*;
-import de.cismet.jpresso.core.serviceacceptor.ProgressListener;
-import de.cismet.jpresso.core.serviceprovider.exceptions.InitializingException;
-import de.cismet.jpresso.core.data.DatabaseConnection;
-import de.cismet.jpresso.core.data.SQLRun;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+
 import java.util.Properties;
 
+import de.cismet.jpresso.core.data.DatabaseConnection;
+import de.cismet.jpresso.core.data.SQLRun;
+import de.cismet.jpresso.core.serviceacceptor.ProgressListener;
+import de.cismet.jpresso.core.serviceprovider.*;
+import de.cismet.jpresso.core.serviceprovider.exceptions.InitializingException;
+
 /**
+ * DOCUMENT ME!
  *
- * @author srichter
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public final class SQLScriptExecutorImpl implements SQLScriptExecutionController {
 
+    //~ Static fields/initializers ---------------------------------------------
+
     public static final int MAX_LOG_ERROR = 20;
+
+    //~ Instance fields --------------------------------------------------------
+
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     boolean debug = log.isDebugEnabled();
     private final SQLRun sqlRun;
@@ -31,14 +47,19 @@ public final class SQLScriptExecutorImpl implements SQLScriptExecutionController
     private boolean canceled;
     private String logs = "";
 
+    //~ Constructors -----------------------------------------------------------
+
     /**
-     * 
-     * @param sqlRun
-     * @param clp
-     * @throws de.cismet.jpressocore.exceptions.InitializingException
+     * Creates a new SQLScriptExecutorImpl object.
+     *
+     * @param   sqlRun  DOCUMENT ME!
+     * @param   clp     DOCUMENT ME!
+     *
+     * @throws  InitializingException  de.cismet.jpressocore.exceptions.InitializingException
+     * @throws  NullPointerException   DOCUMENT ME!
      */
     public SQLScriptExecutorImpl(final SQLRun sqlRun, final ClassResourceProvider clp) throws InitializingException {
-        if (sqlRun == null || clp == null) {
+        if ((sqlRun == null) || (clp == null)) {
             throw new NullPointerException();
         }
         this.clp = clp;
@@ -50,11 +71,10 @@ public final class SQLScriptExecutorImpl implements SQLScriptExecutionController
         }
         try {
             final DynamicDriverManager dm = clp.getDriverManager();
-            if (target != null && target.getProps() != null) {
-                if (target.getProps().values() != null && target.getProps().values().size() > 0) {
+            if ((target != null) && (target.getProps() != null)) {
+                if ((target.getProps().values() != null) && (target.getProps().values().size() > 0)) {
                     final Connection c = dm.getConnection(target.getDriverClass(), target.getUrl(), target.getProps());
                     setTargetConn(c);
-
                 } else {
                     final Connection c = dm.getConnection(target.getDriverClass(), target.getUrl(), new Properties());
                     setTargetConn(c);
@@ -66,29 +86,33 @@ public final class SQLScriptExecutorImpl implements SQLScriptExecutionController
             }
         } catch (Exception e) {
             log.error("Error connecting to target database.", e);
-            //TODO PROPER ERROR HANDLING AND LOGGING!!!
-            throw new InitializingException("Error connecting to target database.", "Connection Error", e);//"Fehler beim Verbindungsaufbau zum Script-Target.", initializeLog, e);
-
+            // TODO PROPER ERROR HANDLING AND LOGGING!!!
+            throw new InitializingException("Error connecting to target database.", "Connection Error", e); // "Fehler beim Verbindungsaufbau zum Script-Target.", initializeLog, e);
         }
     }
 
+    //~ Methods ----------------------------------------------------------------
+
     /**
-     * 
-     * @return
-     * @throws de.cismet.jpressocore.exceptions.InitializingException
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
+    @Override
     public long execute() {
         return execute(null);
     }
 
     /**
-     * 
-     * @param progress
-     * @return
-     * @throws de.cismet.jpressocore.exceptions.InitializingException
+     * DOCUMENT ME!
+     *
+     * @param   progress  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
+    @Override
     public long execute(final ProgressListener progress) {
-        boolean showProgress = (progress != null);
+        final boolean showProgress = (progress != null);
         int counter = 0;
         String msg;
         if (showProgress) {
@@ -113,18 +137,21 @@ public final class SQLScriptExecutorImpl implements SQLScriptExecutionController
                 try {
                     getTargetConn().setAutoCommit(false);
                     if (!test) {
-                        msg = "- Autocommit is false. Will try automatic rollback ON ERRORS (useless you explicid call commit in script)!\n";
+                        msg =
+                            "- Autocommit is false. Will try automatic rollback ON ERRORS (useless you explicid call commit in script)!\n";
                         log.info(msg);
                         logs += msg;
                     } else {
-                        msg = "- Test SQL run. Autocommit is false. Will try automatic rollback (useless you explicid call commit in script)!\n";
+                        msg =
+                            "- Test SQL run. Autocommit is false. Will try automatic rollback (useless you explicid call commit in script)!\n";
                         log.info(msg);
                         logs += msg;
                     }
                     for (final String s : sqlRun.getScript()) {
-                        //Cancel procedure
+                        // Cancel procedure
                         if (canceled) {
-                            logs += "\nSQL run canceled at Line " + line + "! Will try to rollback all uncommited Statements!\n";
+                            logs += "\nSQL run canceled at Line " + line
+                                        + "! Will try to rollback all uncommited Statements!\n";
                             getTargetConn().rollback();
                             logs += "Rollback successful. Done. ";
                             return errorCount;
@@ -135,7 +162,9 @@ public final class SQLScriptExecutorImpl implements SQLScriptExecutionController
                             try {
                                 if (debug) {
                                     msg = "Execute line " + line + ": " + s + " @ " + target.getUrl() + "\n";
-                                    log.debug(msg);
+                                    if (log.isDebugEnabled()) {
+                                        log.debug(msg);
+                                    }
                                 }
                                 stmnt.execute(s);
                                 stmnt.close();
@@ -149,7 +178,8 @@ public final class SQLScriptExecutorImpl implements SQLScriptExecutionController
                                 log.error("Error in line " + line + ":" + stmnt + ": " + ex);
 
                                 if (logErrorCounter < MAX_LOG_ERROR) {
-                                    logs += "    Script erros in line " + line + ", statement: " + s + " (" + ex.toString() + ")\n";
+                                    logs += "    Script erros in line " + line + ", statement: " + s + " ("
+                                                + ex.toString() + ")\n";
                                 } else if (logErrorCounter == MAX_LOG_ERROR) {
                                     logs += "    ************** more errors (output stopped)\n";
                                 }
@@ -162,16 +192,17 @@ public final class SQLScriptExecutorImpl implements SQLScriptExecutionController
                     }
                 } catch (SQLException ex) {
                     log.error("SQL Exception during Script Execution", ex);
-                //ex.printStackTrace();
+                    // ex.printStackTrace();
                 }
-                if (errorCount > 0 || test) {
+                if ((errorCount > 0) || test) {
                     try {
                         if (!test) {
                             msg = "\nScript error --> Rollback\n";
                             log.info(msg);
                             logs += msg;
                         } else {
-                            msg = "\n- Test executed with " + errorCount + " errors --> Rollback of all uncommited statements\n";
+                            msg = "\n- Test executed with " + errorCount
+                                        + " errors --> Rollback of all uncommited statements\n";
                             log.info(msg);
                             logs += msg;
                         }
@@ -215,52 +246,62 @@ public final class SQLScriptExecutorImpl implements SQLScriptExecutionController
     }
 
     /**
-     * 
-     * @return the logs
+     * DOCUMENT ME!
+     *
+     * @return  the logs
      */
+    @Override
     public String getLogs() {
         return logs;
     }
 
     /**
-     * 
-     * @return
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
+    @Override
     public Connection getTargetConn() {
         return targetConn;
     }
 
     /**
-     * 
-     * @param test
+     * DOCUMENT ME!
+     *
+     * @param  test  DOCUMENT ME!
      */
+    @Override
     public void setTest(final boolean test) {
         this.test = test;
     }
 
     /**
-     * 
-     * @param targetConn
+     * DOCUMENT ME!
+     *
+     * @param  targetConn  DOCUMENT ME!
      */
+    @Override
     public void setTargetConn(final Connection targetConn) {
         this.targetConn = targetConn;
     }
 
     /**
-     * 
-     * @return
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
+    @Override
     public boolean isCanceled() {
         return canceled;
     }
 
     /**
-     * 
-     * @param canceled
+     * DOCUMENT ME!
+     *
+     * @param  canceled  DOCUMENT ME!
      */
+    @Override
     public void setCanceled(final boolean canceled) {
         this.canceled = canceled;
     }
 }
-          
-

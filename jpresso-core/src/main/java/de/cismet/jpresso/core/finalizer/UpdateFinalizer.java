@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * JDBCImportExecutor.java
  *
@@ -5,30 +12,40 @@
  */
 package de.cismet.jpresso.core.finalizer;
 
-import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
-import de.cismet.jpresso.core.exceptions.WrongNameException;
-import de.cismet.jpresso.core.kernel.Finalizer;
-import de.cismet.jpresso.core.kernel.IntermedTable;
-import de.cismet.jpresso.core.serviceprovider.exceptions.FinalizerException;
-import de.cismet.jpresso.core.utils.TypeSafeCollections;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import de.cismet.jpresso.core.exceptions.WrongNameException;
+import de.cismet.jpresso.core.kernel.Finalizer;
+import de.cismet.jpresso.core.kernel.IntermedTable;
+import de.cismet.jpresso.core.serviceprovider.exceptions.FinalizerException;
+import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
+import de.cismet.jpresso.core.utils.TypeSafeCollections;
+
 /**
- * @author  srichter
+ * DOCUMENT ME!
+ *
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public final class UpdateFinalizer extends Finalizer {
 
-    /** Logger */
+    //~ Static fields/initializers ---------------------------------------------
+
+    /** Logger. */
     private static final String KOMMA_SPACE = ", ";
     private static final String SPACE_AND_SPACE = " AND ";
+    public static final int MAX_LOG_ERROR = 20;
+
+    //~ Instance fields --------------------------------------------------------
+
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private boolean debug = log.isDebugEnabled();
-    public static final int MAX_LOG_ERROR = 20;
     /** Holds value of property rollback. */
     private final StringBuilder buff = new StringBuilder();
     private final Map<String, int[]> whereMap;
@@ -36,37 +53,68 @@ public final class UpdateFinalizer extends Finalizer {
     private boolean rb = true;
     private boolean force = false;
 
-    /** Creates a new instance of ABFImporter */
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new instance of ABFImporter.
+     */
     public UpdateFinalizer() {
         this.whereMap = TypeSafeCollections.newHashMap();
     }
 
-    public void setTableCompareFields(String in) {
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  in  DOCUMENT ME!
+     */
+    public void setTableCompareFields(final String in) {
         if (in != null) {
             tableCompareString = in.split("&&");
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   param  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  IllegalArgumentException  DOCUMENT ME!
+     */
     private boolean evalString(final String param) {
         if (param.equalsIgnoreCase("true")) {
             return true;
         } else if (param.equalsIgnoreCase("false")) {
             return false;
         } else {
-            throw new IllegalArgumentException("Illegal Rollback argument. Found " + param + "! Please provide 'true' or 'false'!");
+            throw new IllegalArgumentException("Illegal Rollback argument. Found " + param
+                        + "! Please provide 'true' or 'false'!");
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   in  DOCUMENT ME!
+     *
+     * @throws  JPressoException  DOCUMENT ME!
+     */
     public void setForceWrite(final String in) throws JPressoException {
         force = evalString(in);
     }
 
-    /** Setter for property param.
-     * @param param New value of property param.
+    /**
+     * Setter for property param.
      *
+     * @param  rollback  param New value of property param.
      */
     public void setRollback(final String rollback) {
-        log.debug("Rollback got: " + rollback);
+        if (log.isDebugEnabled()) {
+            log.debug("Rollback got: " + rollback);
+        }
         if (evalString(rollback)) {
             log.info("Rollback was set true. The transcation will be rolled back!");
             rb = true;
@@ -75,19 +123,30 @@ public final class UpdateFinalizer extends Finalizer {
         }
     }
 
-    /** 
+    /**
      * The method that actually performs all the writing to DB.
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception                 DOCUMENT ME!
+     * @throws  FinalizerException        DOCUMENT ME!
+     * @throws  IllegalArgumentException  DOCUMENT ME!
+     * @throws  WrongNameException        DOCUMENT ME!
      */
     @Override
     public long finalise() throws Exception {
         if (tableCompareString == null) {
-            throw new FinalizerException("Missing TableCompareFields arguments.\nSyntax: TableCompareFields=TABLENAME1:FIELD1[, FIELD2, ...] [&& TABLENAME2:FIELD1[, FIELD2, ...]]");
+            throw new FinalizerException(
+                "Missing TableCompareFields arguments.\nSyntax: TableCompareFields=TABLENAME1:FIELD1[, FIELD2, ...] [&& TABLENAME2:FIELD1[, FIELD2, ...]]");
         }
-        log.debug("finalise");
+        if (log.isDebugEnabled()) {
+            log.debug("finalise");
+        }
         for (final String in : tableCompareString) {
             final String[] sA = in.trim().split(":");
             if (sA.length != 2) {
-                throw new IllegalArgumentException("Illegal TableCompareFields arguments: " + in + ".\nSyntax: TableCompareFields=TABLENAME1:FIELD1[, FIELD2, ...] [&& TABLENAME2:FIELD1[, FIELD2, ...]]");
+                throw new IllegalArgumentException("Illegal TableCompareFields arguments: " + in
+                            + ".\nSyntax: TableCompareFields=TABLENAME1:FIELD1[, FIELD2, ...] [&& TABLENAME2:FIELD1[, FIELD2, ...]]");
             }
             final IntermedTable itab = getIntermedTables().getIntermedTable(sA[0].trim());
             if (itab == null) {
@@ -96,13 +155,14 @@ public final class UpdateFinalizer extends Finalizer {
             final String[] tA = sA[1].split(",");
             final int[] iA = new int[tA.length];
             if (tA.length < 1) {
-                throw new IllegalArgumentException("Illegal TableCompareFields arguments: " + in + ".\nSyntax: TableCompareFields=TABLENAME1:FIELD1[, FIELD2, ...] [&& TABLENAME2:FIELD1[, FIELD2, ...]]");
+                throw new IllegalArgumentException("Illegal TableCompareFields arguments: " + in
+                            + ".\nSyntax: TableCompareFields=TABLENAME1:FIELD1[, FIELD2, ...] [&& TABLENAME2:FIELD1[, FIELD2, ...]]");
             }
             int i = 0;
             for (final String s : tA) {
                 iA[i++] = itab.getColumnNumber(s.trim());
             }
-            //irgendwas in den hash
+            // irgendwas in den hash
             whereMap.put(itab.getTableName(), iA);
         }
         long errorCounter = 0;
@@ -114,21 +174,23 @@ public final class UpdateFinalizer extends Finalizer {
             final int tableRowCount = itab.getRowCount();
             System.out.println("finalizing ---> " + tableName);
             if (debug) {
-                String debugString = "Update for table: " + tableName + " (" + tableRowCount + " rows)\n";
-                log.debug(debugString);
+                final String debugString = "Update for table: " + tableName + " (" + tableRowCount + " rows)\n";
+                if (log.isDebugEnabled()) {
+                    log.debug(debugString);
+                }
             }
             buff.append("\n" + "Update for table: " + tableName + " (" + tableRowCount + " rows)\n");
 
             int logErrorCounter = 0;
 
-            //Statement s = conn.createStatement();
+            // Statement s = conn.createStatement();
             final int[] where = whereMap.get(itab.getTableName());
             Arrays.sort(where);
-            if (where == null || where.length < 1) {
+            if ((where == null) || (where.length < 1)) {
                 continue;
             }
             for (int j = 0; j < tableRowCount; ++j) {
-                //TODO processCancelCommand handling in superclass
+                // TODO processCancelCommand handling in superclass
                 if (isCanceled()) {
                     conn.rollback();
                     log.info("cancel -> rollback");
@@ -140,7 +202,9 @@ public final class UpdateFinalizer extends Finalizer {
                 stmnt = createUpdateStatement(itab, j, where);
 
                 if (debug) {
-                    log.debug("Statement: " + stmnt);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Statement: " + stmnt);
+                    }
                 }
                 final Statement s = conn.createStatement();
                 try {
@@ -152,9 +216,11 @@ public final class UpdateFinalizer extends Finalizer {
                     ++logErrorCounter;
                     final String msg = "Error at:" + stmnt + ": " + ex;
                     log.error(msg);
-                    log.debug(msg + stmnt, ex);
+                    if (log.isDebugEnabled()) {
+                        log.debug(msg + stmnt, ex);
+                    }
                     setProgressValue(tableName, j + 1, logErrorCounter);
-                    //switch to rollback as error occured
+                    // switch to rollback as error occured
                     rb = true;
                     if (logErrorCounter < MAX_LOG_ERROR) {
                         logs += "    Updates error @ statement:" + stmnt + "\n" + ex.toString() + "\n";
@@ -170,12 +236,13 @@ public final class UpdateFinalizer extends Finalizer {
             } else {
                 conn.commit();
             }
-        //.execute("ROLLBACK");
+            // .execute("ROLLBACK");
         } catch (SQLException ex) {
-
             final String msg = "Error on: ROLLBACK: " + ex;
             log.error(msg);
-            log.debug(msg);
+            if (log.isDebugEnabled()) {
+                log.debug(msg);
+            }
             logs += "    Updates error .. rollback statement\n" + ex.toString() + "\n";
 //            System.out.println("done.");
         }
@@ -194,11 +261,35 @@ public final class UpdateFinalizer extends Finalizer {
 //    public static String KOMMA =;
 //    public static String WHERE =;
 
-    protected String createUpdateStatement(final IntermedTable itab, final int i, final int[] where) throws JPressoException {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   itab   DOCUMENT ME!
+     * @param   i      DOCUMENT ME!
+     * @param   where  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  JPressoException  DOCUMENT ME!
+     */
+    protected String createUpdateStatement(final IntermedTable itab, final int i, final int[] where)
+            throws JPressoException {
         return "UPDATE " + itab.getTableName() + generateSetPart(itab, i, where);
     }
 
-    protected String generateSetPart(final IntermedTable itab, int pos, int[] where) throws JPressoException {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   itab   DOCUMENT ME!
+     * @param   pos    DOCUMENT ME!
+     * @param   where  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  JPressoException  DOCUMENT ME!
+     */
+    protected String generateSetPart(final IntermedTable itab, final int pos, final int[] where)
+            throws JPressoException {
         final int columnCount = itab.getColumnCount();
         final StringBuilder sb = new StringBuilder(" SET ");
         final List<String> values = itab.getValueListWithGivenEnclosingChar(pos);
@@ -221,7 +312,7 @@ public final class UpdateFinalizer extends Finalizer {
             sb.setLength(sb.length() - KOMMA_SPACE.length());
         }
         sb.append(" WHERE ");
-        for (int i : where) {
+        for (final int i : where) {
             String comparator;
             final String val = values.get(i);
             if (!val.equalsIgnoreCase("null")) {

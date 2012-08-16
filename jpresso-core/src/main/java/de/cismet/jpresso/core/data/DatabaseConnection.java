@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -5,41 +12,56 @@
 package de.cismet.jpresso.core.data;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import java.util.Properties;
 
 /**
+ * DOCUMENT ME!
  *
- * @author srichter
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 @XStreamAlias("Connection")
 public final class DatabaseConnection implements JPLoadable {
 
-    // <editor-fold defaultstate="collapsed" desc="Constructors">
-    public DatabaseConnection(String driverClass, String url, Properties props) {
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * <editor-fold defaultstate="collapsed" desc="Constructors">.
+     *
+     * @param  driverClass  DOCUMENT ME!
+     * @param  url          DOCUMENT ME!
+     * @param  props        DOCUMENT ME!
+     */
+    public DatabaseConnection(final String driverClass, final String url, final Properties props) {
         this.driverClass = driverClass;
         this.url = url;
         this.props = props;
     }
 
+    /**
+     * Creates a new DatabaseConnection object.
+     */
     public DatabaseConnection() {
         props = new Properties();
     }
     // </editor-fold>
-    //private transient DatabaseConnection connection; + getConnection baut verbindung auf?
-    @XStreamAlias("DriverClass")
-    private String driverClass = "";
-    @XStreamAlias("URL")
-    private String url = "";
-    @XStreamAlias("ConnectionProperties")
-    private Properties props;
 
-
-    // <editor-fold defaultstate="collapsed" desc="Setters & Getters">
+    /**
+     * <editor-fold defaultstate="collapsed" desc="Setters & Getters">.
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getDriverClass() {
         return driverClass;
     }
 
-    public void setDriverClass(String driverClass) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  driverClass  DOCUMENT ME!
+     */
+    public void setDriverClass(final String driverClass) {
         if (driverClass != null) {
             this.driverClass = driverClass;
         } else {
@@ -47,11 +69,21 @@ public final class DatabaseConnection implements JPLoadable {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getUrl() {
         return url;
     }
 
-    public void setUrl(String url) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  url  DOCUMENT ME!
+     */
+    public void setUrl(final String url) {
         if (url != null) {
             this.url = url;
         } else {
@@ -59,11 +91,21 @@ public final class DatabaseConnection implements JPLoadable {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Properties getProps() {
         return props;
     }
 
-    public void setProps(Properties props) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  props  DOCUMENT ME!
+     */
+    public void setProps(final Properties props) {
         if (props != null) {
             this.props = props;
         } else {
@@ -72,6 +114,25 @@ public final class DatabaseConnection implements JPLoadable {
     }
 // </editor-fold>
 
+    //~ Instance fields --------------------------------------------------------
+
+    // private transient DatabaseConnection connection; + getConnection baut verbindung auf?
+    @XStreamAlias("DriverClass")
+    private String driverClass = "";
+    @XStreamAlias("URL")
+    private String url = "";
+    @XStreamAlias("ConnectionProperties")
+    private Properties props;
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   other  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public boolean weakEquals(final DatabaseConnection other) {
         if (other == null) {
             return false;
@@ -82,6 +143,13 @@ public final class DatabaseConnection implements JPLoadable {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   other  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public boolean deepEquals(final DatabaseConnection other) {
         if (other == null) {
             return false;

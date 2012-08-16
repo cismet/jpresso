@@ -1,18 +1,16 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.project.filetypes.refactoring;
 
-import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
-import de.cismet.jpresso.project.filetypes.connection.ConnectionDataNode;
-import de.cismet.jpresso.project.filetypes.query.QueryDataNode;
-import de.cismet.jpresso.project.filetypes.query.QueryDataObject;
-import de.cismet.jpresso.project.filetypes.run.RunDataObject;
-import de.cismet.jpresso.project.filetypes.sql.SQLDataObject;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.filesystems.FileObject;
@@ -21,16 +19,31 @@ import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
 
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import de.cismet.jpresso.core.serviceprovider.JPressoFileManager;
+
+import de.cismet.jpresso.project.filetypes.connection.ConnectionDataNode;
+import de.cismet.jpresso.project.filetypes.query.QueryDataNode;
+import de.cismet.jpresso.project.filetypes.query.QueryDataObject;
+import de.cismet.jpresso.project.filetypes.run.RunDataObject;
+import de.cismet.jpresso.project.filetypes.sql.SQLDataObject;
+
 /**
+ * DOCUMENT ME!
  *
- * @author srichter
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public class RefactoringEngine {
 
 //    private static List<DataObject> rollback = new ArrayList<DataObject>();
 //
 //    /**
-//     * Refactor project files using the renamed connection. 
+//     * Refactor project files using the renamed connection.
 //     * @param cNode
 //     * @param oldfilename
 //     * @param newfilename

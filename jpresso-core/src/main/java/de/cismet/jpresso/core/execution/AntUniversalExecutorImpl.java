@@ -1,41 +1,52 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.jpresso.core.execution;
 
-import de.cismet.jpresso.core.data.DatabaseConnection;
-import de.cismet.jpresso.core.serviceprovider.AntUniversalExecutor;
-import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
-import de.cismet.jpresso.core.serviceprovider.exceptions.FinalizerException;
-import de.cismet.jpresso.core.kernel.ImportFinalizer;
-import de.cismet.jpresso.core.kernel.Importer;
-import de.cismet.jpresso.core.serviceprovider.exceptions.InitializingException;
-import de.cismet.jpresso.core.kernel.SQLScriptExecutorImpl;
-import de.cismet.jpresso.core.data.ImportRules;
-import de.cismet.jpresso.core.data.JPLoadable;
-import de.cismet.jpresso.core.data.SQLRun;
-
-import de.cismet.jpresso.core.serviceprovider.ClassResourceProvider;
-import de.cismet.jpresso.core.serviceprovider.ClassResourceProviderFactory;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.cismet.jpresso.core.data.DatabaseConnection;
+import de.cismet.jpresso.core.data.ImportRules;
+import de.cismet.jpresso.core.data.JPLoadable;
+import de.cismet.jpresso.core.data.SQLRun;
+import de.cismet.jpresso.core.kernel.ImportFinalizer;
+import de.cismet.jpresso.core.kernel.Importer;
+import de.cismet.jpresso.core.kernel.SQLScriptExecutorImpl;
+import de.cismet.jpresso.core.serviceprovider.AntUniversalExecutor;
+import de.cismet.jpresso.core.serviceprovider.ClassResourceProvider;
+import de.cismet.jpresso.core.serviceprovider.ClassResourceProviderFactory;
+import de.cismet.jpresso.core.serviceprovider.exceptions.FinalizerException;
+import de.cismet.jpresso.core.serviceprovider.exceptions.InitializingException;
+import de.cismet.jpresso.core.serviceprovider.exceptions.JPressoException;
+
 /**
- *  Facade that executes imports and sql scripts, returns errorcount and connections.
- *  Used in the Ant Tasks.
+ * Facade that executes imports and sql scripts, returns errorcount and connections. Used in the Ant Tasks.
  *
- * @author srichter
+ * @author   srichter
+ * @version  $Revision$, $Date$
  */
 public final class AntUniversalExecutorImpl implements AntUniversalExecutor {
+
+    //~ Instance fields --------------------------------------------------------
 
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private final String projDir;
@@ -47,9 +58,14 @@ public final class AntUniversalExecutorImpl implements AntUniversalExecutor {
     private boolean canCloseCurrentSource;
     private boolean canCloseCurrentTarget;
 
+    //~ Constructors -----------------------------------------------------------
+
     /**
+     * Creates a new AntUniversalExecutorImpl object.
      *
-     * @param projDir
+     * @param   projDir  DOCUMENT ME!
+     *
+     * @throws  NullPointerException  DOCUMENT ME!
      */
     public AntUniversalExecutorImpl(final String projDir) {
         if (projDir == null) {
@@ -65,24 +81,29 @@ public final class AntUniversalExecutorImpl implements AntUniversalExecutor {
         canCloseCurrentTarget = true;
     }
 
+    //~ Methods ----------------------------------------------------------------
+
     /**
-     * Close the current target- and sourceconnection if they were not
-     * retrieved by calling getXXXConnection().
+     * Close the current target- and sourceconnection if they were not retrieved by calling getXXXConnection().
      */
     private void processClosingPreviouseConnections() {
         String msg = "closing source";
-        if (canCloseCurrentSource && latestSourceCon != null) {
+        if (canCloseCurrentSource && (latestSourceCon != null)) {
             try {
-                log.debug(msg);
+                if (log.isDebugEnabled()) {
+                    log.debug(msg);
+                }
                 latestSourceCon.close();
             } catch (SQLException ex) {
                 log.error("Can not close source", ex);
             }
         }
-        if (canCloseCurrentTarget && latestTargetCon != null) {
+        if (canCloseCurrentTarget && (latestTargetCon != null)) {
             msg = "closing target";
             try {
-                log.debug(msg);
+                if (log.isDebugEnabled()) {
+                    log.debug(msg);
+                }
                 latestTargetCon.close();
             } catch (SQLException ex) {
                 log.error("Can not close target", ex);
@@ -93,23 +114,22 @@ public final class AntUniversalExecutorImpl implements AntUniversalExecutor {
     }
 
     /**
+     * DOCUMENT ME!
      *
-     * @param names
-     * @return
-     * @throws de.cismet.jpressocore.kernel.InitializingException
-     * @throws de.cismet.jpressocore.kernel.FinalizerException
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
-     * @throws de.cismet.jpressocore.kernel.JPressoException
+     * @param   names  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  JPressoException  de.cismet.jpressocore.kernel.InitializingException
      */
     @Override
-    public final long test(final String... names) throws JPressoException {
+    public long test(final String... names) throws JPressoException {
         long errorCountSum = 0;
         for (final String s : names) {
             String msg = "\nStart Testing: " + s;
             log.info(msg);
             System.out.println(msg);
-            long currentErrors;
+            final long currentErrors;
             try {
                 currentErrors = execute(s, true);
             } catch (Exception ex) {
@@ -125,23 +145,22 @@ public final class AntUniversalExecutorImpl implements AntUniversalExecutor {
     }
 
     /**
+     * DOCUMENT ME!
      *
-     * @param names
-     * @return
-     * @throws de.cismet.jpressocore.kernel.InitializingException
-     * @throws de.cismet.jpressocore.kernel.FinalizerException
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
-     * @throws de.cismet.jpressocore.kernel.JPressoException
+     * @param   names  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  JPressoException  de.cismet.jpressocore.kernel.InitializingException
      */
     @Override
-    public final long execute(final String... names) throws JPressoException {
+    public long execute(final String... names) throws JPressoException {
         long errorCountSum = 0;
         for (final String s : names) {
             String msg = "\nStart Executing: " + s;
             log.info(msg);
             System.out.println(msg);
-            long currentErrors;
+            final long currentErrors;
             try {
                 currentErrors = execute(s, false);
             } catch (Exception ex) {
@@ -156,11 +175,11 @@ public final class AntUniversalExecutorImpl implements AntUniversalExecutor {
     }
 
     @Override
-    public final Connection openConnection(final String name) throws JPressoException {
+    public Connection openConnection(final String name) throws JPressoException {
         try {
             final JPLoadable obj = loader.load(name);
             if (obj instanceof DatabaseConnection) {
-                final DatabaseConnection dbc = (DatabaseConnection) obj;
+                final DatabaseConnection dbc = (DatabaseConnection)obj;
                 return clp.getDriverManager().getConnection(dbc.getDriverClass(), dbc.getUrl(), dbc.getProps());
             }
         } catch (Exception e) {
@@ -170,7 +189,7 @@ public final class AntUniversalExecutorImpl implements AntUniversalExecutor {
     }
 
     @Override
-    public JPLoadable openJPressoFile(String name) throws IOException {
+    public JPLoadable openJPressoFile(final String name) throws IOException {
         JPLoadable exec = cache.get(name);
         if (exec == null) {
             exec = loader.load(name);
@@ -179,10 +198,11 @@ public final class AntUniversalExecutorImpl implements AntUniversalExecutor {
         return exec;
     }
 
-    public final long execute(final JPLoadable exec, final boolean testOnly) throws JPressoException {
+    @Override
+    public long execute(final JPLoadable exec, final boolean testOnly) throws JPressoException {
         long errorCount;
         if (exec instanceof ImportRules) {
-            final ImportRules impRules = (ImportRules) exec;
+            final ImportRules impRules = (ImportRules)exec;
 //            impRules.setFileName(name.substring(0, name.length() - 4));
 //            final ClassResourceProvider clp = ClassResourceProviderFactory.createClassRessourceProvider(new File(getProjDir()));
             final Importer importer = new Importer(impRules, clp);
@@ -191,14 +211,16 @@ public final class AntUniversalExecutorImpl implements AntUniversalExecutor {
             log.info(msg);
             System.out.println(msg);
             importer.runImport();
-            msg = "- Writing to Database, using Finalizer:" + impRules.getRuntimeProperties().getFinalizerClass() + " ...";
+            msg = "- Writing to Database, using Finalizer:" + impRules.getRuntimeProperties().getFinalizerClass()
+                        + " ...";
             log.info(msg);
             System.out.println(msg);
             final String rb = impRules.getRuntimeProperties().getFinalizerProperties().getProperty("Rollback");
-            if (rb != null && testOnly != rb.equals("true")) {
-                msg = "! WARNING: This import run is executed with ROLLBACK = " + testOnly + "! RuntimeProperties are overridden!";
+            if ((rb != null) && (testOnly != rb.equals("true"))) {
+                msg = "! WARNING: This import run is executed with ROLLBACK = " + testOnly
+                            + "! RuntimeProperties are overridden!";
                 log.warn(msg);
-                StringBuffer marker = new StringBuffer();
+                final StringBuffer marker = new StringBuffer();
                 for (int i = 0; i < msg.length(); i++) {
                     marker.append("!");
                 }
@@ -211,13 +233,15 @@ public final class AntUniversalExecutorImpl implements AntUniversalExecutor {
             } else {
                 impRules.getRuntimeProperties().getFinalizerProperties().setProperty("Rollback", "false");
             }
-            final ImportFinalizer finalizer = new ImportFinalizer(impRules.getRuntimeProperties().getFinalizerClass(), importer.getIntermedTablesContainer(), impRules.getRuntimeProperties().getFinalizerProperties());
+            final ImportFinalizer finalizer = new ImportFinalizer(impRules.getRuntimeProperties().getFinalizerClass(),
+                    importer.getIntermedTablesContainer(),
+                    impRules.getRuntimeProperties().getFinalizerProperties());
             errorCount = finalizer.finalise();
             setLatestSourceCon(importer.getSourceConn());
             setLatestTargetCon(importer.getTargetConn());
             return errorCount;
         } else if (exec instanceof SQLRun) {
-            final SQLRun sqlRun = (SQLRun) exec;
+            final SQLRun sqlRun = (SQLRun)exec;
 //            final ClassResourceProvider clp = ClassResourceProviderFactory.createClassRessourceProvider((new File(getProjDir())));
             final SQLScriptExecutorImpl sqlexec = new SQLScriptExecutorImpl(sqlRun, clp);
             sqlexec.setTest(testOnly);
@@ -231,28 +255,37 @@ public final class AntUniversalExecutorImpl implements AntUniversalExecutor {
     }
 
     /**
+     * DOCUMENT ME!
      *
-     * @param name
-     * @param testOnly
-     * @return
-     * @throws de.cismet.jpressocore.kernel.InitializingException
-     * @throws de.cismet.jpressocore.kernel.FinalizerException
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
-     * @throws de.cismet.jpressocore.kernel.JPressoException
+     * @param   name      DOCUMENT ME!
+     * @param   testOnly  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  InitializingException     de.cismet.jpressocore.kernel.InitializingException
+     * @throws  FinalizerException        de.cismet.jpressocore.kernel.FinalizerException
+     * @throws  FileNotFoundException     DOCUMENT ME!
+     * @throws  IOException               DOCUMENT ME!
+     * @throws  JPressoException          de.cismet.jpressocore.kernel.JPressoException
+     * @throws  IllegalArgumentException  DOCUMENT ME!
      */
-    private final long execute(final String name, final boolean testOnly) throws InitializingException, FinalizerException, FileNotFoundException, IOException, JPressoException {
-        if (name == null || name.length() < 5) {
+    private long execute(final String name, final boolean testOnly) throws InitializingException,
+        FinalizerException,
+        FileNotFoundException,
+        IOException,
+        JPressoException {
+        if ((name == null) || (name.length() < 5)) {
             throw new IllegalArgumentException("Illegal filename argument on AntUniversalExecutor.");
         }
         processClosingPreviouseConnections();
-        JPLoadable exec = openJPressoFile(name);
+        final JPLoadable exec = openJPressoFile(name);
         return execute(exec, testOnly);
     }
 
     /**
+     * DOCUMENT ME!
      *
-     * @return
+     * @return  DOCUMENT ME!
      */
     @Override
     public Connection getLatestSourceCon() {
@@ -261,17 +294,19 @@ public final class AntUniversalExecutorImpl implements AntUniversalExecutor {
     }
 
     /**
+     * DOCUMENT ME!
      *
-     * @param source
+     * @param  source  DOCUMENT ME!
      */
-    private void setLatestSourceCon(Connection source) {
+    private void setLatestSourceCon(final Connection source) {
         canCloseCurrentSource = true;
         this.latestSourceCon = source;
     }
 
     /**
+     * DOCUMENT ME!
      *
-     * @return
+     * @return  DOCUMENT ME!
      */
     @Override
     public Connection getLatestTargetCon() {
@@ -280,17 +315,19 @@ public final class AntUniversalExecutorImpl implements AntUniversalExecutor {
     }
 
     /**
+     * DOCUMENT ME!
      *
-     * @param target
+     * @param  target  DOCUMENT ME!
      */
-    private void setLatestTargetCon(Connection target) {
+    private void setLatestTargetCon(final Connection target) {
         canCloseCurrentTarget = true;
         this.latestTargetCon = target;
     }
 
     /**
+     * DOCUMENT ME!
      *
-     * @throws java.lang.Throwable
+     * @throws  Throwable  java.lang.Throwable
      */
     @Override
     protected void finalize() throws Throwable {
@@ -299,8 +336,9 @@ public final class AntUniversalExecutorImpl implements AntUniversalExecutor {
     }
 
     /**
+     * DOCUMENT ME!
      *
-     * @return
+     * @return  DOCUMENT ME!
      */
     @Override
     public String getProjDir() {
@@ -313,50 +351,52 @@ public final class AntUniversalExecutorImpl implements AntUniversalExecutor {
     }
 
     @Override
-    public int startExternalCommand(final Map<String, String> env, final File cwd, final String... command) throws JPressoException {
+    public int startExternalCommand(final Map<String, String> env, final File cwd, final String... command)
+            throws JPressoException {
         ProcessBuilder pcb = new ProcessBuilder(command).redirectErrorStream(false);
-        if (cwd != null && cwd.isDirectory()) {
+        if ((cwd != null) && cwd.isDirectory()) {
             pcb = pcb.directory(cwd);
         }
-        if (env != null && !env.isEmpty()) {
+        if ((env != null) && !env.isEmpty()) {
             final Map<String, String> environment = pcb.environment();
             environment.putAll(env);
         }
 
         try {
             log.info("Starting external command(s): " + Arrays.deepToString(command));
-            Process proc = pcb.start();
+            final Process proc = pcb.start();
             final BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
             final BufferedReader errInput = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
             final Thread stdOutConsumer = new Thread() {
 
-                @Override
-                public void run() {
-                    String msg;
-                    try {
-                        while ((msg = stdInput.readLine()) != null) {
-                            System.out.println(msg);
+                    @Override
+                    public void run() {
+                        String msg;
+                        try {
+                            while ((msg = stdInput.readLine()) != null) {
+                                System.out.println(msg);
+                            }
+                        } catch (IOException ex) {
                         }
-                    } catch (IOException ex) {
                     }
-                }
-            };
+                };
+
             final Thread stdErrConsumer = new Thread() {
 
-                @Override
-                public void run() {
-                    String msg;
-                    try {
-                        while ((msg = errInput.readLine()) != null) {
-                            System.out.println(msg);
+                    @Override
+                    public void run() {
+                        String msg;
+                        try {
+                            while ((msg = errInput.readLine()) != null) {
+                                System.out.println(msg);
+                            }
+                        } catch (IOException ex) {
                         }
-                    } catch (IOException ex) {
                     }
-                }
-            };
+                };
             stdOutConsumer.start();
             stdErrConsumer.start();
-            int exitCode = proc.waitFor();
+            final int exitCode = proc.waitFor();
             // read the output from the command
 
             return exitCode;

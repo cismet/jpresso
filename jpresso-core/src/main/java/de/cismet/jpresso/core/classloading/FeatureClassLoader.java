@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -6,24 +13,44 @@ package de.cismet.jpresso.core.classloading;
 
 import java.net.URL;
 import java.net.URLClassLoader;
+
 import java.util.regex.Pattern;
 
 /**
+ * DOCUMENT ME!
  *
- * @author stefan
+ * @author   stefan
+ * @version  $Revision$, $Date$
  */
 public class FeatureClassLoader extends URLClassLoader {
+
+    //~ Instance fields --------------------------------------------------------
 
     private final Pattern filter;
     private final boolean parentFirstDelegation;
 
-    public FeatureClassLoader(final URL[] urls, final ClassLoader parent, final boolean parentFirstDelegation, final String delegationFilterRegex) {
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new FeatureClassLoader object.
+     *
+     * @param   urls                   DOCUMENT ME!
+     * @param   parent                 DOCUMENT ME!
+     * @param   parentFirstDelegation  DOCUMENT ME!
+     * @param   delegationFilterRegex  DOCUMENT ME!
+     *
+     * @throws  IllegalArgumentException  DOCUMENT ME!
+     */
+    public FeatureClassLoader(final URL[] urls,
+            final ClassLoader parent,
+            final boolean parentFirstDelegation,
+            final String delegationFilterRegex) {
         super(urls, parent);
-        //further checks...
+        // further checks...
         if (urls == null) {
             throw new IllegalArgumentException("No nullpointer allowed for URL[] urls in DynamicCompileClassLoader!");
         }
-        //finally set attributes
+        // finally set attributes
         if (delegationFilterRegex != null) {
             this.filter = Pattern.compile(delegationFilterRegex);
         } else {
@@ -32,16 +59,21 @@ public class FeatureClassLoader extends URLClassLoader {
         this.parentFirstDelegation = parentFirstDelegation;
     }
 
+    //~ Methods ----------------------------------------------------------------
+
     /**
-     * 
-     * @param name
-     * @return
-     * @throws java.lang.ClassNotFoundException
+     * DOCUMENT ME!
+     *
+     * @param   name  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ClassNotFoundException  DOCUMENT ME!
      */
     @Override
     public final synchronized Class<?> loadClass(final String name) throws ClassNotFoundException {
         Class loadedClass;
-        final boolean filtered = (filter != null && filter.matcher(name).matches());
+        final boolean filtered = ((filter != null) && filter.matcher(name).matches());
         if (parentFirstDelegation == filtered) {
             try {
                 // First check whether it's already been loaded, if so use it
@@ -67,17 +99,22 @@ public class FeatureClassLoader extends URLClassLoader {
     }
 
     /**
-     * 
-     * @param name
-     * @param clazz
-     * @param findInterfacesAllowed
-     * @return
-     * @throws java.lang.ClassNotFoundException
+     * DOCUMENT ME!
+     *
+     * @param   name                   DOCUMENT ME!
+     * @param   clazz                  DOCUMENT ME!
+     * @param   findInterfacesAllowed  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ClassNotFoundException  DOCUMENT ME!
      */
-    public Class<?> loadAssignableClass(final String name, final Class<?> clazz, boolean findInterfacesAllowed) throws ClassNotFoundException {
+    public Class<?> loadAssignableClass(final String name, final Class<?> clazz, final boolean findInterfacesAllowed)
+            throws ClassNotFoundException {
         final Class loadedClass = loadClass(name);
         if (clazz != null) {
-            if (loadedClass != null && clazz.isAssignableFrom(loadedClass) && (findInterfacesAllowed || !clazz.isInterface())) {
+            if ((loadedClass != null) && clazz.isAssignableFrom(loadedClass)
+                        && (findInterfacesAllowed || !clazz.isInterface())) {
                 return loadedClass;
             }
         } else {

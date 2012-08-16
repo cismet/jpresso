@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * ConnectionEditor.java
  *
@@ -5,71 +12,121 @@
  */
 package de.cismet.jpresso.project.gui.editors;
 
+import java.util.List;
+import java.util.Properties;
+
+import javax.swing.text.Document;
+
 import de.cismet.jpresso.core.data.DatabaseConnection;
 import de.cismet.jpresso.core.data.SQLRun;
 import de.cismet.jpresso.core.utils.TypeSafeCollections;
-import java.util.List;
-import java.util.Properties;
-import javax.swing.text.Document;
 
 /**
- * @author  srichter
- * @author  hell
+ * DOCUMENT ME!
+ *
+ * @author   srichter
+ * @author   hell
+ * @version  $Revision$, $Date$
  */
 public final class SQLEditor extends TopComponentFinderPanel {
 
-    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
-    private SQLRun run;
+    //~ Static fields/initializers ---------------------------------------------
+
     private static final String SPLIT_PATTERN = ";[\\s]*\n";
 
-    /** Creates new form ConnectionEditor */
+    //~ Instance fields --------------------------------------------------------
+
+    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+    private SQLRun run;
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel pnlMain;
+    private javax.swing.JScrollPane scpSourceParam;
+    private javax.swing.JEditorPane txtSQLEditor;
+    private javax.swing.JTextField txtSourceDriver;
+    private javax.swing.JTextArea txtSourceParam;
+    private javax.swing.JTextField txtSourceUrl;
+    // End of variables declaration//GEN-END:variables
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates new form ConnectionEditor.
+     */
     public SQLEditor() {
         this(null);
         myInit();
     }
 
+    /**
+     * Creates a new SQLEditor object.
+     *
+     * @param  s  DOCUMENT ME!
+     */
     public SQLEditor(final SQLRun s) {
         this.run = s;
         initComponents();
         myInit();
         setContent(this.run);
-
     }
 
-    public void myInit() {
+    //~ Methods ----------------------------------------------------------------
 
+    /**
+     * DOCUMENT ME!
+     */
+    public void myInit() {
         txtSourceParam.setEditable(false);
         txtSourceDriver.setEnabled(false);
         txtSourceUrl.setEnabled(false);
         txtSourceParam.setEnabled(false);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public SQLRun getContent() {
         final SQLRun newrun = new SQLRun();
         final List<String> stmnt = TypeSafeCollections.newArrayList();
         final String[] token = txtSQLEditor.getText().trim().split(SPLIT_PATTERN);
         String toAdd = null;
-        for (String s : token) {
+        for (final String s : token) {
             toAdd = s.trim();
             if (toAdd.length() > 1) {
                 stmnt.add(toAdd);
             }
         }
-        if (toAdd != null && toAdd.length() > 2 && toAdd.endsWith(";")) {
+        if ((toAdd != null) && (toAdd.length() > 2) && toAdd.endsWith(";")) {
             stmnt.set(stmnt.size() - 1, toAdd.substring(0, toAdd.length() - 1));
         }
         newrun.setScript(stmnt);
-        log.debug("SQL Content:");
-        for (String st : stmnt) {
-            log.debug("SCRIPT: " + st);
+        if (log.isDebugEnabled()) {
+            log.debug("SQL Content:");
+        }
+        for (final String st : stmnt) {
+            if (log.isDebugEnabled()) {
+                log.debug("SCRIPT: " + st);
+            }
         }
         return newrun;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  run  DOCUMENT ME!
+     */
     public void setContent(final SQLRun run) {
-
-        if (run != null && run.getConnection() != null) {
-        final DatabaseConnection source = run.getConnection();
+        if ((run != null) && (run.getConnection() != null)) {
+            final DatabaseConnection source = run.getConnection();
             txtSourceDriver.setText(source.getDriverClass());
             txtSourceUrl.setText(source.getUrl());
             final StringBuilder sb = new StringBuilder();
@@ -79,11 +136,12 @@ public final class SQLEditor extends TopComponentFinderPanel {
                 sb.append(";\n");
             }
             txtSQLEditor.setText(sb.toString().trim());
-            //Fehlerquelle?
+            // Fehlerquelle?
             String sParams = "";
             final Properties p = source.getProps();
             for (final String txt : p.stringPropertyNames()) {
-                sParams = new StringBuffer(sParams).append(txt).append(":=").append(p.getProperty(txt)).append("\n").toString();
+                sParams = new StringBuffer(sParams).append(txt).append(":=").append(p.getProperty(txt)).append("\n")
+                            .toString();
             }
 //            while (sProp.hasMoreElements()) {
 //                Prop p = (Prop) sProp.nextElement();
@@ -96,13 +154,12 @@ public final class SQLEditor extends TopComponentFinderPanel {
             txtSourceUrl.setText("");
             txtSourceParam.setText("");
         }
-    //}
+        // }
     }
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
+     * content of this method is always regenerated by the Form Editor.
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -125,12 +182,30 @@ public final class SQLEditor extends TopComponentFinderPanel {
         setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         setLayout(new java.awt.BorderLayout());
 
-        pnlMain.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(null, "SQLRun Editor", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        pnlMain.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createTitledBorder(
+                    null,
+                    "SQLRun Editor",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                    new java.awt.Font("Dialog", 0, 12),
+                    javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")),
+                javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         pnlMain.setLayout(new java.awt.BorderLayout());
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
 
-        scpSourceParam.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(null, "Additional Parameter", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")), javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5), javax.swing.BorderFactory.createEtchedBorder())));
+        scpSourceParam.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createTitledBorder(
+                    null,
+                    "Additional Parameter",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                    new java.awt.Font("Dialog", 0, 12),
+                    javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")),
+                javax.swing.BorderFactory.createCompoundBorder(
+                    javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5),
+                    javax.swing.BorderFactory.createEtchedBorder())));
 
         txtSourceParam.setBackground(java.awt.SystemColor.control);
         scpSourceParam.setViewportView(txtSourceParam);
@@ -145,7 +220,15 @@ public final class SQLEditor extends TopComponentFinderPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         jPanel2.add(scpSourceParam, gridBagConstraints);
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(null, "URL", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        jPanel4.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createTitledBorder(
+                    null,
+                    "URL",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                    new java.awt.Font("Dialog", 0, 12),
+                    javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")),
+                javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         jPanel4.setLayout(new java.awt.BorderLayout());
 
         txtSourceUrl.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -161,16 +244,26 @@ public final class SQLEditor extends TopComponentFinderPanel {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         jPanel2.add(jPanel4, gridBagConstraints);
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(null, "Driver", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        jPanel5.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createTitledBorder(
+                    null,
+                    "Driver",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                    new java.awt.Font("Dialog", 0, 12),
+                    javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")),
+                javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         jPanel5.setLayout(new java.awt.BorderLayout());
 
         txtSourceDriver.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         txtSourceDriver.setEnabled(false);
         txtSourceDriver.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtSourceDriverActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    txtSourceDriverActionPerformed(evt);
+                }
+            });
         jPanel5.add(txtSourceDriver, java.awt.BorderLayout.CENTER);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -185,7 +278,15 @@ public final class SQLEditor extends TopComponentFinderPanel {
 
         jPanel3.setLayout(new java.awt.GridBagLayout());
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(null, "SQL Editor", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12), javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        jPanel1.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createTitledBorder(
+                    null,
+                    "SQL Editor",
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION,
+                    new java.awt.Font("Dialog", 0, 12),
+                    javax.swing.UIManager.getDefaults().getColor("CheckBoxMenuItem.selectionBackground")),
+                javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         jScrollPane1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -205,30 +306,30 @@ public final class SQLEditor extends TopComponentFinderPanel {
         pnlMain.add(jPanel3, java.awt.BorderLayout.CENTER);
 
         add(pnlMain, java.awt.BorderLayout.CENTER);
-    }// </editor-fold>//GEN-END:initComponents
-    private void txtSourceDriverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSourceDriverActionPerformed
+    } // </editor-fold>//GEN-END:initComponents
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void txtSourceDriverActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_txtSourceDriverActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_txtSourceDriverActionPerformed
+    } //GEN-LAST:event_txtSourceDriverActionPerformed
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JPanel pnlMain;
-    private javax.swing.JScrollPane scpSourceParam;
-    private javax.swing.JEditorPane txtSQLEditor;
-    private javax.swing.JTextField txtSourceDriver;
-    private javax.swing.JTextArea txtSourceParam;
-    private javax.swing.JTextField txtSourceUrl;
-    // End of variables declaration//GEN-END:variables
-
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Document getStatementDocument() {
         return txtSQLEditor.getDocument();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  dc  DOCUMENT ME!
+     */
     public void setDatabaseConnection(final DatabaseConnection dc) {
         DatabaseConnection con = dc;
         if (con == null) {
@@ -239,15 +340,26 @@ public final class SQLEditor extends TopComponentFinderPanel {
         final Properties p = con.getProps();
         String sParams = "";
         for (final String txt : p.stringPropertyNames()) {
-            sParams = new StringBuffer(sParams).append(txt).append(":=").append(p.getProperty(txt)).append("\n").toString();
+            sParams = new StringBuffer(sParams).append(txt).append(":=").append(p.getProperty(txt)).append("\n")
+                        .toString();
         }
         txtSourceParam.setText(sParams);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public SQLRun getRun() {
         return run;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  run  DOCUMENT ME!
+     */
     public void setRun(final SQLRun run) {
         this.run = run;
     }
