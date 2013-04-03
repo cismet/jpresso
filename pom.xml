@@ -16,6 +16,13 @@
 
     <name>JPresso NetBeans</name>
     <description>JPresso is an ETL Tool based on the NetBeans Rich Client Platform</description>
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License</name>
+            <distribution>repo</distribution>
+            <url>http://www.gnu.org/licenses/lgpl-3.0.html</url>
+        </license>
+    </licenses>
 
     <developers>
         <developer>
