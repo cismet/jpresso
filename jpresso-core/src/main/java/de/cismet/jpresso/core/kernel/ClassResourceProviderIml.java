@@ -38,6 +38,7 @@ import de.cismet.jpresso.core.utils.TypeSafeCollections;
  * @version  $Revision$, $Date$
  */
 public class ClassResourceProviderIml implements ClassResourceProvider {
+
     //~ Static fields/initializers ---------------------------------------------
 
     // regular expression to find the assigner base's classname public static final String ASSIGNER_BASE_FILTER = "^" +

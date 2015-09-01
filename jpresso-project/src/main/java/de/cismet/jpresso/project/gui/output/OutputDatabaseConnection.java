@@ -564,8 +564,8 @@ public class OutputDatabaseConnection extends TopComponentFinderPanel {
                 tf.setName(rs.getString(4));
                 tf.setTableName(tablename);
                 tf.setType(rs.getString(6));
-                table.add(tf);    // new DefaultMutableTreeNode(rs.getString(4)+"
-                                  // ["+rs.getString(6)+"("+rs.getString(7)+"), "+rs.getString(18)+"]"));
+                table.add(tf); // new DefaultMutableTreeNode(rs.getString(4)+"
+                               // ["+rs.getString(6)+"("+rs.getString(7)+"), "+rs.getString(18)+"]"));
             }
         } catch (Exception e) {
         }
@@ -756,8 +756,7 @@ public class OutputDatabaseConnection extends TopComponentFinderPanel {
                         || (getType().toLowerCase().indexOf("text") != -1)
                         || (getType().toLowerCase().indexOf("date") != -1)
                         || (getType().toLowerCase().indexOf("time") != -1)
-                        ||
-                        // (getType().toLowerCase().indexOf("geometry") != -1) ||
+                        ||// (getType().toLowerCase().indexOf("geometry") != -1) ||
                         (getType().toLowerCase().indexOf("timestamp") != -1)) {
                 return true;
             } else {

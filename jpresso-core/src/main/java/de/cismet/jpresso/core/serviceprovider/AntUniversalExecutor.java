@@ -89,7 +89,7 @@ public interface AntUniversalExecutor {
     String getProjDir();
 
     /**
-     * Tests the given jobs
+     * Tests the given jobs.
      *
      * @param   names  DOCUMENT ME!
      *

@@ -114,7 +114,11 @@ public final class DatabaseConnection implements JPLoadable {
     }
 // </editor-fold>
 
+    // private transient DatabaseConnection connection; + getConnection baut verbindung auf?
+
     //~ Instance fields --------------------------------------------------------
+
+// </editor-fold>
 
     // private transient DatabaseConnection connection; + getConnection baut verbindung auf?
     @XStreamAlias("DriverClass")

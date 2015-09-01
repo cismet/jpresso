@@ -56,19 +56,19 @@ public class ConvertWizardPanel1 implements WizardDescriptor.Panel {
     public HelpCtx getHelp() {
         // Show no Help button for this panel:
         return HelpCtx.DEFAULT_HELP;
-        // If you have context help:
-        // return new HelpCtx(SampleWizardPanel1.class);
+            // If you have context help:
+            // return new HelpCtx(SampleWizardPanel1.class);
     }
 
     @Override
     public boolean isValid() {
         // If it is always OK to press Next or Finish, then:
         return true;
-        // If it depends on some condition (form filled out...), then:
-        // return someCondition();
-        // and when this condition changes (last form field filled in...) then:
-        // fireChangeEvent();
-        // and uncomment the complicated stuff below.
+            // If it depends on some condition (form filled out...), then:
+            // return someCondition();
+            // and when this condition changes (last form field filled in...) then:
+            // fireChangeEvent();
+            // and uncomment the complicated stuff below.
     }
 
     @Override

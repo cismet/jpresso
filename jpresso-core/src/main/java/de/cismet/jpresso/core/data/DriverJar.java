@@ -34,17 +34,12 @@ public class DriverJar {
     /**
      * <editor-fold defaultstate="collapsed" desc="Constructors">.
      *
-     * @param   jarFile           DOCUMENT ME!
-     * @param   driverClassNames  DOCUMENT ME!
-     *
-     * @throws  NullPointerException  DOCUMENT ME!
+     * @param  jarFile           DOCUMENT ME!
+     * @param  driverClassNames  DOCUMENT ME!
      */
     public DriverJar(final File jarFile, final Set<String> driverClassNames) {
-        if (jarFile == null) {
-            throw new NullPointerException("JarFile can not be null!");
-        }
-        this.jarFile = jarFile;
-        setDriverClassNames(driverClassNames);
+        this.SetJarFile(jarFile);
+        this.setDriverClassNames(driverClassNames);
     }
 
     /**
@@ -54,6 +49,13 @@ public class DriverJar {
      */
     public DriverJar(final File jarFile) {
         this(jarFile, null);
+    }
+
+    /**
+     * Creates a new DriverJar object.
+     */
+    public DriverJar() {
+        this(null, null);
     }
 
 // </editor-fold>
@@ -70,6 +72,15 @@ public class DriverJar {
     /**
      * DOCUMENT ME!
      *
+     * @param  jarFile  DOCUMENT ME!
+     */
+    public final void SetJarFile(final File jarFile) {
+        this.jarFile = jarFile;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @return  DOCUMENT ME!
      */
     public Set<String> getDriverClassNames() {
@@ -81,7 +92,7 @@ public class DriverJar {
      *
      * @param  driverClassNames  DOCUMENT ME!
      */
-    public void setDriverClassNames(final Set<String> driverClassNames) {
+    public final void setDriverClassNames(final Set<String> driverClassNames) {
         if (driverClassNames != null) {
             this.driverClassNames = driverClassNames;
         } else {
@@ -95,7 +106,7 @@ public class DriverJar {
 
     @XStreamAlias("file")
     @XStreamAsAttribute
-    private final File jarFile;
+    private File jarFile;
     @XStreamAlias("DriverClasses")
     private Set<String> driverClassNames;
     // is the jar file valid/existing/a file

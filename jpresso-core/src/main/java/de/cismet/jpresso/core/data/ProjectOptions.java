@@ -162,7 +162,11 @@ public final class ProjectOptions implements JPLoadable {
     }
 // </editor-fold>
 
+    // private String name;
+
     //~ Instance fields --------------------------------------------------------
+
+// </editor-fold>
 
     // private String name;
     @XStreamAlias("AdditionalClassPath")

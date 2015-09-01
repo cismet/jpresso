@@ -54,11 +54,7 @@ public final class ConnectionTopComponent extends AbstractJPTopComponent<Connect
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JToolBar jToolBar1;
 
-    //~ Instance fields --------------------------------------------------------
-
     private ConnectionEditor dbe;
-
-    //~ Constructors -----------------------------------------------------------
 
     /**
      * private ConnectionDataObject data;
@@ -80,8 +76,6 @@ public final class ConnectionTopComponent extends AbstractJPTopComponent<Connect
             }
         }
     }
-
-    //~ Methods ----------------------------------------------------------------
 
     /**
      * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
@@ -159,6 +153,9 @@ public final class ConnectionTopComponent extends AbstractJPTopComponent<Connect
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
     } // </editor-fold>//GEN-END:initComponents
+
+    //~ Methods ----------------------------------------------------------------
+
     /**
      * DOCUMENT ME!
      *

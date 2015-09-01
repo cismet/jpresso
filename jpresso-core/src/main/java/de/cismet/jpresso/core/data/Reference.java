@@ -22,6 +22,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
  */
 @XStreamAlias("Reference")
 public final class Reference {
+
     //~ Static fields/initializers ---------------------------------------------
 
     // <editor-fold defaultstate="collapsed" desc="Constructors">
