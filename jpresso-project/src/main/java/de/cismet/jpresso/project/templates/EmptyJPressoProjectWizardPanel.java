@@ -39,8 +39,8 @@ public class EmptyJPressoProjectWizardPanel implements WizardDescriptor.Panel,
 
     private WizardDescriptor wizardDescriptor;
     private EmptyJPressoProjectPanelVisual component;
-    private final Set<ChangeListener> listeners = TypeSafeCollections.newHashSet(1);    // or can use ChangeSupport in
-                                                                                        // NB 6.0
+    private final Set<ChangeListener> listeners = TypeSafeCollections.newHashSet(1); // or can use ChangeSupport in
+                                                                                     // NB 6.0
 
     //~ Constructors -----------------------------------------------------------
 

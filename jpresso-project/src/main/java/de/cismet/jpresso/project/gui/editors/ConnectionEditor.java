@@ -63,13 +63,9 @@ public final class ConnectionEditor extends TopComponentFinderPanel {
     private javax.swing.JTextArea txtTargetParam;
     private javax.swing.JTextField txtTargetUrl;
 
-    //~ Instance fields --------------------------------------------------------
-
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private DatabaseConnection tgt;
     private DriverDescription lastChosenDD;
-
-    //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates new form ConnectionEditor.
@@ -88,8 +84,6 @@ public final class ConnectionEditor extends TopComponentFinderPanel {
         initComponents();
         setContent(t);
     }
-
-    //~ Methods ----------------------------------------------------------------
 
     /**
      * DOCUMENT ME!
@@ -363,6 +357,8 @@ public final class ConnectionEditor extends TopComponentFinderPanel {
 
         add(pnlMain, java.awt.BorderLayout.CENTER);
     } // </editor-fold>//GEN-END:initComponents
+
+    //~ Methods ----------------------------------------------------------------
 
     /**
      * DOCUMENT ME!

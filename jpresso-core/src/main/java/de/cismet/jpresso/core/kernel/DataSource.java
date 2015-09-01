@@ -19,7 +19,7 @@ package de.cismet.jpresso.core.kernel;
  */
 public interface DataSource extends Iterable<String[]> {
 
-    //~ Static fields/initializers ---------------------------------------------
+    //~ Instance fields --------------------------------------------------------
 
     int NO_FETCH_SIZE = -712345;
     String FETCH_SIZE_PROPERTY = "fetchSize";

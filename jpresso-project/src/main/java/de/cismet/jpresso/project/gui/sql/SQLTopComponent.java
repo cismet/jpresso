@@ -91,12 +91,8 @@ public final class SQLTopComponent extends AbstractJPTopComponent<SQLDataObject>
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JToolBar jToolBar1;
 
-    //~ Instance fields --------------------------------------------------------
-
     private SQLEditor se;
     private ConnectionDataObject currentConnection;
-
-    //~ Constructors -----------------------------------------------------------
 
     /**
      * blocks combobox listener during init.
@@ -166,8 +162,6 @@ public final class SQLTopComponent extends AbstractJPTopComponent<SQLDataObject>
             };
         jSplitPane1.setTransferHandler(th);
     }
-
-    //~ Methods ----------------------------------------------------------------
 
     /**
      * DOCUMENT ME!
@@ -343,6 +337,8 @@ public final class SQLTopComponent extends AbstractJPTopComponent<SQLDataObject>
 
         add(jSplitPane1, java.awt.BorderLayout.CENTER);
     } // </editor-fold>//GEN-END:initComponents
+
+    //~ Methods ----------------------------------------------------------------
 
     /**
      * DOCUMENT ME!
